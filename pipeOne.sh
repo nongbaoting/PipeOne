@@ -110,10 +110,8 @@ if [ $HELP -eq 1 ]; then
 	exit 1
 fi
 
-
 baseDir=$(dirname "$0")
 workDir=$(pwd)
-
 
 
 if [  "$genome" == '' ] || [ "$reads" == '' ]; then
@@ -122,11 +120,9 @@ if [  "$genome" == '' ] || [ "$reads" == '' ]; then
 	
 fi
 
-
 reads_basename=$(basename $reads)
 reads="$(dirname $(realpath $reads))/${reads_basename}"
 echo $reads
-
 
 
 s1_Dir=${workDir}/s1_lncRNA
@@ -160,7 +156,7 @@ nextflow run ${baseDir}/s6_rnaEditing.nf -resume -profile $profile --genome $gen
 
 s7_Dir=${workDir}/s7_alternative_splicing
 mkdir -p $s7_Dir; cd $s7_Dir
-# nextflow run ${baseDir}/s7_alternative_splicing.nf -resume -profile $profile --genome $genome --reads $reads --cleaned  $cleaned
+nextflow run ${baseDir}/s7_alternative_splicing.nf -resume -profile $profile --genome $genome --reads $reads --cleaned  $cleaned
 
 s8_Dir=${workDir}/s8_SNP
 mkdir -p $s8_Dir; cd $s8_Dir
