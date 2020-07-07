@@ -4,7 +4,7 @@ params.reads = ""
 // "/public1/pub/guohh/other/mouse_fatty/00_rawdata/*.fastq.gz"
 params.sra   = ""
 params.hisat2_bam = ""
-params.genome ="hg19"
+params.genome =""
 params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : false
 params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
 params.bwa_index = params.genome ? params.genomes[ params.genome ].bwa_index ?:false :false
@@ -226,9 +226,9 @@ process CIRI_full{
 	
 	script:
 	"""
-	java -jar /dat1/apps/CIRI-full_v2.0/CIRI-full.jar Pipeline -1 ${reads_1 } -2 ${reads_2} -a ${gtf} -r /dat1/dat/ref/hg38/hg38+gencode.v32/bwa_index_ln/hg38.fa -d ${id}_output/ -o ${id} -t 16
+	java -jar /opt/CIRI-full_v2.0/CIRI-full.jar Pipeline -1 ${reads_1 } -2 ${reads_2} -a ${gtf} -r /dat1/dat/ref/hg38/hg38+gencode.v32/bwa_index_ln/hg38.fa -d ${id}_output/ -o ${id} -t 16
 	unset DISPLAY
-	java -jar /dat1/apps/CIRI-full_v2.0/CIRI-vis.jar -i ${id}_output/CIRI-full_output/${id}_merge_circRNA_detail.anno -l ${id}_output/CIRI-AS_output/${id}_library_length.list -r /dat1/dat/ref/hg38/hg38+gencode.v32/bwa_index_ln/hg38.fa -d ${id}_output/CIRI-vis_out -min 1
+	java -jar /opt/CIRI-full_v2.0/CIRI-vis.jar -i ${id}_output/CIRI-full_output/${id}_merge_circRNA_detail.anno -l ${id}_output/CIRI-AS_output/${id}_library_length.list -r /dat1/dat/ref/hg38/hg38+gencode.v32/bwa_index_ln/hg38.fa -d ${id}_output/CIRI-vis_out -min 1
 	
 	rm -rf ${id}_output/sam
     """

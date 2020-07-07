@@ -12,14 +12,14 @@
 ## Reference
 
 
-## Running
+## Quick start
 
-Run all in one
+__Run all in one__
 ```
 bash /dsk2/who/nbt/pipe/lncRNA/pipeOne.sh --reads "../reads/testRaw/*_{1,2}.fq.gz" --genome hg38_124 --cleaned true --profile docker
 ```
 
-
+__run each model step by step__
 ```
 
 ```

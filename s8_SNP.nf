@@ -294,22 +294,6 @@ process picard_AddOrReplaceReadGroups_MarkDuplicates {
 }
 
 
-// process picard_MarkDuplicates{
-	
-	
-	// """
-	// java -Djava.io.tmpdir=/home/anlan/tmp -Xmx10g -jar ~/biosoft/picard/picard.jar MarkDuplicates \
-		// I=SRR3589959_sorted.bam \
-		// O=SRR3589959_sorted_maked.bam \
-		// CREATE_INDEX=true \
-		// VALIDATION_STRINGENCY=SILENT \
-		// METRICS_FILE=SRR3589959.metrics
-	// java -jar picard.jar MarkDuplicates \
-	// I=rg_added_sorted.bam O=dedupped.bam  CREATE_INDEX=true VALIDATION_STRINGENCY=SILENT M=output.metrics 
-	// """
-// }
-
-
 process SplitNCigarReads  {
 	
 	input:
@@ -324,7 +308,7 @@ process SplitNCigarReads  {
 	
 	"""
 	set +u; source activate gatk3.8; set -u
-	java -jar ${GenomeAnalysisTK} -T SplitNCigarReads \
+	java -jar ${params.GenomeAnalysisTK} -T SplitNCigarReads \
 		-R ${fasta} -I dedupped.bam -o ${id}.split.bam \
 		-rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS
 
@@ -344,7 +328,7 @@ process  Variant_calling {
 	
 	"""
 	set +u; source activate gatk3.8; set -u
-	java -jar ${GenomeAnalysisTK} -T HaplotypeCaller \
+	java -jar ${params.GenomeAnalysisTK} -T HaplotypeCaller \
 		-R ${fasta} -I ${split_bam} \
 		-dontUseSoftClippedBases -stand_call_conf 20.0 \
 		-o ${id}.vcf
@@ -375,41 +359,6 @@ process  Variant_filtering {
 	"""
 }
 
-
-/*
-process variantAnnotatesnpEff {
-	errorStrategy 'ignore'
-	maxRetries 1
-	
-    tag "$name"
-    publishDir "${params.outdir}/SNPEff_AnnotatedVariants/", mode: 'copy', 
-    saveAs: {filename -> params.saveIntermediateVariants ? "$filename" : null }
-
-    input:
-    set id, "${id}.output.vcf", "${id}.output.vcf.idx" from vcf_filter_out_snpEff
-
-    output:
-    file "*.{snpeff}" into combined_variants_gatk_snpeff
-    file '.command.log' into snpeff_stdout
-    file 'SnpEffStats.csv' into snpeff_results
-
-    script:
-    """
-	set +u; source activate gatk3.8; set -u
-	snpEff \\
-        -c /usr/local/lib/snpEff/snpEff.config \\
-        -i vcf \\
-        -csvStats SnpEffStats.csv \\
-        -o gatk \\
-        -o vcf \\
-        -filterInterval $params.target_bed GRCh37.75 $phased_vcf \\
-            > ${name}_combined_phased_variants.snpeff 
-        
-        # Print version number to standard out
-        echo "GATK version "\$(snpEff -version 2>&1)
-    """
-}
-*/
 
 
 gene_based='refGene'
@@ -446,28 +395,3 @@ process variantAnnotateAnnovar {
 	
 }
 
-
-/*
-process variantAnnotateGATK{     
-    tag "$name"
-    publishDir "${params.outdir}/GATK_AnnotatedVariants", mode: 'copy'
-
-    input:
-    set file(phased_vcf), file(phased_vcf_ind) from combined_variants_gatk
-    file(phased_vcf_snpeff) from combined_variants_gatk_snpeff
-
-    output:
-    file "*.{vcd,idx}"
-
-    script:
-    """
-    gatk -T VariantAnnotator \\
-        -R $params.gfasta \\
-        -A SnpEff \\
-        --variant $phased_vcf \\
-        --snpEffFile ${name}_combined_phased_variants.snpeff \\
-        --out ${name}_combined_phased_annotated_variants.vcf
-    """
-}
-
-*/

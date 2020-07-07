@@ -31,22 +31,25 @@ def lncRNA_mRNA(tpm, lnc_info):
     fo_lnc.close()
     fo_prot.close()
 
+def cp_and_mark_table():
+    pass
+
 class RUN:
 
     def merge(self,):
         home = os.path.dirname(__file__)
         ## 1,2 lncRNA mRNA
-        # lncRNA_mRNA("../s1_lncRNA/results/salmon/salmon_gene_tpm.tsv", "../s1_lncRNA/results/novel_lncRNA/all_lncRNA_info.tsv")
+        lncRNA_mRNA("../s1_lncRNA/results/salmon/salmon_gene_tpm.tsv", "../s1_lncRNA/results/novel_lncRNA/all_lncRNA_info.tsv")
 
         ## s3 APA
-        # os.system(f"Rscript {home}/apa_3utr_filter.R")
+        os.system(f"Rscript {home}/apa_3utr_filter.R")
         ## s4 retro
         os.system("mkdir -p s4_retrotranscriptome")
         os.system(f"cp ../s4_retrotranscriptome/results/telescope/telescope.FPKM-divide_totalMapReads.csv s4_retrotranscriptome/FPKM-divide_totalMapReads.csv")
 
         ## s5 Fusion
-        # os.system("mkdir -p s5_fusion")
-        # os.system(f"cp ../s5_fusion/results/arriba/fusion_arriba_out.tsv s5_fusion/fusion_arriba_out.tsv")
+        os.system("mkdir -p s5_fusion")
+        os.system(f"cp ../s5_fusion/results/arriba/fusion_arriba_out.tsv s5_fusion/fusion_arriba_out.tsv")
 
         ## s6_rnaEditing
         os.system("mkdir -p s6_rnaEditing")
@@ -54,11 +57,11 @@ class RUN:
 
         ## s7
         os.system("mkdir -p s7_alternative_splicing")
-        os.system(f"cp ../s7_alternative_splicing/ s7_alternative_splicing/")
+        os.system(f"cp ../../s7_alternative_splicing/results/spladder_out_table/*confirmed.psi.txt.gz s7_alternative_splicing/")
 
         ## s8_SNP
         os.system("mkdir -p s8_SNP")
-        os.system(f"cp ../s8_SNP/ s8_SNP/")
+        #os.system(f"cp ../s8_SNP/ s8_SNP/")
 
 
 if __name__ == '__main__':

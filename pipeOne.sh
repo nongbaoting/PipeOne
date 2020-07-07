@@ -124,10 +124,12 @@ reads_basename=$(basename $reads)
 reads="$(dirname $(realpath $reads))/${reads_basename}"
 echo $reads
 
-
+read -r -d '' run_all << EOM
 s1_Dir=${workDir}/s1_lncRNA
 mkdir -p $s1_Dir; cd $s1_Dir
-nextflow run ${baseDir}/s1_lncRNA.nf -resume -profile $profile --genome $genome --reads $reads --cleaned $cleaned
+run_lncRNA=(nextflow run ${baseDir}/s1_lncRNA.nf -resume -profile $profile --genome $genome --reads $reads --cleaned $cleaned)
+echo "${run_lncRNA[@]}" >../run_pipOne.sh
+"${run_lncRNA[@]}"
 
 if [ "$cleaned" != "true" ]; then
 	reads="../s1_lncRNA/results/fastp/clean/*.R{1,2}.fastp.fq.gz"
@@ -137,7 +139,8 @@ fi
 
 s2_Dir=${workDir}/s2_circRNA
 mkdir -p $s2_Dir; cd $s2_Dir
-#nextflow run ${baseDir}/s2_circRNA.nf -resume -profile $profile --genome $genome --reads $reads --cleaned $cleaned
+nextflow run ${baseDir}/s2_circRNA_full.nf -resume -profile $profile --genome $genome --reads $reads --cleaned $cleaned
+
 s3_Dir=${workDir}/s3_APA-3TUR
 mkdir -p $s3_Dir; cd $s3_Dir
 nextflow run ${baseDir}/s3_APA-3TUR.nf -resume -profile $profile --genome $genome --reads $reads --cleaned $cleaned
@@ -161,3 +164,5 @@ nextflow run ${baseDir}/s7_alternative_splicing.nf -resume -profile $profile --g
 s8_Dir=${workDir}/s8_SNP
 mkdir -p $s8_Dir; cd $s8_Dir
 nextflow run ${baseDir}/s8_SNP.nf -resume -profile $profile --genome $genome --bam "../s7_alternative_splicing/results/star2pass/*.bam" 
+EOM
+echo "$run_all"
