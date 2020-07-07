@@ -1,9 +1,0 @@
-site_name: PipeOne
-nav:
-    - Home: index.md
-    - 安装与配置:  installation.md
-    - 快速开始: quickstart.md
-    - 使用说明: documentation.md
-    - 关于: about.md
-
-theme: readthedocs
