@@ -2,7 +2,7 @@
 
 params.tables = ""
 params.sample_info = ""
-params.threads = 12
+params.threads = 4
 
 if ( params.sample_info ){
     sample_info = file(params.sample_info)

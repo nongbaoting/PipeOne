@@ -713,7 +713,7 @@ if( params.datainfo && params.featureCounts ){
 	datainfo = file(params.datainfo)
 	process DEG_by_DESeq2_with_featureCounts {
 		publishDir "${params.outdir}/deg_DESeq2/featureCounts/", mode: 'copy'
-		label 'local'
+		
 		input:
 		file 'merged_gene_counts.txt' from featureCounts_res.collect()
 		file "all_lncRNA.list" from cal_deg_ch.collect()
@@ -826,7 +826,7 @@ if (params.reads){
 		
 		process DEG_by_DESeq2_with_salmon {
 			publishDir "${params.outdir}/deg_DESeq2/salmon/", mode: 'copy'
-			label 'local'
+			
 			input:
 			
 			file "all_lncRNA.list" from cal_deg_ch_1.collect()

@@ -10,6 +10,9 @@ __主要的三部分模块都是可以独立运行的，只要提供相应的输
 * 包含个类型数据的文件夹, 每种数据都是以csv格式
 
 #### 分步骤运行
+
+
+
 * 取 top N variance features
 ```
 source activate pipeone

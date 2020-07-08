@@ -6,7 +6,7 @@
 ```
 mkdir pipeone_raw
 cd pipeone_raw
-bash /dsk2/who/nbt/pipe/lncRNA/pipeOne.sh --reads "../reads/testRaw/*_{1,2}.fq.gz" --genome hg38_124 --cleaned true --profile docker
+bash /your/path/to/PipeOne/pipeOne.sh --reads "../reads/testRaw/*_{1,2}.fq.gz" --genome hg38 --cleaned true --profile docker
 ```
 
 #### 2. 寻找重要特征
@@ -20,7 +20,7 @@ nextflow run PipeOne/ml_randomForest.nf  --sample_info ../s1_sample_info-tumor-n
 结果文件:
 results/data/feature_importance.csv
 results/data/feature_importance-addName.csv
-results/data/discriminative_power_of_topk_feature.csv
+results/data/discriminative_power_of_topk_feature.csv 
 
 #### 3. 癌症亚型分析
 
@@ -31,5 +31,5 @@ nextflow run
 
 ```
 
-### [详细说明文档](../documentation)
+__[详细使用说明](../../documentation/documentation)__
 

@@ -124,7 +124,7 @@ reads_basename=$(basename $reads)
 reads="$(dirname $(realpath $reads))/${reads_basename}"
 echo $reads
 
-read -r -d '' run_all << EOM
+#read -r -d '' run_all << EOM
 s1_Dir=${workDir}/s1_lncRNA
 mkdir -p $s1_Dir; cd $s1_Dir
 run_lncRNA=(nextflow run ${baseDir}/s1_lncRNA.nf -resume -profile $profile --genome $genome --reads $reads --cleaned $cleaned)
@@ -164,5 +164,6 @@ nextflow run ${baseDir}/s7_alternative_splicing.nf -resume -profile $profile --g
 s8_Dir=${workDir}/s8_SNP
 mkdir -p $s8_Dir; cd $s8_Dir
 nextflow run ${baseDir}/s8_SNP.nf -resume -profile $profile --genome $genome --bam "../s7_alternative_splicing/results/star2pass/*.bam" 
-EOM
-echo "$run_all"
+
+#EOM
+#echo "$run_all"
