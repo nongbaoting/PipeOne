@@ -3,9 +3,25 @@
 # @Time    : 2019/12/17 20:38
 # @author  : Baoting Nong'
 # @email   : 523135753@qq.com'
-import fire, os
-import  re
+import fire, os, csv
+import re
 from collections import defaultdict
+import pandas as pd
+
+def annovar_res(variant_function_fi):
+    md = defaultdict(list)
+    df = pd.read_csv(variant_function_fi, sep="\t", header=None)
+    for index, row in df.iterrows():
+        loc_type, gene, chrom, end_1, end, ref, var = row
+        start = end_1 -1
+        loc_id = f'{chrom}:{start}:{end}'
+        if loc_type == "intergenic":
+            gene= 'NA'
+        else:
+            gene = gene.split("(")[0]
+
+        md[loc_id] = [gene, loc_type ]
+    return md
 
 class RUN:
 
@@ -69,8 +85,8 @@ class RUN:
         with open(tab, 'r') as fr, open(out, 'w') as fo:
             fo.write(next(fr))
             for li in fr:
-                cell = li.strip().split('\t')
-                chrom,start,end = cell[0].split(':')[0:3]
+                cell = li.strip().split(',')
+                loc_type, gene_name,chrom,start,end = cell[0].split(':')[0:3]
                 if f'{chrom}:{start}:{end}' in mydict:
                     continue
                 fo.write(li )
@@ -92,8 +108,6 @@ class RUN:
                     continue
                 fo.write(li )
 
-
-
     def filter_res(self, inbed, tab, out ):
         mydict = defaultdict(int)
 
@@ -105,13 +119,37 @@ class RUN:
         with open(tab, 'r') as fr, open(out, 'w') as fo:
             fo.write(next(fr))
             for li in fr:
-                cell = li.strip().split('\t')
+                cell = li.strip().split(',')
                 chrom,start,end= cell[0:3]
                 if f'{chrom}:{start}:{end}' in mydict:
                     continue
                 fo.write(li)
 
+    def add_res_anno(self, anno, res, out):
+        md = annovar_res(anno)
+        res_df = pd.read_csv(res, sep="\t")
+        header = list(res_df.columns)
+        header.extend(['gene_name', 'loc_type'] )
+        fo_csv = open(out, 'w')
+        csv_writer = csv.writer(fo_csv, delimiter = "," )
+        csv_writer.writerow(header)
+        for index, row in res_df.iterrows():
+            chrom, start, end = row[0:3]
+            id = f'{chrom}:{start}:{end}'
+            row2 = list(row)
+            row2.extend(md[id])
+            csv_writer.writerow(row2)
+        fo_csv.close()
 
+    def add_tab_anno(self, anno, tab, out ):
+        md = annovar_res(anno)
+        res_df = pd.read_csv(tab, sep="\t")
+        for index, id_ in enumerate(list(res_df.iloc[:,0])):
+            gene_name, loc_type = md[id_]
+            new_id = f'{loc_type}:{gene_name}:{id_}'
+            res_df.iloc[index,0] = new_id
+
+        res_df.to_csv(out, index=False)
 
 if __name__ == '__main__':
     fire.Fire(RUN)

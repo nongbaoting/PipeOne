@@ -32,7 +32,7 @@ def get_geneName(feature_name, gdict):
 
 class myResult_summary:
 
-    def feature(self,rf_res_fi, ginfo_fi ):
+    def feature(self,rf_res_fi, ginfo_fi = "/home/nbt2/proj/2020-TCGA/proc/KIRP/s1_lncRNA/results/novel_lncRNA/protein_coding_and_all_lncRNA.info.tsv"):
 
         #rf_res_fi = "/home/nbt2/proj/2020-TCGA/proc/KIRP/00_tables/pipeOne/FeatureSelection/feature(all)_importance.csv"
         #ginfo_fi = "/home/nbt2/proj/2020-TCGA/proc/KIRP/s1_lncRNA/results/novel_lncRNA/protein_coding_and_all_lncRNA.info.tsv"

@@ -15,7 +15,7 @@ gtf = check_file(params.genecode_gtf)
 
 // bowtie2 index for s4_retrotranscriptome telescope 
 
-/*
+
 process bowtie2_build {
     label 'prepare'
     
@@ -95,8 +95,9 @@ process hisat2_build {
 
 }
 
-*/
+
 process bwa_index{
+    label 'prepare'
     publishDir "./", mode: 'copy'
     input:
     file fasta
