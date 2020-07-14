@@ -46,7 +46,7 @@ RNA-editing-rate.csv
 ```
 mkdir s2_randomForest
 cd s2_randomForest
-nextflow run /your/path/to/PipeOne/s2_ml_randomForest.nf  -profile docker --sample_info ../test_dat/s2_tables/s1_sample_info-tumor-normal.csv --tables ../test_dat/s2_tables/00_rawdata --var_topK 1000  --threads 8
+nextflow run /your/path/to/PipeOne/s2_ml_randomForest.nf  -profile docker --sample_info ../test_dat/s2_tables/s1_sample_info-tumor-normal.csv --rawdir ../test_dat/s2_tables/00_rawdata --var_topK 1000  --threads 8
 ```
 
 __结果文件__:
@@ -61,7 +61,7 @@ results/data/discriminative_power_of_topk_feature.csv
 ```
 mkdir s3_subtype
 cd s3_subtype
-nextflow run /your/path/to/PipeOne/s3_subtype.nf -resume --tables ../test_dat/s3_subtype/00_rawdata --clinical ../test_dat/s3_subtype/KIRP_cli.OS.csv --var_topK 100 -profile docker
+nextflow run /your/path/to/PipeOne/s3_subtype.nf -resume -profile docker --rawdir ../test_dat/s3_subtype/00_rawdata --clinical ../test_dat/s3_subtype/KIRP_cli.OS.csv --var_topK 100 
 ```
 注意： 我们选取各表格方差最大的前100个特征，方便测试程序；在真正运行是应该取更大的数，比如1000
 

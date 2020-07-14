@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 
-params.tables = ""
+params.rawdir = ""
 params.var_topK = 1000
 params.clinical = ""
 params.threads = 4
@@ -8,8 +8,8 @@ params.threads = 4
 clinical    = check_file(params.clinical)
 
 Channel
-    .fromPath("${params.tables}/*.csv")
-    .ifEmpty { exit 1, "files not found: ${params.tables}" }
+    .fromPath("${params.rawdir}/*.csv")
+    .ifEmpty { exit 1, "files not found: ${params.rawdir}" }
     .set{ tables }
 
 process defusion {

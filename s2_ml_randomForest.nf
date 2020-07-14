@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 
-params.tables = ""
+params.rawdir = ""
 params.sample_info = ""
 params.threads = 4
 params.gene_info = ""
@@ -12,8 +12,8 @@ if ( params.sample_info ){
 }else{exit 1, "No  sample file specified!"}
 
 Channel
-    .fromPath("${params.tables}/*.csv")
-    .ifEmpty { exit 1, "files not found: ${params.tables}" }
+    .fromPath("${params.rawdir}/*.csv")
+    .ifEmpty { exit 1, "files not found: ${params.rawdir}" }
     .set{tables}
 
 process proc_and_split_train_test_sample{

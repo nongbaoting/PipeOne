@@ -80,7 +80,7 @@ def samllSample_train_test_split(sample_df, test_size=0.3, random_state=2):
 
 class MYRUN_procRaw:
 
-    def proc(self, rawdir ,  sample_want, var_topk = 1000, tdir = "./data/proc/" ):
+    def proc(self, rawdir , sample_info, var_topk = 1000, tdir = "./data/proc/" ):
         #tdir = "./data/proc/"
         chck_dir(tdir)
         for entry in os.scandir(rawdir):
@@ -91,7 +91,7 @@ class MYRUN_procRaw:
             dfA = pd.read_csv(fiA, header=0, index_col=0)
             dfA = dfA.T
             # rearrange
-            clinical_fi = sample_want
+            clinical_fi = sample_info
             clinical_df = pd.read_csv(clinical_fi, header=0, index_col=None)
 
             sample_idx = get_sample_head_idx(clinical_df)
@@ -107,7 +107,7 @@ class MYRUN_procRaw:
             foutA = os.path.join( tdir, f'proc_{fileA}' )  #### 输出
             dfA_nonzero.to_csv(foutA, header=True, index=True)
 
-    def train_test_split(self, rawdir, sample_info, test_size=0.3, random_state=2):
+    def train_test_split(self, indir, sample_info, test_size=0.3, random_state=2):
         sinfo = pd.read_csv(sample_info)
         train_dir, test_dir = "./data/train_dir/", "./data/test_dir/"
         chck_dir(train_dir); chck_dir(test_dir)
@@ -115,7 +115,7 @@ class MYRUN_procRaw:
         sinfo_train.to_csv("./data/train_dir/train_sample_clustering.csv", index=False)
         sinfo_test.to_csv("./data/test_dir/test_sample_clustering.csv", index=False)
 
-        for entry in os.scandir(rawdir):
+        for entry in os.scandir(indir):
             print(entry.name)
             dat = pd.read_csv(entry.path, header=0, index_col=0)
             fi_name_out = f'proc_{entry.name}'
