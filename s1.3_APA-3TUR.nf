@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 
-params.genome = "hg19_124"
+params.genome = ""
 
 params.read  = ""
 ///home/liangpp5/161/aws/temp/reads/*_{1,2}.fastq.gz

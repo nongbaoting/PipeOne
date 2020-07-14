@@ -1,8 +1,7 @@
 #!/usr/bin/env nextflow
 
-
 params.tables = ""
-
+params.var_topK = 1000
 params.clinical = ""
 params.threads = 4
 
@@ -13,13 +12,39 @@ Channel
     .ifEmpty { exit 1, "files not found: ${params.tables}" }
     .set{ tables }
 
-process subtypes{
+process defusion {
 
-    publishDir "./results",  mode: 'copy',
-        saveAs: {filename -> "./${filename}"}
-
+   
     input:
     file "00_rawdata/*" from tables.collect()
+    file "sample.cli.csv" from clinical
+
+    output:
+    
+    file "*" into next_step
+
+    """
+    set +u; source activate pipeOne_ml; set -u
+    ## select topK variance features
+    python3 ${baseDir}/bin/ML/python_code_2/proc_raw_data.py proc --rawdir 00_rawdata/ --sample_want sample.cli.csv --var_topk ${params.var_topK}
+    
+    ## defusion
+    python3 ${baseDir}/bin/ML/python_code_2/run_defusion.py test_Params
+    python3 ${baseDir}/bin/ML/python_code_2/check_convergence.py
+
+    
+    """
+
+}
+
+process clustering_and_eval{
+    stageInMode 'copy'
+    publishDir "./results",  mode: 'copy',
+        saveAs: {filename -> if(filename =~ /data/ ) "./${filename}"}
+
+
+    input:
+    file "*" from next_step.collect()
     file "sample.cli.csv" from clinical
 
     output:
@@ -27,13 +52,6 @@ process subtypes{
 
     """
     set +u; source activate pipeOne_ml; set -u
-    ## select topK variance features
-    python3 ${baseDir}/bin/ML/python_code_2/proc_raw_data.py proc 00_rawdata/ sample.cli.csv
-    
-    ## defusion
-    python3 ${baseDir}/bin/ML/python_code_2/run_defusion.py test_Params
-    python3 ${baseDir}/bin/ML/python_code_2/check_convergence.py
-
     ## clustering and eval
     python3 ${baseDir}/bin/ML/python_code_2/consistency_eval.py 3
     Rscript ${baseDir}/bin/ML/python_code_2/survival_eval.R
@@ -42,7 +60,6 @@ process subtypes{
     python3 ${baseDir}/bin/ML/python_code_2/select_topk_nong.py select_topK
     python3 ${baseDir}/bin/ML/python_code_2/find_best_RFparams.py
     """
-
 }
 
 

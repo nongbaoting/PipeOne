@@ -4,6 +4,7 @@ params.tables = ""
 params.sample_info = ""
 params.threads = 4
 params.gene_info = ""
+params.var_topK = 1000
 
 if ( params.sample_info ){
     sample_info = file(params.sample_info)
@@ -26,7 +27,7 @@ process proc_and_split_train_test_sample{
 
     """
     set +u; source activate pipeOne_ml; set -u
-    python3 ${baseDir}/bin/ML/proc_raw_data.py proc --rawdir 00_rawdata  --sample_want s1_sample_info-tumor-normal.csv --var_topk 1000
+    python3 ${baseDir}/bin/ML/proc_raw_data.py proc --rawdir 00_rawdata  --sample_want s1_sample_info-tumor-normal.csv --var_topk ${params.var_topK}
     python3 ${baseDir}/bin/ML/proc_raw_data.py train_test_split data/proc s1_sample_info-tumor-normal.csv
     """
 }

@@ -1,14 +1,14 @@
 
 
-library(data.table)
-library(tidyverse)
+suppressPackageStartupMessages(library(data.table, warn.conflicts = FALSE))
+suppressPackageStartupMessages(library(tidyverse, warn.conflicts = FALSE))
 
 
 ## input
 
-apa = read_tsv("../s3_APA-3TUR/results/apa_3utr/pau_results.txt")
-TPM = fread("../s1_lncRNA/results/salmon/salmon_gene_tpm.tsv")
-allInfo = fread("../s1_lncRNA/results/novel_lncRNA/protein_coding_and_all_lncRNA.info.tsv")
+apa = suppressMessages(read_tsv("../s1.3_APA-3TUR/results/apa_3utr/pau_results.txt"))
+TPM = suppressWarnings(fread("../s1.1_lncRNA/results/salmon/salmon_gene_tpm.tsv"))
+allInfo = fread("../s1.1_lncRNA/results/novel_lncRNA/protein_coding_and_all_lncRNA.info.tsv")
 names(TPM)[1] =  "gene_id"
 
 
@@ -29,9 +29,14 @@ apa.pre %>% filter(!grepl("S$", APA_ID) ) ->apa.preDP
 
 apa.pre %>% select(APA_ID, ends_with( '.PAU') ) ->apa.pre.pau
 apa.preDP  %>% select(APA_ID, ends_with( '.PAU') ) ->apa.preDP.pau
-write_tsv(apa.pre.pau, "../s3_APA-3TUR/results/apa_3utr/pau_results.filterPau.txt")
-write_tsv(apa.preDP.pau, "../s3_APA-3TUR/results/apa_3utr/pau_results.filterPau-distal-proximal.txt")
 
-system("mkdir -p s3_APA-3TUR")
-write_tsv(apa.preDP.pau, "s3_APA-3TUR/pau_results.filterPau-distal-proximal.txt")
+names(apa.pre.pau) %>% str_replace(".PAU$", '') ->names(apa.pre.pau) 
+names(apa.preDP.pau) %>% str_replace(".PAU$", '') ->names(apa.preDP.pau) 
+
+
+write_tsv(apa.pre.pau, "../s1.3_APA-3TUR/results/apa_3utr/pau_results.filterPau.txt")
+write_tsv(apa.preDP.pau, "../s1.3_APA-3TUR/results/apa_3utr/pau_results.filterPau-distal-proximal.txt")
+
+system("mkdir -p s1.3_APA-3TUR")
+write_tsv(apa.preDP.pau, "s1.3_APA-3TUR/pau_results.filterPau-distal-proximal.txt")
 

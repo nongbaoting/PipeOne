@@ -28,8 +28,9 @@ def eval(latentX, cluster_num, defined_subtype, sample_id, event, time_to_event,
     cluster_df.to_csv(save_path, header=True, index=False)
     return nmi
 
-cluster_num = sys.argv[0]
-clinical_fi = "./data/sample.cli.csv"
+cluster_num = int(sys.argv[1])
+print(cluster_num)
+clinical_fi = "./sample.cli.csv"
 
 
 clinical = pd.read_csv(clinical_fi, header=0, index_col=None)
@@ -69,7 +70,6 @@ with open(record_fout, "a+") as fwrite:
                             "X_lowDim=%d_alpha=%.2f_gamma=%.2f.csv" \
                             % (low_dim_, low_dim_, alpha_, gamma_)
                 latentX_df = pd.read_csv(latent_fi, header=None, index_col=0)
-
 
                 latentX = latentX_df.values
 

@@ -8,12 +8,14 @@ params.outdir = "results"
 params.threads = 16
 threads = params.threads
 
-params.sprint_index =  "/home/dat/ref/hg38/hg38+gencode.v32/sprint_index/hg38.fa"
-params.sprint_repeat = "/home/dat/ref/hg38/sprint_hg38_repeat.txt"
+params.sprint_index = params.genome ? params.genomes[ params.genome ].sprint_index ?:false :false
+params.sprint_repeat = params.genome ? params.genomes[ params.genome ].sprint_repeat ?:false :false
 params.snp = params.genome ? params.genomes[ params.genome ].snp ?:false :false
 params.annovar_data_dir = params.genome ? params.genomes[ params.genome ].annovar_data_dir ?:false :false
 
 sprint_repeat = file(params.sprint_repeat)
+
+
 params.unstranded = true // defualt unstranded
 params.reverse_stranded = true // dUTP if stranded
 params.forward_stranded = false
@@ -248,8 +250,6 @@ process merge_A2I {
 }
 
 
-
-
 if (params.snp){
 	snpFile = file(params.snp)
 	
@@ -267,7 +267,6 @@ if (params.snp){
 		python3 ${baseDir}/scripts/rnaEditing.py filter_tab snpFile SPrint_A2I_table.annovar.csv SPrint_A2I_table.annovar.filterSNP.tsv
 		python3 ${baseDir}/scripts/rnaEditing.py filter_res snpFile SPRINT_all.annovar.csv SPRINT_all.annovar.filterSNP.csv
 		python3 ${baseDir}/scripts/rnaEditing.py filter_res snpFile SPRINT_A2I.annovar.csv SPRINT_A2I.annovar.filterSNP.csv
-		
 		"""
 	}
 }

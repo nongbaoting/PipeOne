@@ -399,8 +399,8 @@ process Single_graphs {
 	file "${gtf}.pickle" from gtf_pickle
 	
 	output:
-	file "spladder_out/spladder/genes_graph_conf3.${id}.pickle" into graphs_all_merge_rest, graphs_all_quant_rest
-	set id, "spladder_out/spladder/genes_graph_conf3.${id}.pickle" into graphs_ch_rest
+	file "spladder_out/spladder/genes_graph_conf3.${id}.pickle" into graphs_all_merge, graphs_all_quant
+	set id, "spladder_out/spladder/genes_graph_conf3.${id}.pickle" into graphs_ch 
 	"""
 	set +u; source activate AS; set -u
 	spladder build -o spladder_out \\
@@ -414,20 +414,6 @@ process Single_graphs {
 	"""
 }
 
-
-graphs_all_merge_rest
-	.unique()
-	.set{ graphs_all_merge }
-
-graphs_all_quant_rest
-	
-	.unique()
-	.set{ graphs_all_quant }
- 
-graphs_ch_rest
-	
-	.unique()
-	.set{ graphs_ch }
 
 
 process Merged_graph {

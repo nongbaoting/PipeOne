@@ -1,8 +1,8 @@
 #!/usr/bin/env nextflow
 
-ref_directory = "/dat1/dat/ref/PipeOne/test_pipeone/"
+ref_directory = "./"
 params.fasta  = "${ref_directory}/hg38.fa"
-params.genecode_gtf  			= "${ref_directory}/gencode.v32.gtf"
+params.genecode_gtf = "${ref_directory}/gencode.v32.gtf"
 
 
 params.threads = 12
@@ -49,7 +49,8 @@ process sprint_index {
     """
     set +u; source activate RnaEditing; set -u
     mkdir -p sprint_index; cd sprint_index
-    sprint prepare -t ../genome.gtf ../genome.fa bwa
+    ln -s ../genome.fa genome.fa
+    sprint prepare -t ../genome.gtf genome.fa bwa
     """
     }
 

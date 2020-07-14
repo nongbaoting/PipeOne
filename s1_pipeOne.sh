@@ -73,7 +73,7 @@ function args()
 HELP=0
 reads=""
 genome=""
-maxForks=6
+maxForks=2
 threads=8
 saveIntermediateFiles=0
 saveIntermediateHisat2Bam=0
@@ -107,15 +107,15 @@ echo -n "
 
 }
 
-echo "HELP: $HELP"
+
 echo "genome: $genome"
 
 if [ $HELP -eq 1 ]; then
 	usage
 	exit 1
 fi
-
-baseDir=$(dirname "$0")
+SCRIPT=`realpath $0`
+baseDir=$(dirname $SCRIPT)
 workDir=$(pwd)
 
 
@@ -132,23 +132,21 @@ echo $reads
 #read -r -d '' run_all << EOM
 s1_Dir=${workDir}/s1.1_lncRNA
 mkdir -p $s1_Dir; cd $s1_Dir
-run_lncRNA=(nextflow run ${baseDir}/s1.1_lncRNA.nf -resume -profile $profile --genome $genome --reads $reads --cleaned $cleaned)
-echo "${run_lncRNA[@]}" >../run_pipOne.sh
-"${run_lncRNA[@]}"
+nextflow run ${baseDir}/s1.1_lncRNA.nf -resume -profile $profile --genome $genome --reads $reads --cleaned $cleaned
+#run_lncRNA=(nextflow run ${baseDir}/s1.1_lncRNA.nf -resume -profile $profile --genome $genome --reads $reads --cleaned $cleaned)
+#echo "${run_lncRNA[@]}" >../run_pipOne.sh
+#"${run_lncRNA[@]}"
 
 if [ "$cleaned" != "true" ]; then
 	reads="../s1.1_lncRNA/results/fastp/clean/*.R{1,2}.fastp.fq.gz"
 	cleaned="true"
-
 fi
 
-if ["$polyA" != "true" ]; then
+if [ "$polyA" != "true" ]; then
 	s2_Dir=${workDir}/s1.2_circRNA
 	mkdir -p $s2_Dir; cd $s2_Dir
 	nextflow run ${baseDir}/s1.2_circRNA_full.nf -resume -profile $profile --genome $genome --reads $reads --cleaned $cleaned
 fi
-
-
 
 s3_Dir=${workDir}/s1.3_APA-3TUR
 mkdir -p $s3_Dir; cd $s3_Dir
@@ -176,3 +174,9 @@ nextflow run ${baseDir}/s1.8_SNP.nf -resume -profile $profile --genome $genome -
 
 #EOM
 #echo "$run_all"
+table_dir="${workDir}/00_tables"
+mkdir -p $table_dir; cd $table_dir
+source activate pipeOne_ml
+python3 ${baseDir}/bin/summary_table.py check_tables
+python3 ${baseDir}/bin/summary_table.py mark_feature
+

@@ -1,3 +1,4 @@
+
 library(survival)
 library(survminer)
 library(ggplot2)
@@ -48,10 +49,14 @@ for (low_dim_ in low_dim){
       res$table <- res$table + theme(axis.line = element_blank())
       # res$plot <- res$plot + labs(title = "Survival Curves")
 
-      curve_path <- paste0('./data/surv_curve/',
-                           sprintf('low_dim=%d_alpha=%.2f_gamma=%.2f_clustering.png',
-                                   low_dim_, alpha_, gamma_))
-      ggsave(curve_path, print(res))
+      #curve_path <- paste0('./data/surv_curve/',sprintf('low_dim=%d_alpha=%.2f_gamma=%.2f_clustering.png',low_dim_, alpha_, gamma_))
+      #ggsave(curve_path, print(res))
+      curve_path <- paste0('./data/surv_curve/',sprintf('low_dim=%d_alpha=%.2f_gamma=%.2f_clustering.pdf',low_dim_, alpha_, gamma_))
+      pdf(file = curve_path )
+      print(res)
+      dev.off()
+
+
 	  rm(a)
 	  rm(summary_fit)
 	  rm(pvalue)

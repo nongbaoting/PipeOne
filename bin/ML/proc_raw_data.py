@@ -44,7 +44,7 @@ def select_top_k_nonzero_ratio(df, topk):
 # step 3: rearrange samples
 
 def get_sample_head_idx(df):
-    sample_head = re.compile("Run\b|Sample\b", re.IGNORECASE)
+    sample_head = re.compile("Run$|Sample$", re.IGNORECASE)
     for i, c in enumerate(df.columns):
         if sample_head.match(c):
             return i

@@ -1,7 +1,6 @@
 __主要的三部分模块都是可以独立运行的，只要提供相应的输入数据__
 
 ### 1. RNA-seq数据处理
-
 ####  使用
 ```
 mkdir s1_pipeone_raw
@@ -46,7 +45,6 @@ RNA-editing-rate.csv
 
 
 ### 2. 寻找重要特征
-
 需要
 * sample_info, csv 格式
     >sample_info 必须有两列信息, 列名为 Sample 和Group
@@ -79,4 +77,4 @@ python3 /home/nbt2/proj/2020-pipeOne-test/python_code_2/result_summary.py featur
 ```
 
 
-### 3. 亚型分析
+## 3. 亚型分析
