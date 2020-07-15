@@ -8,8 +8,8 @@ nav:
     - 快速开始: quickstart.md
     - '使用说明': 
         - 1. RNA-seq数据处理: documentation/doc_s1.md
-        - 2. 寻找重要特征: documentation/doc_s2.md
-        - 3. 亚型分析: documentation/doc_s3.md
+        - 2. 寻找重要特征:    documentation/doc_s2.md
+        - 3. 亚型分析:       documentation/doc_s3.md
     - 关于: about.md
 theme: 'readthedocs'
 plugins:

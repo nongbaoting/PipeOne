@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
-params.genome = "hg38_124"
-params.species = 'human'
+params.genome = ""
+params.species = ''
 params.genecode_gtf = params.genome ? params.genomes[ params.genome ].genecode_gtf ?: false : false
 params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
 params.lncpedia_gtf  = params.genome ? params.genomes[ params.genome ].lncpedia_gtf  ?: false : false

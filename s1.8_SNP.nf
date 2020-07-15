@@ -4,7 +4,7 @@ params.bam  = ""
 params.sra  = ""
 params.reads = ""
 params.cleaned  = false
-
+params.threads = 8
 params.single = ""
 params.genome =""
 params.saveIntermediateVariants = true
@@ -18,7 +18,6 @@ params.annovar_data_dir = params.genome ? params.genomes[ params.genome ].annova
 
 GenomeAnalysisTK = file(params.GenomeAnalysisTK)
 
-params.threads = 8
 def read_base = params.reads.split('/')[-1]
 def ifPaired = read_base =~/\{1,2\}/
 
@@ -257,7 +256,7 @@ if(params.reads || params.sra ){
 		set id, file("${id}.Aligned.out.sam") into star_2pass_out
 		
 		"""
-		STAR --genomeDir STARIndex_2pass \
+		STAR --genomeDir STARIndex_2pass --runThreadN  ${params.threads} \
 			--readFilesIn ${reads} --readFilesCommand zcat \
 			--outFileNamePrefix	${id}.
 		"""
@@ -368,7 +367,7 @@ operation='g'
 process variant_AnnotateAnnovar {
 	
 	publishDir "${params.outdir}/variantAnnotateAnnovar/", mode: 'copy', 
-    saveAs: { filename -> params.saveIntermediateVariants ? "$filename" : null }
+    	saveAs: { filename -> params.saveIntermediateVariants ? "$filename" : null }
 
     input:
     tuple id, "${id}.output.vcf", "${id}.output.vcf.idx" from  vcf_filter_out_annovar
@@ -384,9 +383,21 @@ process variant_AnnotateAnnovar {
 	table_annovar.pl avinput.${id}.avinput  annovar_db \
 		--buildver ${params.genome_build} --remove --protocol $gene_based \
 		--operation $operation -nastring . \
-		-out ${id} --thread 12 1> SnpIndel_annovar.log 2>&1
-	
+		-out ${id} --thread ${params.threads} 1> SnpIndel_annovar.log 2>&1
     """
-	
 }
 
+
+process To_gene_base_table {
+	publishDir "${params.outdir}/table/", mode: 'copy'
+
+	input:
+	file "vcf/*" from annovar_out.collect()
+
+	output:
+	file "snp.geneBase.tsv"
+
+	"""
+	python3 ${baseDir}/bin/SNP.py gene_base_table snp.geneBase.tsv vcf
+	"""
+}

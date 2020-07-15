@@ -1,5 +1,4 @@
 
-
 #### Get test data
 * [Google Drive](https://drive.google.com/drive/folders/1XX9NgpUTRj4llgJq6dGen__-qq4qJ-c0?usp=sharing): test_dat.7z
 * OR Baidu
@@ -21,7 +20,7 @@ cd s1_pipeone_raw
 bash /your/path/to/PipeOne/s1_pipeOne.sh --reads "../test_dat/s1_RNA-seq/*.R{1,2}.fastp.fq.gz" --genome hg38 --cleaned true
 ```
 
-RNA-seq不同方面的表格：
+RNA-seq不同方面的表格:
 ```
 $ ls 00_tables/00_rawdata
 APA_pau-distal-proximal.csv
@@ -61,7 +60,7 @@ results/data/discriminative_power_of_topk_feature.csv
 ```
 mkdir s3_subtype
 cd s3_subtype
-nextflow run /your/path/to/PipeOne/s3_subtype.nf -resume -profile docker --rawdir ../test_dat/s3_subtype/00_rawdata --clinical ../test_dat/s3_subtype/KIRP_cli.OS.csv --var_topK 100 
+nextflow run /your/path/to/PipeOne/s3_subtype.nf -resume -profile docker --rawdir ../test_dat/s3_subtype/00_rawdata --clinical ../test_dat/s3_subtype/KIRP_cli.OS.csv --var_topK 100
 ```
 注意： 我们选取各表格方差最大的前100个特征，方便测试程序；在真正运行是应该取更大的数，比如1000
 

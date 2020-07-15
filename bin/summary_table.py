@@ -69,14 +69,14 @@ class RUN:
         chck_dir("s1.6_rnaEditing")
         os.system(f"cp ../s1.6_rnaEditing/results/sprint/Merge/SPrint_A2I_table.annovar.csv s1.6_rnaEditing/SPrint_A2I_table.annovar.csv")
 
-        ## s7
+        ## s7 AS
         chck_dir("s1.7_alternative_splicing")
         os.system(
             f"cp ../s1.7_alternative_splicing/results/spladder_out_table/*confirmed.psi.txt.gz s1.7_alternative_splicing/")
 
         ## s8_SNP
         chck_dir("s1.8_SNP")
-        #os.system(f"cp ../s1.8_SNP/ s8_SNP/")
+        os.system(f"cp ../s1.8_SNP/table/snp.geneBase.tsv s1.8_SNP/snp.geneBase.tsv")
 
     def mark_feature(self,):
         chck_dir('00_rawdata')
@@ -92,6 +92,8 @@ class RUN:
             if re.search(".*confirmed.psi.txt.gz", entry.name ):
                 new_name = re.sub("txt.gz$", 'csv', entry.name)
                 add_marks(entry.path , f"00_rawdata/{new_name}", "AS")
+
+        add_marks("s1.8_SNP/snp.geneBase.tsv", "00_rawdata/snp.geneBase.csv", "SNP")
 
     def rename_sample(self,sample_sheet):
         outdir = "./00_rawdata_tcga"
