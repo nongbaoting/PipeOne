@@ -5,18 +5,22 @@ params.sample_info = ""
 params.threads = 4
 params.gene_info = ""
 params.var_topK = 1000
+params.test_size = 0.3
+params.random_state = 2
 
-if ( params.sample_info ){
-    sample_info = file(params.sample_info)
-    if( !sample_info.exists() ) exit 1, "Sample file not found: ${params.sample_info}"
-}else{exit 1, "No  sample file specified!"}
+
+
+sample_info = check_file(params.sample_info)
 
 Channel
     .fromPath("${params.rawdir}/*.csv")
     .ifEmpty { exit 1, "files not found: ${params.rawdir}" }
     .set{tables}
+tables.into{tables; tables_2}
+tables_2.println()
 
-process proc_and_split_train_test_sample{
+process proc_and_split_train_test_sample {
+    publishDir "./results",  mode: 'copy'
 
     input:
     file "s1_sample_info-tumor-normal.csv" from sample_info
@@ -27,8 +31,10 @@ process proc_and_split_train_test_sample{
 
     """
     set +u; source activate pipeOne_ml; set -u
-    python3 ${baseDir}/bin/ML/proc_raw_data.py proc --rawdir 00_rawdata  --sample_want s1_sample_info-tumor-normal.csv --var_topk ${params.var_topK}
-    python3 ${baseDir}/bin/ML/proc_raw_data.py train_test_split data/proc s1_sample_info-tumor-normal.csv
+    python3 ${baseDir}/bin/ML/proc_raw_data.py proc --rawdir 00_rawdata  --sample_info s1_sample_info-tumor-normal.csv --var_topk ${params.var_topK}
+    python3 ${baseDir}/bin/ML/proc_raw_data.py train_test_split --indir data/proc \\
+        --sample_info s1_sample_info-tumor-normal.csv \\
+        --test_size ${params.test_size}   --random_state ${params.random_state}
     """
 }
 
@@ -41,7 +47,7 @@ process RandomForest{
     file "data/*" from pre_ch.collect()
 
     output:
-    tuple "data/feature_importance.csv", "data/discriminative_power_of_topk_feature.csv" into rf_res
+    tuple "data/*", "data/feature_importance.csv", "data/discriminative_power_of_topk_feature.csv" into rf_res
 
     """
     set +u; source activate pipeOne_ml; set -u
@@ -51,6 +57,7 @@ process RandomForest{
 }
 
 if( params.gene_info){
+     
     gene_info = check_file(params.gene_info )
 
     process add_gene_name{

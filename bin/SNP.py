@@ -20,9 +20,9 @@ def scanAndFind_pattern(mydir, mypattern):
 
 class MYRUN:
 
-    def gene_base_table(self, outfile, vcfDir):
+    def gene_base_table(self, outfile, annovar_dir):
         reg_anno = re.compile("multianno.txt$")
-        myfiles = scanAndFind_pattern(vcfDir, reg_anno)
+        myfiles = scanAndFind_pattern(annovar_dir, reg_anno)
         non_silence = ['frameshift deletion', 'frameshift insertion', 'nonframeshift deletion',
                        'nonframeshift insertion', 'nonsynonymous SNV', 'stopgain', 'stoploss']
         mydict = defaultdict(dict)

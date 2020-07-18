@@ -65,13 +65,22 @@ python3 ${baseDir}/bin/ML/proc_raw_data.py train_test_split --indir ../data/proc
 ```
     --indir 上一步的输出结果
     --sample_info   样品信息
+    --test_size 随机测试集百分比。 默认 0.3
+    --random_state  随机种子，为得到重复的测试集
+
+输出目录：
+>train_dir 训练数据目录
+>test_dir 测试数据目录
 
 
 * 运行主程序
+
 ```
 python3 ${baseDir}/bin/ML/main_randomForest.py --threads 8
 ```
     --threads   用多少线程
+    --train_dir 训练数据目录
+    --test_dir 测试数据目录
 
 
 * 整理结果（可选）
@@ -84,7 +93,14 @@ python3 ${baseDir}/bin/ML/result_summary.py feature  --rf_res_fi data/feature_im
 #### __结果文件__:
 
 * results/data/feature_importance.csv
-
+    > random forest 的feature importance
 * results/data/feature_importance-addName.csv
 
 * results/data/discriminative_power_of_topk_feature.csv
+    > 模型区分的两种的能力
+    >senitivity  = tp  / (tp + fn)
+    >specificity = tn / (tn + fp)
+    >tp: true positive
+    >fn: false negative
+    >tn: true negative
+    >fp: false positive

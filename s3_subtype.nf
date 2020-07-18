@@ -13,7 +13,7 @@ Channel
     .set{ tables }
 
 process defusion {
-
+     publishDir "./results",  mode: 'copy'
    
     input:
     file "00_rawdata/*" from tables.collect()
@@ -26,10 +26,10 @@ process defusion {
     """
     set +u; source activate pipeOne_ml; set -u
     ## select topK variance features
-    python3 ${baseDir}/bin/ML/python_code_2/proc_raw_data.py proc --rawdir 00_rawdata/ --sample_want sample.cli.csv --var_topk ${params.var_topK}
+    python3 ${baseDir}/bin/ML/python_code_2/proc_raw_data.py proc --rawdir 00_rawdata/ --sample_info sample.cli.csv --var_topk ${params.var_topK}
     
     ## defusion
-    python3 ${baseDir}/bin/ML/python_code_2/run_defusion.py test_Params
+    python3 ${baseDir}/bin/ML/python_code_2/run_defusion.py test_Params ${params.threads}
     python3 ${baseDir}/bin/ML/python_code_2/check_convergence.py
 
     

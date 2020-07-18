@@ -392,12 +392,12 @@ process To_gene_base_table {
 	publishDir "${params.outdir}/table/", mode: 'copy'
 
 	input:
-	file "vcf/*" from annovar_out.collect()
+	file "annovar_res/*" from annovar_out.collect()
 
 	output:
 	file "snp.geneBase.tsv"
 
 	"""
-	python3 ${baseDir}/bin/SNP.py gene_base_table snp.geneBase.tsv vcf
+	python3 ${baseDir}/bin/SNP.py gene_base_table snp.geneBase.tsv annovar_res
 	"""
 }

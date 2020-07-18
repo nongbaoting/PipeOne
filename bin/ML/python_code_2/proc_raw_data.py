@@ -80,7 +80,7 @@ def samllSample_train_test_split(sample_df, test_size=0.3, random_state=2):
 
 class MYRUN_procRaw:
 
-    def proc(self, rawdir ,  sample_want, var_topk = 1000, tdir = "./data/proc/" ):
+    def proc(self, rawdir ,  sample_info, var_topk = 1000, tdir = "./data/proc/" ):
         #tdir = "./data/proc/"
         chck_dir(tdir)
         for entry in os.scandir(rawdir):
@@ -91,7 +91,7 @@ class MYRUN_procRaw:
             dfA = pd.read_csv(fiA, header=0, index_col=0)
             dfA = dfA.T
             # rearrange
-            clinical_fi = sample_want
+            clinical_fi = sample_info
             clinical_df = pd.read_csv(clinical_fi, header=0, index_col=None)
 
             sample_idx = get_sample_head_idx(clinical_df)
