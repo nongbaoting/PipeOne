@@ -2,7 +2,7 @@ from feature_validation import *
 from sklearn.model_selection import LeaveOneOut
 import os,fire
 
-def main(threads = 12, train_dir = "./data/test_dir/", test_dir ="./data/train_dir/"):
+def main(threads = 12, train_dir = "./data/train_dir/", test_dir ="./data/test_dir/"):
 
     logfi = "./log.txt"  # log file, record key points in the whole process
     if os.path.exists(logfi):
@@ -26,7 +26,7 @@ def main(threads = 12, train_dir = "./data/test_dir/", test_dir ="./data/train_d
     X_train, y_train, feature_name = load_data(train_dir)
     X_test , y_test , feature_name_t = load_data(test_dir )
     X_train, X_test = np.nan_to_num(X_train), np.nan_to_num(X_test)
-
+    #print(y_train)
     parameters = {"n_estimators": [3, 5, 7, 10, 20, 30, 50, 100],
                 "max_depth": [2, 3, 4, 7, 10],
                 "min_samples_split": [2, 3, 4, 5, 7],

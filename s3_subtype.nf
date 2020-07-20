@@ -45,7 +45,7 @@ process clustering_and_eval{
 
     input:
     file "*" from next_step.collect()
-    file "sample.cli.csv" from clinical
+    file "data/sample.cli.csv" from clinical
 
     output:
     file "data/*" into pre_ch

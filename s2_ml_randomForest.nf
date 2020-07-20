@@ -16,8 +16,7 @@ Channel
     .fromPath("${params.rawdir}/*.csv")
     .ifEmpty { exit 1, "files not found: ${params.rawdir}" }
     .set{tables}
-tables.into{tables; tables_2}
-tables_2.println()
+
 
 process proc_and_split_train_test_sample {
     publishDir "./results",  mode: 'copy'
@@ -47,7 +46,8 @@ process RandomForest{
     file "data/*" from pre_ch.collect()
 
     output:
-    tuple "data/*", "data/feature_importance.csv", "data/discriminative_power_of_topk_feature.csv" into rf_res
+    file "data/feature_importance.csv" into rf_res
+    file "data/*"
 
     """
     set +u; source activate pipeOne_ml; set -u
@@ -65,7 +65,7 @@ if( params.gene_info){
         saveAs: {filename -> "./${filename}" }
 
     input:
-    tuple "data/feature_importance.csv", "data/discriminative_power_of_topk_feature.csv" from  rf_res
+    file "data/feature_importance.csv" from  rf_res
     file "gene_info" from  gene_info
     
     output:

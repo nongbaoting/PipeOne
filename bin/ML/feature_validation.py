@@ -15,7 +15,8 @@ def load_data(data_dir):
         data_full = os.path.join(data_dir, fi)
         if "clustering" in fi:
             y_info = pd.read_csv(data_full, header=0, index_col=None)
-            y = np.array(y_info["Group"])
+            #y = np.array(y_info["Group"])
+            y = np.array(y_info["Group"].replace({'Primary Tumor': 1, 'Solid Tissue Normal':0 }))
         else:
             data = pd.read_csv(data_full, header=0, index_col=0)
             datavalue = data.values

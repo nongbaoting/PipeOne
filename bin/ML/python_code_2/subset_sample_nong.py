@@ -17,10 +17,11 @@ class MYRUN_subset_sample:
         chck_dir(outdir)
         for entry in os.scandir(indir):
             print(entry.name)
-            dat = pd.read_csv(entry.path )
+            dat = pd.read_csv(entry.path , index_col=0)
             outfi = os.path.join(outdir, entry.name)
-            sub_dat = dat[dat.iloc[:,0].isin(sinfo.iloc[:,0]) ]
-            sub_dat.to_csv(outfi, index=False)
+            #sub_dat = dat[dat.iloc[:,0].isin(sinfo.iloc[:,0]) ]
+            sub_dat = dat.reindex(index=sinfo.iloc[:,0] ,fill_value=0)
+            sub_dat.to_csv(outfi) 
         os.system(f"cp {sample_info} {outdir}/dat_sample_clustering.csv")
 
     def sub_feature_samples(self, indir, train_dir,  outdir, sample_info):

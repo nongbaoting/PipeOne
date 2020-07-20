@@ -70,13 +70,44 @@ python3 ${baseDir}/bin/ML/proc_raw_data.py train_test_split --indir ../data/proc
 
 输出目录：
 >train_dir 训练数据目录
->test_dir 测试数据目录
+>test_dir  测试数据目录
+
+目录的内容:
+
+```
+$ ls train_dir
+dat_sample_clustering.csv
+proc_APA_pau-distal-proximal.csv
+proc_fusion_arriba_out.csv
+proc_lncR_gene.tpm.csv
+proc_merge_graphs_alt_3prime_C3.confirmed.psi.csv
+proc_merge_graphs_alt_5prime_C3.confirmed.psi.csv
+proc_merge_graphs_exon_skip_C3.confirmed.psi.csv
+proc_merge_graphs_intron_retention_C3.confirmed.psi.csv
+proc_merge_graphs_mult_exon_skip_C3.confirmed.psi.csv
+proc_merge_graphs_mutex_exons_C3.confirmed.psi.csv
+proc_prot_gene.tpm.csv
+proc_retro-FPKM-divide_totalMapReads.csv
+proc_RNA-editing-rate.csv
+proc_snp.geneBase.csv
+```
+
+
+或者用固定的sample
+```
+python3  ${baseDir}/bin/ML/python_code_2/subset_sample_nong.py subset data/proc ./data/train_dir train.csv
+python3 /home/nbt2/pipe/PipeOne/bin/ML/python_code_2/subset_sample_nong.py subset --indir ./data/proc --sample_info test.csv --tdir ./data/test_dir 
+```
+    --indir 上一步的输出结果
+    --sample_info   样品信息
+    --tdir 输出目录
+
 
 
 * 运行主程序
 
 ```
-python3 ${baseDir}/bin/ML/main_randomForest.py --threads 8
+python3 ${baseDir}/bin/ML/main_randomForest.py --threads 8 --train_dir ./data/train_dir --test_dir ./data/test_dir
 ```
     --threads   用多少线程
     --train_dir 训练数据目录
@@ -98,7 +129,7 @@ python3 ${baseDir}/bin/ML/result_summary.py feature  --rf_res_fi data/feature_im
 
 * results/data/discriminative_power_of_topk_feature.csv
     > 模型区分的两种的能力
-    >senitivity  = tp  / (tp + fn)
+    >senitivity  = tp / (tp + fn)
     >specificity = tn / (tn + fp)
     >tp: true positive
     >fn: false negative

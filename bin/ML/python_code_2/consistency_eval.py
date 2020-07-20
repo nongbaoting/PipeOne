@@ -28,7 +28,8 @@ def eval(latentX, cluster_num, defined_subtype, sample_id, event, time_to_event,
     cluster_df.to_csv(save_path, header=True, index=False)
     return nmi
 
-cluster_num = sys.argv[0]
+cluster_num = int(sys.argv[1])
+print(cluster_num)
 clinical_fi = "./data/sample.cli.csv"
 
 def get_sample_head_idx(df):
