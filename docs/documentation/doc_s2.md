@@ -1,12 +1,25 @@
 
-__2. 寻找重要特征__
+__Module 2: Importance Features__
 
-#### 需要
+#### Run in One Command
+```
+mkdir s2_randomForest
+cd s2_randomForest
+nextflow run /your/path/to/PipeOne/s2_ml_randomForest.nf  -profile docker --sample_info ../test_dat/s2_tables/s1_sample_info-tumor-normal.csv --rawdir ../test_dat/s2_tables/00_rawdata --var_topK 1000  --threads 8
+```
+__Options__
+
+```
+--sample_info <str> The sample_info file must contains two columns, the column names are Sample and Group
+--var_topK <int> top K most variance features. default 1000
+
+```
+
 1.sample_info
    
-    sample_info 必须有两列信息, 列名为 Sample 和Group
+    The sample_info file must contains two columns, the column names are Sample and Group
 
-    例如：
+    For Example
 
 ```
 $ cat sample_info.csv
@@ -17,13 +30,13 @@ sample_3,1
 sample_4,1
 sample_n,0
 ```
-注意：group的值只有两组
+Note: There are only two types of group values, use 0 represents normal, 1 represents tumor
 
-2.包含个类型数据的文件夹
+2.Directory containing data tables of various types, width is generated in the module 1
 
-    每个table的第一行是sample ID，第一列是feature。
+    The first row of each table is the sample ID, and the first column is the feature ID.
 
-    例如：
+    For Example:
 
 ```
 $ cat table.csv
@@ -34,19 +47,14 @@ feature_3,value,value,value,value,...,value
 feature_n,value,value,value,value,...,value
 ```
 
-注意每个文件都是csv逗号分割格式。
-
-#### 一步运行
-```
-mkdir s2_randomForest
-cd s2_randomForest
-nextflow run /your/path/to/PipeOne/s2_ml_randomForest.nf  -profile docker --sample_info ../test_dat/s2_tables/s1_sample_info-tumor-normal.csv --rawdir ../test_dat/s2_tables/00_rawdata --var_topK 1000  --threads 8
-```
+Note that each file is in csv comma separated format.
 
 
 
-#### 分步骤运行
-* 取 top N variance features
+
+#### Run Module 2  step by step
+
+* get top K variance features
   
 ```
 source activate pipeOne_ml
@@ -54,26 +62,27 @@ baseDir="/your/path/to/PipeOne/"
 python3 ${baseDir}/bin/ML/proc_raw_data.py proc --rawdir 00_rawdata  --sample_info s1_sample_info-tumor-normal.csv --var_topk 1000 --tdir ./data/proc/
     
 ```
-    --rawdir    RNA-seq各个结果的表格，例如表达水平（TPM值），RNA-editing rate, Fusion event 等
-    --sample_info   样品信息
-    --var_topk  各表格用多少feature 数，默认1000
-    --tdir  输出目录， 默认 ./data/proc/
+    --rawdir  RNA-seq result table, such as expression level (TPM value), RNA editing rate, fusion event, etc.
+    --sample_info   sample information file
+    --var_topk  top K most variance features
+    --tdir  Output directory, default ./data/proc/
 
-* 讲数据分为测试集和训练集
+* Divide data into test set and training set
+
 ```
 python3 ${baseDir}/bin/ML/proc_raw_data.py train_test_split --indir ../data/proc  --sample_info s1_sample_info-tumor-normal.csv
 ```
-    --indir 上一步的输出结果
-    --sample_info   样品信息
-    --test_size 随机测试集百分比。 默认 0.3
-    --random_state  随机种子，为得到重复的测试集
+    --indir The output of the previous step
+    --sample_info   sample information file
+    --test_size The percentage of the random test set. Default 0.3
+    --random_state  Random seed, to get reproduce result. default 2
 
-输出目录：
->train_dir 训练数据目录
->test_dir  测试数据目录
+Output directory:
+>train_dir Training data directory
 
-目录的内容:
+>test_dir  Testing data directory
 
+tables of the directory:
 ```
 $ ls train_dir
 dat_sample_clustering.csv
@@ -92,46 +101,54 @@ proc_RNA-editing-rate.csv
 proc_snp.geneBase.csv
 ```
 
+Or use a set of fixed sample
 
-或者用固定的sample
 ```
 python3  ${baseDir}/bin/ML/python_code_2/subset_sample_nong.py subset data/proc ./data/train_dir train.csv
 python3 /home/nbt2/pipe/PipeOne/bin/ML/python_code_2/subset_sample_nong.py subset --indir ./data/proc --sample_info test.csv --tdir ./data/test_dir 
 ```
-    --indir 上一步的输出结果
-    --sample_info   样品信息
-    --tdir 输出目录
+    --indir The output of the previous step
+    --sample_info   sample information file
+    --tdir Output directory
 
 
 
-* 运行主程序
+* Run the main program
 
 ```
 python3 ${baseDir}/bin/ML/main_randomForest.py --threads 8 --train_dir ./data/train_dir --test_dir ./data/test_dir
 ```
-    --threads   用多少线程
-    --train_dir 训练数据目录
-    --test_dir 测试数据目录
+    --threads   number of threads to use
+    --train_dir Training data directory
+    --test_dir  Testing data directory
 
 
-* 整理结果（可选）
+* add gene info to  results (optional)
 ```
 python3 ${baseDir}/bin/ML/result_summary.py feature  --rf_res_fi data/feature_importance.csv  --ginfo_fi ../../s1.1_lncRNA/results/novel_lncRNA/protein_coding_and_all_lncRNA.info.tsv
 ```
-    --rf_res_fi Random Foreast 的结果（data/feature_importance.csv）
-    --ginfo_fi  基因的信息文件，可在第一步的结果里面找到（s1_lncRNA/results/novel_lncRNA/protein_coding_and_all_lncRNA.info.tsv）
+    --rf_res_fi Results of Random Foreast (data/feature_importance.csv)
+    --ginfo_fi  The gene information file can be found in the results of the first step (s1_lncRNA/results/novel_lncRNA/protein_coding_and_all_lncRNA.info.tsv)
 
-#### __结果文件__:
+#### __Output files__:
 
 * results/data/feature_importance.csv
     > random forest 的feature importance
+
 * results/data/feature_importance-addName.csv
 
 * results/data/discriminative_power_of_topk_feature.csv
-    > 模型区分的两种的能力
+
+    >module evaluation
+    >
     >senitivity  = tp / (tp + fn)
+
     >specificity = tn / (tn + fp)
+
     >tp: true positive
+
     >fn: false negative
+
     >tn: true negative
+    
     >fp: false positive

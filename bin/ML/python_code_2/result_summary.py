@@ -24,7 +24,7 @@ def get_geneName(feature_name, gdict):
     elif dataType == "Retro":
         gene_name = feature_name.split('_',1)[1]
     elif dataType == "RNAEditing":
-        editing_site = '_'.join(ff[1:])
+        gene_name = feature_name.split(':')[1]
     elif dataType == "SNP":
         gene_name = ff[1]
     return gene_name
@@ -32,7 +32,7 @@ def get_geneName(feature_name, gdict):
 
 class myResult_summary:
 
-    def feature(self,rf_res_fi, ginfo_fi = "/home/nbt2/proj/2020-TCGA/proc/KIRP/s1_lncRNA/results/novel_lncRNA/protein_coding_and_all_lncRNA.info.tsv"):
+    def feature(self, rf_res_fi, ginfo_fi ):
 
         #rf_res_fi = "/home/nbt2/proj/2020-TCGA/proc/KIRP/00_tables/pipeOne/FeatureSelection/feature(all)_importance.csv"
         #ginfo_fi = "/home/nbt2/proj/2020-TCGA/proc/KIRP/s1_lncRNA/results/novel_lncRNA/protein_coding_and_all_lncRNA.info.tsv"

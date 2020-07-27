@@ -1,40 +1,39 @@
-__主要的三部分模块都是可以独立运行的，只要提供相应的输入数据__
+__As long as the corresponding input data is provided, the three main modules can operate independently__
 
-__1. RNA-seq数据处理__
+__Module 1: RNA-seq processing__
 
-####  使用
+####  Usage
 ```
 mkdir s1_pipeone_raw
 cd s1_pipeone_raw
 bash /your/path/to/PipeOne/s1_pipeOne.sh --reads "../test_dat/s1_RNA-seq/*.R{1,2}.fastp.fq.gz" --genome hg38 --cleaned true
 ```
-#### 参数
+#### Options
 Require:
 ```
---reads  <string>     输入FASTQ文件, for example: "/home/reads/*_R{1,2}.fastq.gz"，
-                      * 代表可以匹配的文件， {1,2} 代表双端测序
+--reads  <string>     FASTQ gzip files, for example: "/home/reads/*_R{1,2}.fastq.gz"
 
---genome <string>     使用的在 conf/igenomes.config 定义genome 版本
+--genome <string>     Genome version defined in conf/igenomes.config
 ```
 Optional:
 ```
---cleaned  <booloen>    true 或者 false FASTQ文件是否是质量控制过，如果是false 则用fastp进行质量控制。defalt [false]
---layout   <string>     paired 或者 single. 默认 [paired]
---threads  <int>       每一步使用的最大线程数。 默认 [8]
---maxForks <int>       并行多少步骤。 默认 [2]
---saveIntermediateFiles       是否保留中间文件到结果。 默认 [off]
---saveIntermediateHisat2Bam   是否保留hisat2 的bam 文件. 默认 [off]
--h --help     显示帮助
+--cleaned  <booloen>   true or false. Whether the FASTQ file has been quality controlled, if it is false, use fastp for quality control. defalt [false]
+--layout   <string>     paired or single. Default [paired]
+--threads  <int>       The maximum number of threads used in each step. Default [8]
+--maxForks <int>       How many steps in parallel. Default [2]
+--saveIntermediateFiles       Whether to keep the intermediate file to the result. Default [off]
+--saveIntermediateHisat2Bam   Whether to keep the bam file of hisat2. Default [off]
+-h --help     show  help message
 ```
 
 
-#### 输出
+#### Output
 
-* __RNA-seq 经过不同的程序运行的结果__
-    * 00_tables 经过不同的程序运行得到的表格
-    * s1.*文件夹, 经过不同的程序运行目录
-      * result 结果目录
-      * work 工作目录
+* __Files result from different programs applied to RNA-seq__
+    * 00_tables Tables from different aspect of RNA-seq
+    * s1.*  Program running directory
+      * result result directory
+      * work work directory
 ```
 $ tree -L 2
 .
@@ -72,7 +71,7 @@ $ tree -L 2
 30 directories, 0 files
 ```
 
-* __RNA-seq 经过不同的程序运行得到的表格: s1.*文件夹__
+* __Tables from different aspect of RNA-seq: s1.*
 ```
 $ ls  00_tables
 00_rawdata
@@ -86,7 +85,7 @@ s1.8_SNP
 ```
 
 
-* __RNA-seq 数据处理后得到的各个表格汇总，为下一步运行所需__
+* __Tables of different aspects of RNA-seq from one directory, which are required in the next module__
 ```
 $ ls 00_tables/00_rawdata
 APA_pau-distal-proximal.csv
@@ -101,4 +100,3 @@ prot_gene.tpm.csv
 retro-FPKM-divide_totalMapReads.csv
 RNA-editing-rate.csv
 ```
-

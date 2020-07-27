@@ -49,7 +49,7 @@ process sprint_index {
     """
     set +u; source activate RnaEditing; set -u
     mkdir -p sprint_index; cd sprint_index
-    ln -s ../genome.fa genome.fa
+    cp ../genome.fa genome.fa
     sprint prepare -t ../genome.gtf genome.fa bwa
     """
     }

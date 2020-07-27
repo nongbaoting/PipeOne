@@ -6,21 +6,21 @@
 
 <img src = "./Figs/s0.png", width = "800">
 
-#### Module 1: RNA-seq数据处理
+#### Module 1: RNA-seq Processing
 
 -----
 
 <img src = "./Figs/s1.png", width = "800">
 
 
-#### Module 2: 寻找重要特征
+#### Module 2: Importance Features
 
 -----
 
 <img src = "./Figs/s2.png">
 
 
-#### Module 3: 癌症亚型分析
+#### Module 3: Subtype Analysis
 
 ----------
 

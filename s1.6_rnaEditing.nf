@@ -175,7 +175,7 @@ if ( params.sprint_index  ){
 	
 }
 
-params.sprint_tmp = "keep"
+params.sprint_tmp = "false"
 
 process sprint{
 	publishDir "${params.outdir}/sprint/", mode: 'copy',
@@ -209,9 +209,9 @@ process sprint{
 	mkdir -m 775 -p tmp
 	sprint main -rp ${sprint_repeat} -c 1 -p ${threads} -1 read_1.fq -2 read_2.fq sprint_index/${sprint_base} tmp bwa samtools
 	cp tmp/SPRINT_identified_all.res ${id}.SPRINT_identified_all.res
-	rm read_1.fq read_2.fq
 	
-	if [[ "${params.sprint_tmp}" == "keep" ]];then
+	rm read_1.fq read_2.fq
+	if [[ "${params.sprint_tmp}" == "true" ]];then
 		ln -s tmp ${id}
 	else
 		rm -rf tmp
@@ -264,9 +264,9 @@ if (params.snp){
 		set  "SPRINT_all.annovar.filterSNP.csv", "SPRINT_A2I.annovar.filterSNP.csv","SPrint_A2I_table.annovar.filterSNP.tsv"
 		
 		"""
-		python3 ${baseDir}/scripts/rnaEditing.py filter_tab snpFile SPrint_A2I_table.annovar.csv SPrint_A2I_table.annovar.filterSNP.tsv
-		python3 ${baseDir}/scripts/rnaEditing.py filter_res snpFile SPRINT_all.annovar.csv SPRINT_all.annovar.filterSNP.csv
-		python3 ${baseDir}/scripts/rnaEditing.py filter_res snpFile SPRINT_A2I.annovar.csv SPRINT_A2I.annovar.filterSNP.csv
+		python3 ${baseDir}/bin/rnaEditing.py filter_tab snpFile SPrint_A2I_table.annovar.csv SPrint_A2I_table.annovar.filterSNP.tsv
+		python3 ${baseDir}/bin/rnaEditing.py filter_res snpFile SPRINT_all.annovar.csv SPRINT_all.annovar.filterSNP.csv
+		python3 ${baseDir}/bin/rnaEditing.py filter_res snpFile SPRINT_A2I.annovar.csv SPRINT_A2I.annovar.filterSNP.csv
 		"""
 	}
 }

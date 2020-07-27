@@ -389,7 +389,7 @@ process variant_AnnotateAnnovar {
 
 
 process To_gene_base_table {
-	publishDir "${params.outdir}/table/", mode: 'copy'
+	publishDir "${params.outdir}/annovar_table/", mode: 'copy'
 
 	input:
 	file "annovar_res/*" from annovar_out.collect()

@@ -3,10 +3,13 @@
 # @Time    : 2020/6/26 11:11
 # @author  : Baoting Nong'
 # @email   : 523135753@qq.com'
-import fire,os,re
+import fire,os,re,sys 
 import numpy as np
 import pandas as pd
 
+def chck_dir(dir):
+    if not os.path.exists(dir):
+        os.makedirs(dir)
 
 def get_topk(X, weight, topk):
     idx = np.argsort(-weight)
@@ -16,41 +19,57 @@ def get_topk(X, weight, topk):
 def get_matrix_files(data_dir):
     view = []
     for entry in os.scandir(data_dir):
-        if re.search('.csv$', entry.name):
+        if re.search('.csv$', entry.name) and not re.search('clustering.csv$', entry.name):
             the_view = re.sub('^proc_', '', entry.name)
             the_view = re.sub('\.csv$', '', the_view)
             view.append(the_view)
     return view
 
-class MYTOP:
+def split_params(NMF_param):
+    low_dim_, alpha_, gamma_ = [i.split('=')[1] for i in NMF_param.split('_')]
+    return (int(low_dim_), float(alpha_), float(gamma_) )
 
-    def select_topK(self, topK='50,100,200', consistence_file = "record_log_rank_test_pvalue.csv"):
-        consist = pd.read_csv(consistence_file)
-        consist = consist.sort_values(by='pvalue' )
-        low_dim, alpha, gamma = consist.iloc[0,0:3]
-        topk_ls = [int(i) for i in topK.split(',') ]
-        proc_file_lst = get_matrix_files("./data/proc/")
+def split_fileName_params(fileName):
+    low_dim, alpha, gamma, cluster_n = [i.split('=')[1] for i in fileName.split('_')]
+    return (int(low_dim), float(alpha),float(gamma),int(cluster_n) )
 
-        cluster =  "./results/lowDim=%d/" \
-                    "lowDim=%d_alpha=%.2f_gamma=%.2f_clustering.csv" % (low_dim, low_dim, alpha, gamma)
-        os.system(f'cp {cluster} ./data/proc/')
-        for topk in topk_ls:
+def select_topK( topK_importance='50,100,200', outdir = "./data_randomForest", cluster_survival_file = "record_log_rank_test_pvalue.csv", 
+ cluster_file = ""):
+    
+    if os.path.exists(cluster_file):
+        cluster_fi = cluster_file
+        low_dim, alpha, gamma = split_fileName_params( os.path.basename(cluster_file) )
+    elif os.path.exists(cluster_survival_file):
+        consist = pd.read_csv(cluster_survival_file)
+        consist = consist.sort_values(by='logRankTest_pvalue' )
+        NMF_param, cluster = consist.iloc[0,0:2]
+        low_dim, alpha, gamma = split_params(NMF_param)
+        cluster_fi =  "./clusters/eval_cluster_num/%s_clusters=%d_clustering.csv" % (NMF_param, cluster)
+    else:
+        sys.exit("please provide --cluster_survival_file or --cluster_file")
 
-            if not os.path.exists("./data/top%d/" % topk):
-                os.makedirs("./data/top%d/" % topk)
-            os.system( f'cp {cluster} ./data/top{topk}/')
-            for file in proc_file_lst:
-                fi = "./data/proc/proc_%s.csv" % file
-                X = pd.read_csv(fi, header=0, index_col=0)
+    chck_dir(outdir); 
+    os.system(f'cp -r ./data/proc/  {outdir}/')
+    os.system(f'cp {cluster_fi}  {outdir}/proc/')
+    proc_file_lst = get_matrix_files("./data/proc/")
+    topk_ls = [int(i) for i in topK_importance.split(',') ]
+    for topk in topk_ls:
 
-                weight_fi = "./results/lowDim=%d/weight_%s_lowDim=%d_alpha=%.2f_gamma=%.2f.csv" \
-                            % (low_dim, file, low_dim, alpha, gamma)
-                weight = pd.read_csv(weight_fi, header=None, index_col=None)
-                weight_arr = np.array(weight[1])
-                topk_X = get_topk(X, weight_arr, topk)
+        if not os.path.exists("%s/top%d/" % (outdir, topk) ) :
+            os.makedirs("%s/top%d/" % (outdir, topk) )
+        os.system( f'cp {cluster_fi} {outdir}/top{topk}/')
+        for file_ in proc_file_lst:
+            fi = "./data/proc/proc_%s.csv" % file_
+            X = pd.read_csv(fi, header=0, index_col=0)
 
-                fout = "./data/top%d/top%d_proc_%s.csv" % (topk, topk, file)
-                topk_X.to_csv(fout, index=True)
+            weight_fi = "./NMF/lowDim=%d/weight_%s_lowDim=%d_alpha=%.2f_gamma=%.2f.csv" \
+                        % (low_dim, file_, low_dim, alpha, gamma)
+            weight = pd.read_csv(weight_fi, header=None, index_col=None)
+            weight_arr = np.array(weight[1])
+            topk_X = get_topk(X, weight_arr, topk)
+
+            fout = "%s/top%d/top%d_proc_%s.csv" % (outdir, topk, topk, file_ )
+            topk_X.to_csv(fout, index=True)
 
 if __name__ == '__main__':
-    fire.Fire(MYTOP)
+    fire.Fire(select_topK)

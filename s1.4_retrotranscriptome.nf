@@ -5,6 +5,7 @@ params.sra = ""
 
 params.genome = ""
 params.cleaned  = false
+params.saveIntermediate =  false
 params.retro_gtf = params.genome ? params.genomes[ params.genome ].retro_gtf ?: false : false
 params.bowtie2_index = params.genome ? params.genomes[ params.genome ].bowtie2_index ?:false :false
 retro_gtf = file(params.retro_gtf)
@@ -153,61 +154,8 @@ if(params.reads ){
 }
 
 read_ch.into{ hisat2_ch;reads_print; reads_star; reads_bowtie2}
-//reads_print.println()
 
 
-/*
-process star{
-	maxForks 2
-	tag { id }
-	
-	publishDir "${params.outdir}/star/", mode: 'copy'
-	
-	input:
-	set id,  file(reads) from reads_star
-	
-	output:
-	set id, "${id}.Aligned.sortedByCoord.out.bam" into star_out
-	
-	script:
-	"""
-	STAR --genomeDir $starIdex --readFilesIn ${reads} --runThreadN $threads  --outFileNamePrefix ${id}. \\
-	--chimSegmentMin 10  --outFilterMultimapNmax 100 --readFilesCommand zcat  \\
-	--outSAMtype BAM SortedByCoordinate  >star.log
-	
-	#--genomeLoad LoadAndRemove --limitBAMsortRAM 40000000000
-	
-	"""
-	
-}
-
-process telescope_star{
-	maxForks 4
-	tag {id}
-	errorStrategy 'ignore'
-	maxRetries 2
-	
-	publishDir "${params.outdir}/telescope_star/", mode: 'copy', 
-		saveAs: {filename -> "${id}.${filename}"}
-	
-	input:
-	set id, file(bams) from star_out
-	
-	output:
-	file "telescope-telescope_report.tsv"
-	
-	script:
-	
-	"""
-	samtools index ${bams}
-	mkdir -p temp
-	telescope assign ${bams} /dsk1/ref/hg38/telescope_HERV_rmsk.hg38.v2/transcripts.gtf \\
-	--max_iter 200 --theta_prior 200000  --tempdir ./temp
-	"""
-	
-}
-
-*/
 
 
 if ( params.bowtie2_index  ){
@@ -226,8 +174,9 @@ process bowtie2{
 	
 	publishDir "${params.outdir}/bowtie2/", mode: 'copy',
 		saveAs: {filename -> 
-			if(filename =~/bam/) "bams/${filename}"
+			if(filename =~/bam/ &&  params.saveIntermediate ) "bams/${filename}"
 			else if(filename =~/log/) "logs/${filename}"
+			else null	
 			}
 	
 	input:

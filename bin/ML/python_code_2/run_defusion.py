@@ -46,7 +46,7 @@ def run_defusion(low_dim, alpha, gamma, view):
 
     L = snf_cal(D)
 
-    tdir = "./results/lowDim=%d/" % low_dim
+    tdir = "./NMF/lowDim=%d/" % low_dim
     chck_dir(tdir)
     print("running lowDim=%d_alpha=%.2f_gamma=%.2f" % (low_dim, alpha, gamma))
     fout = tdir + "lowDim=%d_alpha=%.2f_gamma=%.2f.pkl" % (low_dim, alpha, gamma)
@@ -68,28 +68,27 @@ def run_defusion(low_dim, alpha, gamma, view):
         save_feature_weight(Z[v], var_names[v], zfout)
 
 
-class MYRUN_DF:
-    def test_Params(self,  cores = 24 ):
-        low_dim = np.arange(2, 8, 1)
-        # low_dim = np.array([7])
-        alpha = np.array([0.01, 0.02, 0.1, 1, 5])
-        gamma = np.array([0, 0.1, 1, 10, 100])
-        params = {"low_dim": low_dim, "alpha": alpha, "gamma": gamma}
-        params_grid = list(ParameterGrid(params))
 
-        core_num = cores
-        view = []
-        data_dir = "./data/proc/"
-        for entry in os.scandir(data_dir):
-            if re.search('.csv$', entry.name):
-                the_view = re.sub('^proc_', '', entry.name)
-                the_view = re.sub('\.csv$', '', the_view)
-                view.append(the_view)
-        print(view)
+def MYRUN_DF(threads ):
+    low_dim = np.arange(2, 8, 1)
+    # low_dim = np.array([7])
+    alpha = np.array([0.01, 0.02, 0.1, 1, 5])
+    gamma = np.array([0, 0.1, 1, 10, 100])
+    params = {"low_dim": low_dim, "alpha": alpha, "gamma": gamma}
+    params_grid = list(ParameterGrid(params))
 
-        Parallel(n_jobs=core_num)(delayed(run_defusion)(params_["low_dim"],
-                                                        params_["alpha"],
-                                                        params_["gamma"], view) for params_ in params_grid)
+    view = []
+    data_dir = "./data/proc/"
+    for entry in os.scandir(data_dir):
+        if re.search('.csv$', entry.name):
+            the_view = re.sub('^proc_', '', entry.name)
+            the_view = re.sub('\.csv$', '', the_view)
+            view.append(the_view)
+    print(view)
+
+    Parallel(n_jobs=threads)(delayed(run_defusion)(params_["low_dim"],
+                                                    params_["alpha"],
+                                                    params_["gamma"], view) for params_ in params_grid)
 
 
 

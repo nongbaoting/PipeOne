@@ -1,29 +1,29 @@
 
-### 准备软件
+#### Prerequisites
 1. Java (version >= 1.7)
 2. [Nextflow](https://www.nextflow.io/) (version >= 19.10.0)
 3. Docker
 4. [conda](https://docs.conda.io/en/latest/miniconda.html)
 5. [7z](https://www.7-zip.org/download.html)
-   `sudo apt install p7zip-full p7zip-rar`
-   
-### 安装
 
-1.下载PipeOne Docker 镜像
+	   `sudo apt install p7zip-full p7zip-rar`
+   
+#### Installation
+
+1.pull down the PipeOne Docker image
    
 ```
 docker pull nongbaoting/pipeone:latest
 ```
 
 
-2.下载PipeOne
+2.download PipeOne
 
 ```
 git clone https://github.com/nongbaoting/PipeOne.git
 ```
 
-
-如果只要单独运行随机森林和亚型分析，安装conda 环境即可
+If you only want to run Module 2 or Module 3, install conda environment is adequate
 ```
 conda create -n pipeOne_ml python=3.6
 source activate pipeOne_ml
@@ -32,31 +32,34 @@ cd PipeOne
 pip install -r conf/requirement.txt
 ```
 
+#### Download reference data
 
+Download one of the data sets below:
 
-### 下载参考数据
-[google drive](https://drive.google.com/drive/folders/1XX9NgpUTRj4llgJq6dGen__-qq4qJ-c0?usp=sharing)
+* [google drive](https://drive.google.com/drive/folders/1XX9NgpUTRj4llgJq6dGen__-qq4qJ-c0?usp=sharing)
 
-Baidu 网盘:
->链接：https://pan.baidu.com/s/1gbZR1LJAmuT_fmFY1UJ7sA 
->提取码：8fnl
+* Baidu Cloud Disk:
 
-解压，构建索引
+	>Link: https://pan.baidu.com/s/1gbZR1LJAmuT_fmFY1UJ7sA 
+	>Extraction code: 8fnl
+
+__Decompression and build index__
+
 ```
 7z x hg38_ref.7z
 cd hg38_ref
-## 运行构建索引
+## build index
 main_code_path=/your/path/to/PipeOne/
 nextflow run ${main_code_path}/s0_prepare_ref.nf -resume -profile docker --threads 4 
-## 删掉中间文件
+## Delete intermediate files
 rm -rf work result
 ```
 
 
-### 配置
-修改程序配置文件`PipeOne/conf/genomes.config`, 添加索引目录
+#### Configuration
+Modify the program configuration file `PipeOne/conf/genomes.config`,  change the line below:
 
-`ref_directory = ""` 改为 `ref_directory = "/your/path/to/hg38_ref"`
+`ref_directory = ""` change to `ref_directory = "/your/path/to/hg38_ref"`
 
 ```
 params {
@@ -64,10 +67,10 @@ params {
   genomes {
    
 	"hg38" {
-		// 
+		// the reference directory you need to  specify
 		ref_directory           = "/your/path/to/hg38_ref"
 
-        // 下面无需改
+        // No need to change below
 		species 				= "human"
 		genome_build			= "hg38"
 

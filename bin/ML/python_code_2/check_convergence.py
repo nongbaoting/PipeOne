@@ -31,7 +31,7 @@ params = {"low_dim": low_dim, "alpha": alpha, "gamma": gamma}
 params_grid = list(ParameterGrid(params))
 
 for params_ in params_grid:
-    tdir = "./results/lowDim=%d/" % params_["low_dim"]
+    tdir = "./NMF/lowDim=%d/" % params_["low_dim"]
     fi = tdir + "lowDim=%d_alpha=%.2f_gamma=%.2f.pkl" \
         % (params_["low_dim"], params_["alpha"], params_["gamma"])
 

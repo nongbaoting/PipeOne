@@ -87,7 +87,7 @@ def load_data(data_dir):
     for fi in data_fi:
         if "clustering" in fi:
             y_info = pd.read_csv(data_dir + fi, header=0, index_col=None)
-            y = np.array(y_info["subtype"])
+            y = np.array(y_info["Subtype"])
             #
             #y = np.array(y_info['subtype'].replace({'Primary Tumor':1, 'Solid Tissue Normal':0 }))
 

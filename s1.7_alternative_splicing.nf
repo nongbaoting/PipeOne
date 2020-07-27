@@ -274,7 +274,7 @@ if (params.reads || params.sra ){
 
 	process star_2_pass{
 		tag {id}
-		publishDir "${params.outdir}/star2pass", mode: 'copy'
+		publishDir "${params.outdir}/star2pass", mode: 'link'
 		
 		input:
 		file "STARIndex/*" from  STARIndex_2pass.collect()
@@ -305,7 +305,7 @@ if (params.reads || params.sra ){
 			--alignMatesGapMax 1000000 \\
 			--sjdbScore 2 
 			
-		ln -s ${id}.Aligned.sortedByCoord.out.bam ${id}.bam
+		mv ${id}.Aligned.sortedByCoord.out.bam ${id}.bam
 		samtools index ${id}.bam
 		chmod -R a+rw  .
 		"""

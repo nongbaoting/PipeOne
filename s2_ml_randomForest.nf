@@ -31,8 +31,8 @@ process proc_and_split_train_test_sample {
     """
     set +u; source activate pipeOne_ml; set -u
     python3 ${baseDir}/bin/ML/proc_raw_data.py proc --rawdir 00_rawdata  --sample_info s1_sample_info-tumor-normal.csv --var_topk ${params.var_topK}
-    python3 ${baseDir}/bin/ML/proc_raw_data.py train_test_split --indir data/proc \\
-        --sample_info s1_sample_info-tumor-normal.csv \\
+    python3 ${baseDir}/bin/ML/proc_raw_data.py train_test_split --indir data/proc \
+        --sample_info ./data/common_sample_info.csv \
         --test_size ${params.test_size}   --random_state ${params.random_state}
     """
 }

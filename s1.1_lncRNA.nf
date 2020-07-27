@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 params.genome = ""
-params.species = ''
+params.species = params.genome ? params.genomes[ params.genome ].species ?: false : false
 params.genecode_gtf = params.genome ? params.genomes[ params.genome ].genecode_gtf ?: false : false
 params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
 params.lncpedia_gtf  = params.genome ? params.genomes[ params.genome ].lncpedia_gtf  ?: false : false
@@ -13,7 +13,7 @@ params.reads  = ""
 params.single = false
 params.cleaned  = false
 params.featureCounts = false
-
+params.saveIntermediate = false
 genecode_lncRNA_gtf = file(params.genecode_lncRNA_gtf)
 
 if ( params.fasta ){
@@ -33,6 +33,8 @@ if ( params.lncpedia_gtf ){
 }else{exit 1, "No lncpedia gtf file specified!"}
 
 
+println("genome: " + params.genome + "\n" + "species: "+ params.species )
+
 scripts = Channel.fromPath("$baseDir/scripts/*")
 scripts.into{scripts_1; scripts_2}
 params.threads = 16
@@ -44,7 +46,7 @@ params.forward_stranded =false
 
 params.layout = 'paired'
 def ifPaired = true
-if (params.layout =~ /single/ ){
+if (params.layout =~ /(?i)single(?-i)/ ){
 	ifPaired = false
 }
 
@@ -209,8 +211,9 @@ if ( params.hisat2_index && !params.bam ){
         tag {id}
         publishDir "${params.outdir}/hisat2/", mode: 'copy',
             saveAs: {filename -> 
-                if(filename =~ /bam/) filename
+                if(filename =~ /bam/ &&  params.saveIntermediate  )  "bam/$filename"
                 else if (filename =~/log/) "logs/${filename}"
+				else null
                 }
         
         input:
@@ -264,9 +267,12 @@ process stringtie {
     tag { id }
     publishDir "${params.outdir}/stringtie", mode: 'copy',
         saveAs: {filename ->
-            if (filename.indexOf("transcripts.gtf") > 0) "transcripts/$filename"
-            else if (filename.indexOf("cov_refs.gtf") > 0) "cov_refs/$filename"
-            else "$filename"
+			if( params.saveIntermediate ){
+				if (filename.indexOf("transcripts.gtf") > 0) "transcripts/$filename"
+				else if (filename.indexOf("cov_refs.gtf") > 0) "cov_refs/$filename"
+				else "$filename"
+			}else null
+            
         }
 
     input:
@@ -357,7 +363,8 @@ cpatpath = params.cpatpath
 
 process cpat{
 	
-	publishDir "${params.outdir}/CPAT/", mode: 'copy'
+	publishDir "${params.outdir}/CPAT/", mode: 'copy', 
+    	saveAs: { filename -> params.saveIntermediate ? "$filename" : null }
 	
 	input:
 	file "novel_lncRNA_candidate.fa" from lncRNA_candidate_fa_1.collect()
@@ -367,7 +374,8 @@ process cpat{
 	file "CPAT.out" into cpat_out
 	
 	shell:
-	if(params.species=="human"){
+	
+	if(params.species =~ /(?i)human(?-i)/){
         '''
 		set +u; source activate lncRNA; set -u
         cpat.py -g novel_lncRNA_candidate.fa \
@@ -375,7 +383,7 @@ process cpat{
                                        -d !{cpatpath}/dat/Human_logitModel.RData \
                                        -o CPAT.out
         '''
-    }else if (params.species=="mouse"){
+    }else if (params.species =~ /(?i)mouse(?-i)/ ){
 		
         '''
 		set +u; source activate lncRNA; set -u
@@ -385,7 +393,7 @@ process cpat{
                                        -o CPAT.out
         '''
 
-    }else if (params.species=="zebrafish"){
+    }else if (params.species =~/(?i)zebrafish(?-i)/){
 		
         '''
 		set +u; source activate lncRNA; set -u
@@ -394,12 +402,12 @@ process cpat{
                                        -d !{cpatpath}/dat/zebrafish_logitModel.RData \
                                        -o CPAT.out
         '''
-    }else {
+    }else if (params.species =~ /(?i)Fly(?-i)/) {
         '''
 		set +u; source activate lncRNA; set -u
         cpat.py -g novel_lncRNA_candidate.fa  \
                                        -x !{cpatpath}/dat/fly_Hexamer.tsv \
-                                       -d !{cpatpath}/dat/fly_logitModel.RData \
+                                       -d !{cpatpath}/dat/Fly_logitModel.RData \
                                        -o CPAT.out
         '''
     }
@@ -409,7 +417,8 @@ process cpat{
 process PLEK {
 	
     validExitStatus 0,1,2
-	publishDir "${params.outdir}/PLEK/", mode: 'copy'
+	publishDir "${params.outdir}/PLEK/", mode: 'copy', 
+    	saveAs: { filename -> params.saveIntermediate ? "$filename" : null }
 	
 	input:
 	file "novel_lncRNA_candidate.fa" from lncRNA_candidate_fa_2.collect()
@@ -428,11 +437,11 @@ process PLEK {
 }
 
 process CPPred {
-	publishDir "${params.outdir}/CPPred/", mode: 'copy'
+	publishDir "${params.outdir}/CPPred/", mode: 'copy', 
+    	saveAs: { filename -> params.saveIntermediate ? "$filename" : null }
 	
 	input:
 	file "novel_lncRNA_candidate.fa" from lncRNA_candidate_CPPred.collect()
-	
 	
 	output:
 	file "CPPred.out" into CPPred_out
@@ -446,7 +455,8 @@ process CPPred {
 }
 
 process prepare_reference_gtf {
-    publishDir "${params.outdir}/reference_gtf_info/", mode: 'copy'
+    publishDir "${params.outdir}/reference_gtf_info/", mode: 'copy', 
+    	saveAs: { filename -> params.saveIntermediate ? "$filename" : null }
 	
 	input:
 	file "gencode_annotation.gtf" from gtf
@@ -478,7 +488,7 @@ process filter_coding_potentail{
 
     publishDir "${params.outdir}/filter_coding_potentail/", mode: 'copy',
 		saveAs: { filename-> 
-			if( filename =~ /(list|fa|gtf)$/)filename
+			if( filename =~ /(list|fa|gtf)$/) filename
 			}
 	publishDir "${params.outdir}/novel_lncRNA/", mode: 'copy',
 		saveAs: { filename-> 
@@ -742,7 +752,8 @@ if (params.reads){
 	
 	process salmon_index{
 		
-		publishDir "${params.outdir}/salmon/salmon_index/", mode: 'copy'
+		publishDir "${params.outdir}/salmon/salmon_index/", mode: 'copy', 
+    		saveAs: { filename -> params.saveIntermediate ? "$filename" : null }
 		input:
 		file 'transcripts.fa' from cal_expr_fa.collect()
 		
@@ -757,7 +768,8 @@ if (params.reads){
 
 	process salmon {
 		
-		publishDir "${params.outdir}/salmon/samples", mode: 'copy'
+		publishDir "${params.outdir}/salmon/samples", mode: 'copy',
+    		saveAs: { filename -> params.saveIntermediate ? "$filename" : null }
 		
 		tag {id } 
 		input:

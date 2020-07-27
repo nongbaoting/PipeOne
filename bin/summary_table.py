@@ -54,6 +54,8 @@ class RUN:
         home = os.path.dirname(__file__)
         ## 1,2 lncRNA mRNA
         lncRNA_mRNA("../s1.1_lncRNA/results/salmon/salmon_gene_tpm.tsv", "../s1.1_lncRNA/results/novel_lncRNA/all_lncRNA_info.tsv")
+        
+        ## circRNA
 
         ## s3 APA
         os.system(f"Rscript --vanilla {home}/apa_3utr_filter.R")
@@ -76,7 +78,7 @@ class RUN:
 
         ## s8_SNP
         chck_dir("s1.8_SNP")
-        os.system(f"cp ../s1.8_SNP/table/snp.geneBase.tsv s1.8_SNP/snp.geneBase.tsv")
+        os.system(f"cp ../s1.8_SNP/results/annovar_table/snp.geneBase.tsv s1.8_SNP/snp.geneBase.tsv")
 
     def mark_feature(self,):
         chck_dir('00_rawdata')
