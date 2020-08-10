@@ -14,7 +14,7 @@ Channel
     .set{ tables }
 
 process defusion {
-     publishDir "./results",  mode: 'copy'
+    publishDir "./results",  mode: 'copy'
    
     input:
     file "00_rawdata/*" from tables.collect()

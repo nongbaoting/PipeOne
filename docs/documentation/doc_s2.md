@@ -54,7 +54,7 @@ Note that each file is in csv comma separated format.
 
 #### Run Module 2  step by step
 
-* get top K variance features
+__1. get top K variance features__
   
 ```
 source activate pipeOne_ml
@@ -67,7 +67,7 @@ python3 ${baseDir}/bin/ML/proc_raw_data.py proc --rawdir 00_rawdata  --sample_in
     --var_topk  top K most variance features
     --tdir  Output directory, default ./data/proc/
 
-* Divide data into test set and training set
+__2. Divide data into test set and training set__
 
 ```
 python3 ${baseDir}/bin/ML/proc_raw_data.py train_test_split --indir ../data/proc  --sample_info s1_sample_info-tumor-normal.csv
@@ -113,7 +113,7 @@ python3 /home/nbt2/pipe/PipeOne/bin/ML/python_code_2/subset_sample_nong.py subse
 
 
 
-* Run the main program
+__3. Run the main program__
 
 ```
 python3 ${baseDir}/bin/ML/main_randomForest.py --threads 8 --train_dir ./data/train_dir --test_dir ./data/test_dir
@@ -123,7 +123,7 @@ python3 ${baseDir}/bin/ML/main_randomForest.py --threads 8 --train_dir ./data/tr
     --test_dir  Testing data directory
 
 
-* add gene info to  results (optional)
+__4. add gene info to  results (optional)__
 ```
 python3 ${baseDir}/bin/ML/result_summary.py feature  --rf_res_fi data/feature_importance.csv  --ginfo_fi ../../s1.1_lncRNA/results/novel_lncRNA/protein_coding_and_all_lncRNA.info.tsv
 ```

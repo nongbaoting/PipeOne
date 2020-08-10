@@ -39,7 +39,7 @@ ff1a9e27-04bb-4732-8631-4ffad26c700e_gdc_realn_rehead,0,2294
 
 #### Run step by step
 
-1. select topK variance features and run NMF
+__1. select topK variance features and run NMF__
 ```
 source activate pipeOne_ml
 baseDir=/path/to/PipeOne/
@@ -58,7 +58,7 @@ __Options__
     --var_topK  top K most variance features. default [1000]
     --threads <int> number of threads to use default [24]
 
-2. clustering and eval
+__2. clustering and eval__
 ```
 python3 ${baseDir}/bin/ML/python_code_2/eval_cluster_num.py --cluster_range "3-8"
 Rscript ${baseDir}/bin/ML/python_code_2/survival_eval.R ./data/sample.cli.csv ./clusters/surv_curve/ "3-8"
@@ -72,7 +72,7 @@ Script `survival_eval.R` need three mandotory inputs: __clinical information fil
 __cluster_result__ which produce by script `eval_cluster_num.py`, and __cluster_range__ same as --cluster_range
 
 
-3. select features
+__3. select features__
 ```
 python3 ${baseDir}/bin/ML/python_code_2/select_topk_nong.py 
 python3 ${baseDir}/bin/ML/python_code_2/find_best_RFparams.py 
@@ -100,7 +100,7 @@ __Note:__ The `--cluster_survival_file` option is mutually exclusive with the `-
 __main result__
 * `record_log_rank_test_pvalue.csv`, Survival difference of different classification results
 * `FeatureSelection` random Forest results
-    * `RF_best_params_settings_for_feature_selection.csv`   best Random Foerest parameter and accuracy
+    * `RF_best_params_settings_for_feature_selection.csv` best Random Foerest parameter and accuracy
     * `feature*_importance.csv`  Random Foerest Feature importance
     * `RF_params_setting_record.txt` all Random Foerest parameter and accuracy
 

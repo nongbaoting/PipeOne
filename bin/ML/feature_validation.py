@@ -36,25 +36,30 @@ class FeatureValidation:
         self.X_test = X_test
         self.y_test = y_test
 
-    def select_topk_feature(self, feature_importance, topk):
+    def select_topk_feature(self, feature_importance, feature_name, topk):
         X_train = self.X_train
         X_test = self.X_test
 
         sort_idx = np.argsort(-feature_importance)
-        topk = np.minimum(topk, len(sort_idx))
+        #topk = np.minimum(topk, len(sort_idx))
 
+        ## use non-zero feature importance only
+        nonzero_num = np.sum(feature_importance != 0)
+        topk = np.minimum(topk, nonzero_num )
+        
         topk_X_train = X_train[:, sort_idx[0:topk]]
         topk_X_test = X_test[:, sort_idx[0:topk]]
+        topK_feature_name =  [feature_name[i] for i in  list(sort_idx[0:topk])  ]
 
         self.topk_X_train = topk_X_train
         self.top_X_test = topk_X_test
-
+        self.topK_feature_name = topK_feature_name
         # return topk_X_train, topk_X_train
 
-    def do_grid_search(self, params, cv, n_jobs):
+    def do_grid_search(self, params, cv, n_jobs, random_state = 0):
         X_train = self.topk_X_train
         y_train = self.y_train
-        classifier = RandomForestClassifier(random_state=42)
+        classifier = RandomForestClassifier(random_state= random_state)
         clf = GridSearchCV(classifier, params, n_jobs=n_jobs, cv=cv)
 
         clf.fit(X_train, y_train)
@@ -63,7 +68,11 @@ class FeatureValidation:
         best_score = clf.best_score_
         best_estimator = clf.best_estimator_
 
-        return best_estimator, best_params, best_score
+        ## add training evaluation
+        y_pred = best_estimator.predict(X_train )
+        train_sen, train_spec = self.sensitivity_specificity(y_train, y_pred)
+
+        return best_estimator, best_params, best_score, train_sen, train_spec
 
     def sensitivity_specificity(self, y_true, y_pred):
         tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
@@ -84,6 +93,19 @@ class FeatureValidation:
 
         return test_sen, test_spec
 
+    def get_feature_importance(self, fout, params, random_state = 0):
+        clf = RandomForestClassifier(n_estimators=params["n_estimators"], max_depth=params["max_depth"],
+                                 min_samples_split=params["min_samples_split"],
+                                 class_weight=params["class_weight"], random_state=random_state) 
+
+        clf.fit(self.topk_X_train, self.y_train)
+        feature_importance = clf.feature_importances_
+        feature_dict = {"feature": self.topK_feature_name, "weight": feature_importance}
+
+        feature_df = pd.DataFrame.from_dict(feature_dict)
+        feature_df.to_csv(fout, header=True, index=False)
+        #return feature_importance
+
 
 def grid_search(X, y, classifier, parameters, cv, n_jobs):
     clf = GridSearchCV(classifier, parameters, n_jobs=n_jobs, cv=cv)
@@ -93,10 +115,10 @@ def grid_search(X, y, classifier, parameters, cv, n_jobs):
     return best_params, best_score
 
 
-def get_feature_importance(X, y, feature_name, fout, params):
+def get_feature_importance(X, y, feature_name, fout, params, random_state = 0):
     clf = RandomForestClassifier(n_estimators=params["n_estimators"], max_depth=params["max_depth"],
                                  min_samples_split=params["min_samples_split"],
-                                 class_weight=params["class_weight"], random_state=42)
+                                 class_weight=params["class_weight"], random_state=random_state)
 
     clf.fit(X, y)
     feature_importance = clf.feature_importances_

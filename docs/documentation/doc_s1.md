@@ -15,6 +15,7 @@ Require:
 
 --genome <string>     Genome version defined in conf/igenomes.config
 ```
+
 Optional:
 ```
 --cleaned  <booloen>   true or false. Whether the FASTQ file has been quality controlled, if it is false, use fastp for quality control. defalt [false]
@@ -26,7 +27,6 @@ Optional:
 -h --help     show  help message
 ```
 
-
 #### Output
 
 * __Files result from different programs applied to RNA-seq__
@@ -34,6 +34,7 @@ Optional:
     * s1.*  Program running directory
       * result result directory
       * work work directory
+
 ```
 $ tree -L 2
 .
@@ -71,7 +72,7 @@ $ tree -L 2
 30 directories, 0 files
 ```
 
-* __Tables from different aspect of RNA-seq: s1.*
+* __Tables from different aspect of RNA-seq: s1.*__
 ```
 $ ls  00_tables
 00_rawdata
@@ -84,8 +85,7 @@ s1.7_alternative_splicing
 s1.8_SNP
 ```
 
-
-* __Tables of different aspects of RNA-seq from one directory, which are required in the next module__
+* __Tables of different aspects of RNA-seq in one directory__, which are required in module 2 and module3
 ```
 $ ls 00_tables/00_rawdata
 APA_pau-distal-proximal.csv
