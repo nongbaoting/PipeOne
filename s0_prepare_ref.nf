@@ -109,7 +109,8 @@ process bwa_index{
     """
     set +u; source activate RnaEditing; set -u
     mkdir -p bwa_index
-    bwa index -p bwa_index/bwa_index   ${fasta} 
+    bwa index -p bwa_index/bwa_index   ${fasta}
+    
     """
     
 }

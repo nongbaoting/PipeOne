@@ -15,6 +15,11 @@
 ```
 docker pull nongbaoting/pipeone:latest
 ```
+or
+```
+docker pull registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:latest
+docker tag registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:latest nongbaoting/pipeone:latest
+```
 
 
 2.download PipeOne

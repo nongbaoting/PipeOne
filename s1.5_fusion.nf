@@ -7,6 +7,8 @@ params.reads = ""
 
 params.genome =""
 params.cleaned  = false
+params.saveIntermediateFiles = false
+
 params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : false
 params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
 params.star_index = params.genome ? params.genomes[ params.genome ].star_index ?:false :false
@@ -83,7 +85,7 @@ if(params.reads ){
 			tag {id}
             maxForks 2
 			
-			publishDir "${params.outdir}/fastp/", mode: 'copy',
+			publishDir "${params.outdir}/fastp/", mode: 'link',
 				saveAs: {filename -> 
 					if(filename =~ /fastp.fq.gz/) "clean/${filename}"
 					else "report/${id}.${filename}" 
@@ -150,7 +152,7 @@ if(params.reads ){
 		errorStrategy 'ignore'
 		maxForks 1
 		
-		publishDir "${params.outdir}/fastp/", mode: 'copy',
+		publishDir "${params.outdir}/fastp/", mode: 'link',
 			saveAs: {filename -> 
 				if(filename =~ /fastp.fq.gz/) "clean/${filename}"
 				else "report/${id}.${filename}" 
@@ -193,7 +195,7 @@ if (params.arriba == "true" ){
 		errorStrategy 'ignore'
 		
 		tag { id }
-		publishDir "${params.outdir}/arriba/", mode: 'copy',
+		publishDir "${params.outdir}/arriba/", mode: 'link',
 		  saveAs: {filename ->
 			if( filename =~ /.fusions.tsv/ ) "tsv/${filename}"
 				else if(filename =~ /fusions.pdf/) "pdf/${filename}"
@@ -244,7 +246,7 @@ if (params.arriba == "true" ){
 	}
 
 	process merge_arriba{
-		publishDir "${params.outdir}/arriba/", mode: 'copy'
+		publishDir "${params.outdir}/arriba/", mode: 'link'
 		
 		input:
 		path "arriba_out/*" from arriba_out.collect()
@@ -272,7 +274,7 @@ if(params.star_fusion == "true"){
 		errorStrategy 'ignore'
 		
 		tag { id }
-		publishDir "${params.outdir}/star_fusion/", mode: 'copy'
+		publishDir "${params.outdir}/star_fusion/", mode: 'link'
 				
 		input:
 		set id , file(reads) from reads_star_fusion
@@ -302,7 +304,7 @@ if(params.star_fusion == "true"){
 process arriba {
 	errorStrategy 'ignore'
 	tag { id }
-	publishDir "${params.outdir}/arriba/", mode: 'copy',
+	publishDir "${params.outdir}/arriba/", mode: 'link',
       saveAs: {filename ->
 		if( filename =~ /.fusions.tsv/ ) "tsv/${filename}"
 		else if(filename =~ /fusions.pdf/) "pdf/${filename}"

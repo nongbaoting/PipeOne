@@ -13,7 +13,7 @@ params.reads  = ""
 params.single = false
 params.cleaned  = false
 params.featureCounts = false
-params.saveIntermediate = false
+params.saveIntermediateFiles = false
 genecode_lncRNA_gtf = file(params.genecode_lncRNA_gtf)
 
 if ( params.fasta ){
@@ -94,7 +94,7 @@ if(params.reads ){
 			tag {id}
             maxForks 2
 			
-			publishDir "${params.outdir}/fastp/", mode: 'copy',
+			publishDir "${params.outdir}/fastp/", mode: 'link',
 				saveAs: {filename -> 
 					if(filename =~ /fastp.fq.gz/) "clean/${filename}"
 					else "report/${id}.${filename}" 
@@ -161,7 +161,7 @@ if(params.reads ){
 		errorStrategy 'ignore'
 		maxForks 1
 		
-		publishDir "${params.outdir}/fastp/", mode: 'copy',
+		publishDir "${params.outdir}/fastp/", mode: 'link',
 			saveAs: {filename -> 
 				if(filename =~ /fastp.fq.gz/) "clean/${filename}"
 				else "report/${id}.${filename}" 
@@ -209,9 +209,9 @@ if ( params.hisat2_index && !params.bam ){
     process hisat2 {
 			
         tag {id}
-        publishDir "${params.outdir}/hisat2/", mode: 'copy',
+        publishDir "${params.outdir}/hisat2/", mode: 'link',
             saveAs: {filename -> 
-                if(filename =~ /bam/ &&  params.saveIntermediate  )  "bam/$filename"
+                if(filename =~ /bam/   )  "bam/$filename"
                 else if (filename =~/log/) "logs/${filename}"
 				else null
                 }
@@ -265,9 +265,9 @@ bam_ch.into{ bam_stringite; bam_stringtieFPKM; bam_featurecounts;}
 
 process stringtie {
     tag { id }
-    publishDir "${params.outdir}/stringtie", mode: 'copy',
+    publishDir "${params.outdir}/stringtie", mode: 'link',
         saveAs: {filename ->
-			if( params.saveIntermediate ){
+			if( params.saveIntermediateFiles ){
 				if (filename.indexOf("transcripts.gtf") > 0) "transcripts/$filename"
 				else if (filename.indexOf("cov_refs.gtf") > 0) "cov_refs/$filename"
 				else "$filename"
@@ -302,7 +302,7 @@ process stringtie {
 
 process taco{
 	
-	publishDir "${params.outdir}/taco/", mode: 'copy'
+	publishDir "${params.outdir}/taco/", mode: 'link'
 	input:
 	file gtf
 	file "stringtie_gtf/*" from stringtie_gtf.collect()
@@ -320,7 +320,7 @@ process taco{
 
 // to get known annotate genes/lncRNA and novel lncRNAs
 process gffcompare{
-	publishDir "${params.outdir}/gffcompare/", mode: 'copy'
+	publishDir "${params.outdir}/gffcompare/", mode: 'link'
 	
 	input:
 	file fasta
@@ -363,8 +363,8 @@ cpatpath = params.cpatpath
 
 process cpat{
 	
-	publishDir "${params.outdir}/CPAT/", mode: 'copy', 
-    	saveAs: { filename -> params.saveIntermediate ? "$filename" : null }
+	publishDir "${params.outdir}/CPAT/", mode: 'link', 
+    	saveAs: { filename -> params.saveIntermediateFiles ? "$filename" : null }
 	
 	input:
 	file "novel_lncRNA_candidate.fa" from lncRNA_candidate_fa_1.collect()
@@ -417,8 +417,8 @@ process cpat{
 process PLEK {
 	
     validExitStatus 0,1,2
-	publishDir "${params.outdir}/PLEK/", mode: 'copy', 
-    	saveAs: { filename -> params.saveIntermediate ? "$filename" : null }
+	publishDir "${params.outdir}/PLEK/", mode: 'link', 
+    	saveAs: { filename -> params.saveIntermediateFiles ? "$filename" : null }
 	
 	input:
 	file "novel_lncRNA_candidate.fa" from lncRNA_candidate_fa_2.collect()
@@ -437,8 +437,8 @@ process PLEK {
 }
 
 process CPPred {
-	publishDir "${params.outdir}/CPPred/", mode: 'copy', 
-    	saveAs: { filename -> params.saveIntermediate ? "$filename" : null }
+	publishDir "${params.outdir}/CPPred/", mode: 'link', 
+    	saveAs: { filename -> params.saveIntermediateFiles ? "$filename" : null }
 	
 	input:
 	file "novel_lncRNA_candidate.fa" from lncRNA_candidate_CPPred.collect()
@@ -455,7 +455,7 @@ process CPPred {
 }
 
 process prepare_reference_gtf {
-    publishDir "${params.outdir}/reference_gtf_info/", mode: 'copy', 
+    publishDir "${params.outdir}/reference_gtf_info/", mode: 'link', 
     	saveAs: { filename -> params.saveIntermediate ? "$filename" : null }
 	
 	input:
@@ -486,16 +486,16 @@ known_gtf_list_ch.into{ known_gtf_list_ch; known_gtf_list_ch_1;  known_gtf_list_
 
 process filter_coding_potentail{
 
-    publishDir "${params.outdir}/filter_coding_potentail/", mode: 'copy',
+    publishDir "${params.outdir}/filter_coding_potentail/", mode: 'link',
 		saveAs: { filename-> 
 			if( filename =~ /(list|fa|gtf)$/) filename
 			}
-	publishDir "${params.outdir}/novel_lncRNA/", mode: 'copy',
+	publishDir "${params.outdir}/novel_lncRNA/", mode: 'link',
 		saveAs: { filename-> 
 			if( filename =~ /novel_lncRNA/) filename
 			}
 	
-	publishDir "${params.outdir}/novel_lncRNA/tmp/", mode: 'copy'
+	publishDir "${params.outdir}/novel_lncRNA/tmp/", mode: 'link'
 			
     scratch false
 	
@@ -566,7 +566,7 @@ if( params.featureCounts){
 	process featureCounts{
 		
 		tag { id }
-		publishDir "${params.outdir}/featureCounts/samples", mode: 'copy'
+		publishDir "${params.outdir}/featureCounts/samples", mode: 'link'
 		
 		input:
 		set id, file(bam) from bam_featurecounts
@@ -592,7 +592,7 @@ if( params.featureCounts){
 
 	process merge_featureCounts {
 		
-		publishDir "${params.outdir}/featureCounts/", mode: 'copy'
+		publishDir "${params.outdir}/featureCounts/", mode: 'link'
 
 		input:
 		file input_files from featureCounts_to_merge.collect()
@@ -610,7 +610,7 @@ if( params.featureCounts){
 }
 
 process format_lncRNA_info{
-	publishDir "${params.outdir}/novel_lncRNA/", mode: 'copy'
+	publishDir "${params.outdir}/novel_lncRNA/", mode: 'link'
 	errorStrategy 'ignore'
     
 	input:
@@ -649,7 +649,7 @@ process format_lncRNA_info{
 
 
 process classify_lncRNA {
-    publishDir "${params.outdir}/novel_lncRNA/classify", mode: 'copy'
+    publishDir "${params.outdir}/novel_lncRNA/classify", mode: 'link'
     errorStrategy 'ignore'
     
     input:
@@ -722,7 +722,7 @@ cal_deg_ch.into{cal_deg_ch;cal_deg_ch_1;cal_deg_ch_2 }
 if( params.datainfo && params.featureCounts ){
 	datainfo = file(params.datainfo)
 	process DEG_by_DESeq2_with_featureCounts {
-		publishDir "${params.outdir}/deg_DESeq2/featureCounts/", mode: 'copy'
+		publishDir "${params.outdir}/deg_DESeq2/featureCounts/", mode: 'link'
 		
 		input:
 		file 'merged_gene_counts.txt' from featureCounts_res.collect()
@@ -752,8 +752,8 @@ if (params.reads){
 	
 	process salmon_index{
 		
-		publishDir "${params.outdir}/salmon/salmon_index/", mode: 'copy', 
-    		saveAs: { filename -> params.saveIntermediate ? "$filename" : null }
+		publishDir "${params.outdir}/salmon/salmon_index/", mode: 'link', 
+    		saveAs: { filename -> params.saveIntermediateFiles ? "$filename" : null }
 		input:
 		file 'transcripts.fa' from cal_expr_fa.collect()
 		
@@ -761,15 +761,15 @@ if (params.reads){
 		file "salmon_index/*" into salmon_index_ch
 		
 		"""
-		set +u; source activate lncRNA; set -u
+		# set +u; source activate lncRNA; set -u
 		salmon index -t transcripts.fa -i salmon_index -p 4
 		"""
 	}
 
 	process salmon {
 		
-		publishDir "${params.outdir}/salmon/samples", mode: 'copy',
-    		saveAs: { filename -> params.saveIntermediate ? "$filename" : null }
+		publishDir "${params.outdir}/salmon/samples", mode: 'link',
+    		saveAs: { filename -> params.saveIntermediateFiles ? "$filename" : null }
 		
 		tag {id } 
 		input:
@@ -783,14 +783,16 @@ if (params.reads){
 		if(params.single){
 						
 			"""
-			set +u; source activate lncRNA; set -u
-			salmon quant -i transcripts_index -l A -r $reads -p 8 -o ${id}
+			# set +u; source activate lncRNA; set -u
+			salmon quant -i transcripts_index -l A -r $reads -p 8 -o ${id} --gcBias
+
 			"""
 		}else{
 						
 			"""
-			set +u; source activate lncRNA; set -u
-			salmon quant -i transcripts_index -l A -1 ${reads[0] } -2 ${reads[1] } -p 8 -o ${id}
+			# set +u; source activate lncRNA; set -u
+			salmon quant -i transcripts_index -l A -1 ${reads[0] } -2 ${reads[1] } -p 8 -o ${id} --gcBias
+
 			"""
 		}
 		
@@ -798,7 +800,7 @@ if (params.reads){
 
 	process salmon_merge {
 		
-		publishDir "${params.outdir}/salmon/", mode: 'copy'
+		publishDir "${params.outdir}/salmon/", mode: 'link'
 		
 		input:
 		file "ref_gtf" from cal_expr_gtf_1.collect()
@@ -822,7 +824,7 @@ if (params.reads){
 	
 	if(params.datainfo){
 		process differential_anlysis_by_slueth{
-			publishDir "${params.outdir}/deg_slueth/", mode: 'copy'
+			publishDir "${params.outdir}/deg_slueth/", mode: 'link'
 			
 			input:
 			file "samples/*" from kallisto_slueth.collect()
@@ -837,7 +839,7 @@ if (params.reads){
 		}
 		
 		process DEG_by_DESeq2_with_salmon {
-			publishDir "${params.outdir}/deg_DESeq2/salmon/", mode: 'copy'
+			publishDir "${params.outdir}/deg_DESeq2/salmon/", mode: 'link'
 			
 			input:
 			

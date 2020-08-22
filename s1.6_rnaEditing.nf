@@ -7,6 +7,7 @@ params.cleaned = false
 params.outdir = "results"
 params.threads = 16
 threads = params.threads
+params.saveIntermediateFiles = false
 
 params.sprint_index = params.genome ? params.genomes[ params.genome ].sprint_index ?:false :false
 params.sprint_repeat = params.genome ? params.genomes[ params.genome ].sprint_repeat ?:false :false
@@ -63,7 +64,7 @@ if(params.reads ){
 			tag {id}
             maxForks 2
 			
-			publishDir "${params.outdir}/fastp/", mode: 'copy',
+			publishDir "${params.outdir}/fastp/", mode: 'link',
 				saveAs: {filename -> 
 					if(filename =~ /fastp.fq.gz/) "clean/${filename}"
 					else "report/${id}.${filename}" 
@@ -130,7 +131,7 @@ if(params.reads ){
 		errorStrategy 'ignore'
 		maxForks 1
 		
-		publishDir "${params.outdir}/fastp/", mode: 'copy',
+		publishDir "${params.outdir}/fastp/", mode: 'link',
 			saveAs: {filename -> 
 				if(filename =~ /fastp.fq.gz/) "clean/${filename}"
 				else "report/${id}.${filename}" 
@@ -178,7 +179,7 @@ if ( params.sprint_index  ){
 params.sprint_tmp = "false"
 
 process sprint{
-	publishDir "${params.outdir}/sprint/", mode: 'copy',
+	publishDir "${params.outdir}/sprint/", mode: 'link',
 		saveAs: {filename -> 
 			if (filename =~ /SPRINT_identified_all.res/) "res/${filename}"
 			else "tmp/${filename}"
@@ -224,7 +225,7 @@ params.miniEditing_reads = 5
 
 process merge_A2I {
 	
-	publishDir "${params.outdir}/sprint/Merge", mode: 'copy'
+	publishDir "${params.outdir}/sprint/Merge", mode: 'link'
 		
 	input:
 	file "results/*"     from sprint_res.collect()
@@ -254,7 +255,7 @@ if (params.snp){
 	snpFile = file(params.snp)
 	
 	process snpFilter{
-		publishDir "${params.outdir}/sprint_filter/", mode: 'copy'
+		publishDir "${params.outdir}/sprint_filter/", mode: 'link'
 		
 		input:
 		tuple  "SPRINT_all.annovar.csv", "SPRINT_A2I.annovar.csv", "SPrint_A2I_table.annovar.csv" from merge_out.collect()

@@ -10,7 +10,6 @@ def chck_dir(dir):
     if not os.path.exists(dir):
         os.makedirs(dir)
 
-
 def sensitivity_specificity(y_true, y_pred):
     """
     计算敏感度和特异度

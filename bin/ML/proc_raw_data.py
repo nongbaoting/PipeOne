@@ -1,4 +1,3 @@
-
 import numpy as np
 import pandas as pd
 # from scipy.io import savemat
@@ -20,7 +19,7 @@ def select_top_k_var(df, topk):
     var = df.var(axis=0, skipna=True)
     var = var.fillna(0)
     sort_id = np.argsort(-var.values)
-    df_out = df.iloc[:, sort_id[0: topk]]
+    df_out = df.iloc[:, sort_id[0: topk] ]
     return df_out
 
 def select_top_k_nonzero_ratio(df, topk):
@@ -49,7 +48,6 @@ def get_sample_head_idx(df):
         if sample_head.match(c):
             return i
 
-
 def sub_feature_samples(indir, train_dir, sample_info, outdir):
     sinfo = pd.read_csv(sample_info)
     chck_dir(outdir)
@@ -61,12 +59,10 @@ def sub_feature_samples(indir, train_dir, sample_info, outdir):
         fi_name_out = f'proc_{entry.name}'
         train_fi = os.path.join(train_dir, fi_name_out)
         dat_train = pd.read_csv(train_fi, header=0, index_col=0)
-
         sub_dat = datT.reindex(index = sinfo.iloc[:, 0], columns=dat_train.columns, fill_value=0)
         outfi = os.path.join(outdir, fi_name_out)
         sub_dat.to_csv(outfi, index=True, header=True)
     os.system(f"cp {sample_info} {outdir}/dat_sample_clustering.csv")
-
 
 def samllSample_train_test_split(sample_df, test_size=0.3, random_state=2):
     train, test = pd.DataFrame(), pd.DataFrame()
@@ -76,8 +72,6 @@ def samllSample_train_test_split(sample_df, test_size=0.3, random_state=2):
         train = train.append(train_, ignore_index=True )
         test = test.append(test_, ignore_index=True)
     return train, test
-
-
 class MYRUN_procRaw:
 
     def proc(self, rawdir , sample_info, var_topk = 1000 ):
@@ -122,8 +116,8 @@ class MYRUN_procRaw:
             dfA_nonzero.to_csv(foutA, header=True, index=True)
         
         print(f'\nNumber of samples in input sample info: {input_len}')
-        print(f'Number of samples in feature data set : {data_len}')
-        print(f'Number of common samples              : {len(exist_sample)}')
+        print(f'Number of samples in feature data set   : {data_len}')
+        print(f'Number of common samples                : {len(exist_sample)}')
 
         common_fi = "./data/common_sample_info.csv"
         cli_common = clinical_df[ clinical_df["Sample"].isin(exist_sample) ]

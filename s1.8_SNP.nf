@@ -7,14 +7,14 @@ params.cleaned  = false
 params.threads = 8
 params.single = ""
 params.genome =""
-params.saveIntermediateVariants = true
+params.saveIntermediateVariants = false
+params.saveIntermediateFiles = false
+
 params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : false
 params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
 params.star_index = params.genome ? params.genomes[ params.genome ].star_index ?:false :false
 params.genome_build  = params.genome ? params.genomes[ params.genome ].genome_build ?:false :false
 params.annovar_data_dir = params.genome ? params.genomes[ params.genome ].annovar_data_dir ?:false :false
-
-
 
 GenomeAnalysisTK = file(params.GenomeAnalysisTK)
 
@@ -81,7 +81,7 @@ if(params.reads ){
 			tag {id}
             maxForks 2
 			
-			publishDir "${params.outdir}/fastp/", mode: 'copy',
+			publishDir "${params.outdir}/fastp/", mode: 'link',
 				saveAs: {filename -> 
 					if(filename =~ /fastp.fq.gz/) "clean/${filename}"
 					else "report/${id}.${filename}" 
@@ -146,7 +146,7 @@ if(params.reads ){
 	process fastq_dump_and_fastp{
 		tag {id}
 		
-		publishDir "${params.outdir}/fastp/", mode: 'copy',
+		publishDir "${params.outdir}/fastp/", mode: 'link',
 			saveAs: {filename -> 
 				if(filename =~ /fastp.fq.gz/) "clean/${filename}"
 				else "report/${id}.${filename}" 
@@ -334,7 +334,7 @@ process  Variant_calling {
 }
 
 process  Variant_filtering {
-	publishDir "${params.outdir}/Variant_filtering/", mode: 'copy', 
+	publishDir "${params.outdir}/Variant_filtering/", mode: 'link', 
     saveAs: { filename -> params.saveIntermediateVariants ? "$filename" : null }
 	
 	input:
@@ -366,7 +366,7 @@ operation='g'
 
 process variant_AnnotateAnnovar {
 	
-	publishDir "${params.outdir}/variantAnnotateAnnovar/", mode: 'copy', 
+	publishDir "${params.outdir}/variantAnnotateAnnovar/", mode: 'link', 
     	saveAs: { filename -> params.saveIntermediateVariants ? "$filename" : null }
 
     input:
@@ -389,7 +389,7 @@ process variant_AnnotateAnnovar {
 
 
 process To_gene_base_table {
-	publishDir "${params.outdir}/annovar_table/", mode: 'copy'
+	publishDir "${params.outdir}/annovar_table/", mode: 'link'
 
 	input:
 	file "annovar_res/*" from annovar_out.collect()

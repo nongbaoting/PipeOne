@@ -18,13 +18,14 @@ Require:
 
 Optional:
 ```
---cleaned  <booloen>   true or false. Whether the FASTQ file has been quality controlled, if it is false, use fastp for quality control. defalt [false]
---layout   <string>     paired or single. Default [paired]
---threads  <int>       The maximum number of threads used in each step. Default [8]
---maxForks <int>       How many steps in parallel. Default [2]
---saveIntermediateFiles       Whether to keep the intermediate file to the result. Default [off]
---saveIntermediateHisat2Bam   Whether to keep the bam file of hisat2. Default [off]
--h --help     show  help message
+--cleaned	<boolean>	true or false. defualt[true]
+--layout	<string>	paired or single. defualt [paired]
+--library	<string>	polyA or total. defualt [polyA]
+--threads	<int>	number of CPU process for each steps. default [8]
+--maxForks	<int>	max forks number of parrallel. default [2]
+--profile	<str>	execution envirenment. defualt [docker]
+--saveIntermediateFiles	save intermediate files defualt [off]
+-h --help   print usage
 ```
 
 #### Output
@@ -41,13 +42,19 @@ $ tree -L 2
 ├── 00_tables
 │   ├── 00_rawdata
 │   ├── s1.1_lncR_mRNA
+│   ├── s1.2_circRNA
 │   ├── s1.3_APA-3TUR
 │   ├── s1.4_retrotranscriptome
 │   ├── s1.5_fusion
 │   ├── s1.6_rnaEditing
 │   ├── s1.7_alternative_splicing
-│   └── s1.8_SNP
+│   ├── s1.8_SNP
+│   └── t.txt
+├── one_command.sh
 ├── s1.1_lncRNA
+│   ├── results
+│   └── work
+├── s1.2_circRNA
 │   ├── results
 │   └── work
 ├── s1.3_APA-3TUR
@@ -69,7 +76,7 @@ $ tree -L 2
     ├── results
     └── work
 
-30 directories, 0 files
+34 directories, 2 files
 ```
 
 * __Tables from different aspect of RNA-seq: s1.*__
@@ -77,6 +84,7 @@ $ tree -L 2
 $ ls  00_tables
 00_rawdata
 s1.1_lncR_mRNA
+s1.2_circRNA
 s1.3_APA-3TUR
 s1.4_retrotranscriptome
 s1.5_fusion
@@ -87,16 +95,21 @@ s1.8_SNP
 
 * __Tables of different aspects of RNA-seq in one directory__, which are required in module 2 and module3
 ```
-$ ls 00_tables/00_rawdata
-APA_pau-distal-proximal.csv
-lncR_gene.tpm.csv
-merge_graphs_alt_3prime_C3.confirmed.psi.csv
-merge_graphs_alt_5prime_C3.confirmed.psi.csv
-merge_graphs_exon_skip_C3.confirmed.psi.csv
-merge_graphs_intron_retention_C3.confirmed.psi.csv
-merge_graphs_mult_exon_skip_C3.confirmed.psi.csv
-merge_graphs_mutex_exons_C3.confirmed.psi.csv
-prot_gene.tpm.csv
-retro-FPKM-divide_totalMapReads.csv
-RNA-editing-rate.csv
+$ tree 00_tables/00_rawdata 
+00_tables/00_rawdata
+├── APA_pau-distal-proximal.csv
+├── circRNA_cpm.csv
+├── lncR_gene.tpm.csv
+├── merge_graphs_alt_3prime_C3.confirmed.psi.csv
+├── merge_graphs_alt_5prime_C3.confirmed.psi.csv
+├── merge_graphs_exon_skip_C3.confirmed.psi.csv
+├── merge_graphs_intron_retention_C3.confirmed.psi.csv
+├── merge_graphs_mult_exon_skip_C3.confirmed.psi.csv
+├── merge_graphs_mutex_exons_C3.confirmed.psi.csv
+├── prot_gene.tpm.csv
+├── retro-FPKM-divide_totalMapReads.csv
+├── RNA-editing-rate.csv
+└── snp.geneBase.csv
+
+0 directories, 13 files
 ```

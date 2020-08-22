@@ -5,6 +5,7 @@ params.reads = ""
 
 params.genome = ""
 params.cleaned  = false
+params.saveIntermediateFiles = false
 params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : false
 params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
 params.star_index = params.genome ? params.genomes[ params.genome ].star_index ?:false :false
@@ -108,7 +109,7 @@ if(params.reads ){
 			tag {id}
             maxForks 2
 			
-			publishDir "${params.outdir}/fastp/", mode: 'copy',
+			publishDir "${params.outdir}/fastp/", mode: 'link',
 				saveAs: {filename -> 
 					if(filename =~ /fastp.fq.gz/) "clean/${filename}"
 					else "report/${id}.${filename}" 
@@ -175,7 +176,7 @@ if(params.reads ){
 		errorStrategy 'ignore'
 		maxForks 1
 		
-		publishDir "${params.outdir}/fastp/", mode: 'copy',
+		publishDir "${params.outdir}/fastp/", mode: 'link',
 			saveAs: {filename -> 
 				if(filename =~ /fastp.fq.gz/) "clean/${filename}"
 				else "report/${id}.${filename}" 
@@ -382,12 +383,8 @@ process Single_graphs_for_generate_gtf_pickle {
 	// .filter{ it[0].toString() !="SRR7062359"  }
 	// .println{ text_blue(it[0]) }
 
-
- 
 // bam_files.println()
 // println	 text_blue('hello ') + graph_one.collect()
-
-
 
 process Single_graphs {
 	
@@ -508,7 +505,7 @@ process Quant_each {
 
 process QuantAll_and_EventCalling{
 	
-	publishDir "${params.outdir}/spladder_out/", mode: 'copy'
+	publishDir "${params.outdir}/spladder_out/", mode: 'link'
 	
 	input:
 	file "*" from bam_bai_quant.collect()
@@ -552,7 +549,7 @@ process QuantAll_and_EventCalling{
 
 process PSI_table{
 
-	publishDir "${params.outdir}/spladder_out_table/", mode: 'copy'
+	publishDir "${params.outdir}/spladder_out_table/", mode: 'link'
 
 	input:
 	file "spladder_out/*" from spladder_out.collect()

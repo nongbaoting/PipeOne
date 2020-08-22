@@ -41,7 +41,6 @@ class FeatureValidation:
         X_test = self.X_test
 
         sort_idx = np.argsort(-feature_importance)
-        #topk = np.minimum(topk, len(sort_idx))
 
         ## use non-zero feature importance only
         nonzero_num = np.sum(feature_importance != 0)
@@ -56,10 +55,10 @@ class FeatureValidation:
         self.topK_feature_name = topK_feature_name
         # return topk_X_train, topk_X_train
 
-    def do_grid_search(self, params, cv, n_jobs, random_state = 0):
+    def do_grid_search(self, params, cv, n_jobs, max_features = None, random_state = 42):
         X_train = self.topk_X_train
         y_train = self.y_train
-        classifier = RandomForestClassifier(random_state= random_state)
+        classifier = RandomForestClassifier(max_features= max_features, random_state= random_state)
         clf = GridSearchCV(classifier, params, n_jobs=n_jobs, cv=cv)
 
         clf.fit(X_train, y_train)
@@ -93,10 +92,10 @@ class FeatureValidation:
 
         return test_sen, test_spec
 
-    def get_feature_importance(self, fout, params, random_state = 0):
+    def get_feature_importance(self, fout, params, max_features = None, random_state = 42):
         clf = RandomForestClassifier(n_estimators=params["n_estimators"], max_depth=params["max_depth"],
                                  min_samples_split=params["min_samples_split"],
-                                 class_weight=params["class_weight"], random_state=random_state) 
+                                 class_weight=params["class_weight"], max_features = max_features, random_state=random_state) 
 
         clf.fit(self.topk_X_train, self.y_train)
         feature_importance = clf.feature_importances_
@@ -115,7 +114,7 @@ def grid_search(X, y, classifier, parameters, cv, n_jobs):
     return best_params, best_score
 
 
-def get_feature_importance(X, y, feature_name, fout, params, random_state = 0):
+def get_feature_importance(X, y, feature_name, fout, params, random_state = 42):
     clf = RandomForestClassifier(n_estimators=params["n_estimators"], max_depth=params["max_depth"],
                                  min_samples_split=params["min_samples_split"],
                                  class_weight=params["class_weight"], random_state=random_state)

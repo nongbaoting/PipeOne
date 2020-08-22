@@ -1,15 +1,13 @@
 #!/usr/bin/env nextflow
 
 params.genome = ""
-
 params.read  = ""
-///home/liangpp5/161/aws/temp/reads/*_{1,2}.fastq.gz
 params.sra    = ""
-// "/public2/nong/pipeline/test_data/circRNA/*_{1,2}.fastq.gz"
 params.single = false
 params.cleaned  = false
 params.datainfo = false
 params.contrast = false
+params.saveIntermediateFiles = false
 
 params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
 params.utr_gtf =  params.genome ? params.genomes[ params.genome ].utr_gtf  ?: false : false
@@ -69,7 +67,7 @@ if(params.reads ){
 			tag {id}
             maxForks 2
 			
-			publishDir "${params.outdir}/fastp/", mode: 'copy',
+			publishDir "${params.outdir}/fastp/", mode: 'link',
 				saveAs: {filename -> 
 					if(filename =~ /fastp.fq.gz/) "clean/${filename}"
 					else "report/${id}.${filename}" 
@@ -136,7 +134,7 @@ if(params.reads ){
 		errorStrategy 'ignore'
 		maxForks 1
 		
-		publishDir "${params.outdir}/fastp/", mode: 'copy',
+		publishDir "${params.outdir}/fastp/", mode: 'link',
 			saveAs: {filename -> 
 				if(filename =~ /fastp.fq.gz/) "clean/${filename}"
 				else "report/${id}.${filename}" 
@@ -179,7 +177,7 @@ if(  params.apa3utr && (! params.salmon_index_3UTR ) ){
 	process utr_to_fasta{
 		
 		
-		publishDir "${params.outdir}/ref_transcripts/", mode: 'copy'
+		publishDir "${params.outdir}/ref_transcripts/", mode: 'link'
 		
 		input:
 		file "output_utrs.bed" from apa3utr_bed
@@ -198,7 +196,7 @@ if(  params.apa3utr && (! params.salmon_index_3UTR ) ){
 
 	process salmon_index_3UTR{
 		
-		publishDir "${params.outdir}/ref_salmon_index_3UTR/", mode: 'copy'
+		publishDir "${params.outdir}/ref_salmon_index_3UTR/", mode: 'link'
 		
 		input:
 		file 'transcripts.fa' from cal_expr_fa
@@ -255,7 +253,7 @@ process salmon_APA {
 
 process qapa {
 	
-	publishDir "${params.outdir}/apa_3utr/", mode: 'copy'
+	publishDir "${params.outdir}/apa_3utr/", mode: 'link'
 	
 	input:
 	file utr_gtf

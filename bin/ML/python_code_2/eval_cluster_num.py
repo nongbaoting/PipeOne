@@ -14,23 +14,25 @@ def chck_dir(dir):
 def eval(latentX, cluster_num, sample_id, save_path, save_path_header):
     silhouette = []
     for cluster_num_ in cluster_num:
-        predict_subtype = KMeans(n_clusters=cluster_num_,random_state=0).fit_predict(latentX)
+        predict_subtype = KMeans(n_clusters=cluster_num_, random_state=0).fit_predict(latentX)
         silhouette_ = silhouette_score(latentX, predict_subtype)
         silhouette.append(silhouette_)
-
-             
-
+        
+        cluster_df = pd.DataFrame({"Sample": sample_id, "Subtype":predict_subtype} )
+        save_cluster_path = save_path_header + f'_clusters={cluster_num_ }_clustering.csv'
+        cluster_df.to_csv(save_cluster_path, header=True, index=False)
+        
     fig, ax = plt.subplots()
     ax.plot(cluster_num, silhouette, marker="^", markersize=3, linewidth=1.5)
     ax.set_xlabel("#Cluster")
     ax.set_ylabel("Sihouette Score")
     plt.savefig(save_path)
 
-    cluster_num_wanted = cluster_num[ silhouette.index(max(silhouette ))  ]
-    predict_subtype = KMeans(n_clusters= cluster_num_wanted, random_state=0).fit_predict(latentX)
-    cluster_df = pd.DataFrame({"Sample": sample_id, "Subtype":predict_subtype} )
-    save_cluster_path = save_path_header + f'_clusters={cluster_num_wanted }_clustering.csv'
-    cluster_df.to_csv(save_cluster_path, header=True, index=False)
+    # cluster_num_wanted = cluster_num[ silhouette.index(max(silhouette ))  ]
+    # predict_subtype = KMeans(n_clusters= cluster_num_wanted, random_state=0).fit_predict(latentX)
+    # cluster_df = pd.DataFrame({"Sample": sample_id, "Subtype":predict_subtype} )
+    # save_cluster_path = save_path_header + f'_clusters={cluster_num_wanted }_clustering.csv'
+    # cluster_df.to_csv(save_cluster_path, header=True, index=False)
 
     return silhouette
 
@@ -77,9 +79,8 @@ def myeval(cluster_range="3-8"):
                     })
                     silhouette_sm2 = silhouette_sm2.append(sil_sm, ignore_index=True)
 
-
     silhouette_df = pd.DataFrame.from_dict(silhouette_summary, orient="index",
-                                        columns=["cluster_num="+str(num) for num in cluster_num])
+                                        columns=["cluster_num="+str(num) for num in cluster_num] )
     silhouette_df_fout = tdir + "silhoutte_score_summary.csv"
     silhouette_df.to_csv(silhouette_df_fout, index=True, header=True)
 

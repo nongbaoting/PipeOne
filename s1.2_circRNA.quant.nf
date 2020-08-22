@@ -1,5 +1,5 @@
 #!/usr/bin/env nextflow
-nf_required_version = '0.31.1'
+
 params.reads = ""
 // "/public1/pub/guohh/other/mouse_fatty/00_rawdata/*.fastq.gz"
 params.sra   = ""
@@ -10,6 +10,7 @@ params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : 
 params.bwa_index = params.genome ? params.genomes[ params.genome ].bwa_index ?:false :false
 params.hisat2_index = params.genome ? params.genomes[ params.genome ].hisat2_index ?:false :false
 params.threads = 12
+params.saveIntermediateFiles = false
 
 threads = params.threads
 bwa_index = params.bwa_index
@@ -33,6 +34,8 @@ if ( params.gtf ){
     gtf = file(params.gtf)
     if( !gtf.exists() ) exit 1, "GTF file not found: ${params.gtf}"
 }
+
+
 
 if ( params.bwa_index  ){
     bwa_indices = Channel
@@ -74,14 +77,14 @@ if(params.reads ){
 		println "sing-end mode"
 	}
 	ch.into{ch;ch_print;}
-	ch_print.println()
+	//ch_print.println()
 	
 	if (! params.cleaned ){
 		process fastp{
 			tag {id}
             maxForks 2
 			
-			publishDir "${params.outdir}/fastp/", mode: 'copy',
+			publishDir "${params.outdir}/fastp/", mode: 'link',
 				saveAs: {filename -> 
 					if(filename =~ /fastp.fq.gz/) "clean/${filename}"
 					else "report/${id}.${filename}" 
@@ -148,7 +151,7 @@ if(params.reads ){
 		errorStrategy 'ignore'
 		maxForks 1
 		
-		publishDir "${params.outdir}/fastp/", mode: 'copy',
+		publishDir "${params.outdir}/fastp/", mode: 'link',
 			saveAs: {filename -> 
 				if(filename =~ /fastp.fq.gz/) "clean/${filename}"
 				else "report/${id}.${filename}" 
@@ -182,57 +185,155 @@ if(params.reads ){
 }
 
 
-process cutadapt_fixLength {
-	maxForks 10
-	tag {id} 
-	validExitStatus 0,141
-	 
-	input:
-	set id, file(reads) from read_ch
 
-	output:
-	set id, "${id}.R1.fastp_trim.fastq","${id}.R2.fastp_trim.fastq" into trim_fq
+read_ch.into{CIRIquant_ch; hisat2_ch; print_ch;}
+
+if( params.hisat2_bam) {
+	 Channel
+		.fromPath(params.hisat2_bam)
+		.ifEmpty{error "Can not find any bam files  matching:${params.hisat2_bam}"}
+		.map{ file ->
+			key = file.name.toString().tokenize('.').get(0)
+			return tuple(key, file)
+			}
+		.groupTuple()
+		.set{ hisat2_bam }
+}else{
 	
-	shell:
-	'''
-	#!/bin/bash
-	read_len=$(zcat !{reads[0] } | head -n 2|tail -n 1 |wc -c )
-	read_len=$(expr $read_len - 10)
-	
-	cutadapt -m $read_len -l $read_len -o !{id}.R1.fastp_trim.fastq -p !{id}.R2.fastp_trim.fastq !{reads[0]} !{reads[1]}
-    '''
-	
+	params.unstranded = true // defualt unstranded
+	params.reverse_stranded = true // dUTP if stranded
+	params.forward_stranded =false
+
+	process hisat2 {
+			
+		tag {id}
+		publishDir "${params.outdir}/hisat2/", mode: 'link',
+			saveAs: {filename -> 
+				if(filename =~ /bam/ && params.saveIntermediateFiles ) filename
+				else if (filename =~/log/) "logs/${filename}"
+				else null
+				}
+		
+		input:
+		set id, file(reads)   from hisat2_ch
+		file "hisat2_index/*" from hisat2_indices.collect()
+		
+		output:
+		set id, "${id}.hisat2.sortbycoordinate.bam" into hisat2_bam
+		file "${id}.hisat2.log" into hisat2_log
+		
+		script:
+		def rnastrandness = ''
+        if (params.forward_stranded && !params.unstranded){
+            rnastrandness = ifPaired ? '--rna-strandness FR' : '--rna-strandness F'
+        } else if (params.reverse_stranded && !params.unstranded){
+            rnastrandness = ifPaired ? '--rna-strandness RF' : '--rna-strandness R' 
+        }
+		
+		if( ifPaired ){
+			"""
+			set +u; source activate lncRNA; set -u
+			hisat2 -p $threads --dta  $rnastrandness  -x hisat2_index/$hisat2_base \
+			-1 ${reads[0]} -2 ${reads[1]}   2> ${id}.hisat2.log | samtools sort -@ 8 - -o ${id}.hisat2.sortbycoordinate.bam 
+			samtools index ${id}.hisat2.sortbycoordinate.bam
+			conda deactivate
+			"""
+		}else{
+			
+			"""
+			set +u; source activate lncRNA; set -u
+			hisat2 -p $threads --dta  $rnastrandness -x  hisat2_index/$hisat2_base \
+			-U  ${reads}   2> ${id}.hisat2.log  | samtools sort -@ 8 - -o ${id}.hisat2.sortbycoordinate.bam
+			samtools index ${id}.hisat2.sortbycoordinate.bam
+			conda deactivate
+			"""
+		}
+
+	}
+
 }
 
-trim_fq.into{CIRIquant_ch; CIRI2_ch; print_ch;}
+hisat2_bam
+	.combine(CIRIquant_ch, by: 0)
+	.set{CIRIquant_combine_ch }
 
-
-process CIRI_full{
-	maxForks 10 
-	
-	tag {id} 
-	errorStrategy 'ignore'
-	publishDir "${params.outdir}/CIRI_full/", mode: 'copy'
+process CIRIquant {
+	tag {id }
+	publishDir "${params.outdir}/CIRIquant/samples", mode: 'link',
+		saveAs: {filename ->
+				if(filename == id ) null
+				else filename 
+				}
 	
 	input:
-	set id, file(reads_1), file(reads_2) from CIRI2_ch
-	file "bwa_index/*" from bwa_indices.collect()
-	file gtf
-	file fasta
+	tuple id, file(bam), file(reads) from CIRIquant_combine_ch
+	path fasta
+	path gtf
+	file "bwa_index/*"    from bwa_indices.collect()
+	file "hisat2_index/*" from hisat2_indices_2.collect()
 	
 	output:
-	set id, "${id}_output/CIRI-full_output/${id}_merge_circRNA_detail.anno", "${id}_output/CIRI-vis_out" into circ_full_result
-	file "${id}_output/*" into res
+	file "${id}" into  CIRIquant_out
+	set "${id}/circ/${id}.ciri", "${id}/gene/", "${id}/${id}.*" into CIRIquant_file
 	
-	script:
 	"""
-	java -jar /opt/CIRI-full_v2.0/CIRI-full.jar Pipeline -1 ${reads_1 } -2 ${reads_2} -a ${gtf} -r /dat1/dat/ref/hg38/hg38+gencode.v32/bwa_index_ln/hg38.fa -d ${id}_output/ -o ${id} -t 16
-	unset DISPLAY
-	java -jar /opt/CIRI-full_v2.0/CIRI-vis.jar -i ${id}_output/CIRI-full_output/${id}_merge_circRNA_detail.anno -l ${id}_output/CIRI-AS_output/${id}_library_length.list -r /dat1/dat/ref/hg38/hg38+gencode.v32/bwa_index_ln/hg38.fa -d ${id}_output/CIRI-vis_out -min 1
+	set +u; source activate CIRIquant; set -u
+	echo "name: ${params.genome}
+	tools:
+	  bwa: \$(which bwa)
+	  hisat2:  \$(which hisat2)
+	  stringtie: \$(which stringtie)
+	  samtools: \$(which samtools)
+
+	reference:
+	  fasta: ${fasta}
+	  gtf: ${gtf}
+	  bwa_index: bwa_index/${bwa_base}
+	  hisat_index: hisat2_index/${hisat2_base}
+	" >config.yml
 	
-	rm -rf ${id}_output/sam
-    """
+	samtools index ${bam}
+	CIRIquant -t ${threads} \
+          -1 ${reads[0] } \
+          -2 ${reads[1] } \
+          --config ./config.yml \
+          -o ${id} \
+          -p ${id} \
+		  --bam ${bam} \
+		  -t $threads
+	"""
 }
 
+
+
+
+process merge_CIRIquant{
+
+	publishDir "${params.outdir}/CIRIquant/", mode: 'link'
+	
+	input:
+	path "CIRIquant/*" from CIRIquant_out.collect()
+
+	output:
+	tuple path("circRNA_info.csv"), path("circRNA_bsj.csv"), path("circRNA_ratio.csv"), path("gene_count_matrix.csv")
+	tuple path("sample_gene.lst"), path("sample_psuedo.lst")
+ 	path "circRNA_cpm.csv"
+
+	shell:
+	''' 
+	set +u; source activate CIRIquant; set -u
+	find -L ./CIRIquant -name "*_out.gtf"|sort |awk '{print $3, $0}' FS="/" OFS="\t" > sample_gene.lst
+	find -L ./CIRIquant -name "*.gtf"|awk '{print $3,"./CIRIquant/" $3 "/" $3 ".gtf", "C" }'  FS="/" OFS="\t" >sample_psuedo.lst
+
+	prep_CIRIquant -i sample_psuedo.lst \
+                 --lib library_info.csv \
+                 --circ circRNA_info.csv \
+                 --bsj circRNA_bsj.csv \
+                 --ratio circRNA_ratio.csv
+
+	prepDE.py -i sample_gene.lst
+	Rscript  !{baseDir}/bin/circRNA_cpm.R
+	'''
+}
 
 

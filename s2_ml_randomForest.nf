@@ -8,8 +8,6 @@ params.var_topK = 1000
 params.test_size = 0.3
 params.random_state = 2
 
-
-
 sample_info = check_file(params.sample_info)
 
 Channel

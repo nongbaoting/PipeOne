@@ -3,7 +3,7 @@ from sklearn.model_selection import LeaveOneOut
 import os,fire
 from collections import defaultdict
 
-def main(threads = 12, train_dir = "./data/train_dir/", test_dir ="./data/test_dir/", random_state = 0):
+def main(threads = 12, train_dir = "./data/train_dir/", test_dir ="./data/test_dir/",max_features = 'auto', random_state = 42):
 
     logfi = "./log.txt"  # log file, record key points in the whole process
     if os.path.exists(logfi):
@@ -74,10 +74,13 @@ def main(threads = 12, train_dir = "./data/train_dir/", test_dir ="./data/test_d
         feature_validation.select_topk_feature(feature_importance, feature_name, topk)
 
         # find the best parameter settings with top k features in training set.
-        val_best_estimator, val_best_params, val_best_score, val_train_sen, val_train_spec = feature_validation.do_grid_search(parameters, cv, n_jobs, random_state = random_state)
+        max_features = 'auto'
+        val_best_estimator, val_best_params, val_best_score, val_train_sen, val_train_spec \
+             = feature_validation.do_grid_search(parameters, cv, n_jobs, max_features =  max_features, random_state = random_state)
         
         val_feature_importance_out = data_dir + f"/feature_importance_{topk}.csv"
-        feature_validation.get_feature_importance(val_feature_importance_out, val_best_params, random_state = random_state)
+        feature_validation.get_feature_importance(val_feature_importance_out, val_best_params, 
+                            max_features =  max_features, random_state = random_state)
         
         chck5 = "The best parameter settings with top%d features" % topk
         f.write(chck5+"\n")
@@ -98,7 +101,6 @@ def main(threads = 12, train_dir = "./data/train_dir/", test_dir ="./data/test_d
         eval_dict["test_sensitivity" ].append(test_sensitivity)
         eval_dict["test_specificity" ].append(test_specificity)
 
-        
         eval_dt["train_sensitivity"].append(val_train_sen)
         eval_dt["train_specificity"].append(val_train_spec)
         eval_dt["test_sensitivity" ].append(test_sensitivity)

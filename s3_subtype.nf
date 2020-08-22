@@ -33,7 +33,6 @@ process defusion {
     python3 ${baseDir}/bin/ML/python_code_2/run_defusion.py --threads ${params.threads}  
     python3 ${baseDir}/bin/ML/python_code_2/check_convergence.py
     """
-
 }
 
 process clustering_and_eval{
@@ -60,7 +59,6 @@ process clustering_and_eval{
 process features_selection{
     stageInMode 'copy'
     publishDir "./results", mode: 'copy'
-
 
     input:
     file "*" from cluster_res.collect()

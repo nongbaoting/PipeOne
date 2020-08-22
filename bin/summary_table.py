@@ -50,12 +50,15 @@ def rename_col(infile, outfile, sampleDict):
 
 class RUN:
 
-    def check_tables(self,):
+    def check_tables(self, library = 'polyA'):
         home = os.path.dirname(__file__)
         ## 1,2 lncRNA mRNA
         lncRNA_mRNA("../s1.1_lncRNA/results/salmon/salmon_gene_tpm.tsv", "../s1.1_lncRNA/results/novel_lncRNA/all_lncRNA_info.tsv")
         
-        ## circRNA
+        ## s2 circRNA
+        if library == "total":
+            chck_dir("s1.2_circRNA")
+            os.system("cp ../s1.2_circRNA/results/CIRIquant/circRNA_cpm.csv s1.2_circRNA/circRNA_cpm.csv")
 
         ## s3 APA
         os.system(f"Rscript --vanilla {home}/apa_3utr_filter.R")
@@ -73,18 +76,17 @@ class RUN:
 
         ## s7 AS
         chck_dir("s1.7_alternative_splicing")
-        os.system(
-            f"cp ../s1.7_alternative_splicing/results/spladder_out_table/*confirmed.psi.txt.gz s1.7_alternative_splicing/")
+        os.system(f"cp ../s1.7_alternative_splicing/results/spladder_out_table/*confirmed.psi.txt.gz s1.7_alternative_splicing/")
 
         ## s8_SNP
         chck_dir("s1.8_SNP")
         os.system(f"cp ../s1.8_SNP/results/annovar_table/snp.geneBase.tsv s1.8_SNP/snp.geneBase.tsv")
 
-    def mark_feature(self,):
+    def mark_feature(self, library = 'polyA'):
         chck_dir('00_rawdata')
         add_marks("s1.1_lncR_mRNA/prot_gene.tpm.tsv", "00_rawdata/prot_gene.tpm.csv", "mRNA")
         add_marks("s1.1_lncR_mRNA/lncR_gene.tpm.tsv", "00_rawdata/lncR_gene.tpm.csv", "lncRNA")
-
+        add_marks("s1.2_circRNA/circRNA_cpm.csv", "00_rawdata/circRNA_cpm.csv", "circRNA")
         add_marks("s1.3_APA-3TUR/pau_results.filterPau-distal-proximal.txt", "00_rawdata/APA_pau-distal-proximal.csv", "APA")
         add_marks("s1.4_retrotranscriptome/FPKM-divide_totalMapReads.csv", "00_rawdata/retro-FPKM-divide_totalMapReads.csv", "Retro", sep=",")
         add_marks("s1.5_fusion/fusion_arriba_out.tsv", "00_rawdata/fusion_arriba_out.csv", "Fusion")

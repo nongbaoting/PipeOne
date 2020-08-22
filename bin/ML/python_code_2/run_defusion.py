@@ -67,8 +67,6 @@ def run_defusion(low_dim, alpha, gamma, view):
                 % (view[v], low_dim, alpha, gamma)
         save_feature_weight(Z[v], var_names[v], zfout)
 
-
-
 def MYRUN_DF(threads ):
     low_dim = np.arange(2, 8, 1)
     # low_dim = np.array([7])

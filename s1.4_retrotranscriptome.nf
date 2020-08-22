@@ -53,7 +53,7 @@ if(params.reads ){
 			tag {id}
             maxForks 2
 			
-			publishDir "${params.outdir}/fastp/", mode: 'copy',
+			publishDir "${params.outdir}/fastp/", mode: 'link',
 				saveAs: {filename -> 
 					if(filename =~ /fastp.fq.gz/) "clean/${filename}"
 					else "report/${id}.${filename}" 
@@ -120,7 +120,7 @@ if(params.reads ){
 		errorStrategy 'ignore'
 		maxForks 1
 		
-		publishDir "${params.outdir}/fastp/", mode: 'copy',
+		publishDir "${params.outdir}/fastp/", mode: 'link',
 			saveAs: {filename -> 
 				if(filename =~ /fastp.fq.gz/) "clean/${filename}"
 				else "report/${id}.${filename}" 
@@ -172,7 +172,7 @@ process bowtie2{
 	tag { id }
 	maxForks 10
 	
-	publishDir "${params.outdir}/bowtie2/", mode: 'copy',
+	publishDir "${params.outdir}/bowtie2/", mode: 'link',
 		saveAs: {filename -> 
 			if(filename =~/bam/ &&  params.saveIntermediate ) "bams/${filename}"
 			else if(filename =~/log/) "logs/${filename}"
@@ -216,7 +216,7 @@ process bowtie2{
 
 
 process merge_MapReads{
-	publishDir "${params.outdir}/bowtie2/", mode: 'copy'
+	publishDir "${params.outdir}/bowtie2/", mode: 'link'
 	
 	input:
 	file "bowtie2/*" from  bowtie2_out_count.collect()
@@ -245,7 +245,7 @@ process telescope_bowtie2 {
 	errorStrategy 'ignore'
 	maxRetries 2
 	
-	publishDir "${params.outdir}/telescope/telescope/tsv/", mode: 'copy'
+	publishDir "${params.outdir}/telescope/telescope/tsv/", mode: 'link'
 		
 	input:
 	set id, file(bams) from bowtie2_out
@@ -267,7 +267,7 @@ process telescope_bowtie2 {
 
 process merge_telescope{
 	errorStrategy 'ignore'
-	publishDir "${params.outdir}/telescope/", mode: 'copy'
+	publishDir "${params.outdir}/telescope/", mode: 'link'
 	
 	input:
 	file retro_gtf
