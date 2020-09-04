@@ -191,7 +191,7 @@ process bowtie2{
 	script:
 	if(ifPaired && reads.size() == 2 ){
 		"""
-		set +u; source activate telescope; set -u
+		set +u; source activate pipeOne_telescope; set -u
 		bowtie2  -p ${threads} -1  ${reads[0]} -2 ${reads[1]} -x bowtie2_index/${bowtie2_base} \\
 			--no-mixed --very-sensitive-local -k 100 --score-min L,0,1.6 2> ${id}.bowtie2.log | \\
 		samtools sort -@ 2 - -o ${id}.bowtie2.sortbycoordinate.bam
@@ -199,7 +199,7 @@ process bowtie2{
 		"""
 	}else if (! ifPaired && reads.size() == 1 ){
 		"""
-		set +u; source activate telescope; set -u
+		set +u; source activate pipeOne_telescope; set -u
 		bowtie2  -p ${threads} -U ${reads} -x bowtie2_index/${bowtie2_base} \\
 		 --very-sensitive-local -k 100 --score-min L,0,1.6 2> ${id}.bowtie2.log | \\
 		samtools sort -@ 2 - -o ${id}.bowtie2.sortbycoordinate.bam 
@@ -226,7 +226,7 @@ process merge_MapReads{
 	
 	
 	'''
-	set +u; source activate telescope; set -u
+	set +u; source activate pipeOne_telescope; set -u
 	echo "Sample\tReads" >bowtie2_properPaired_total.txt
 
 	find bowtie2 -name "stat*log" | \
@@ -257,7 +257,7 @@ process telescope_bowtie2 {
 	script:
 	
 	"""
-	set +u; source activate telescope; set -u
+	set +u; source activate pipeOne_telescope; set -u
 	samtools index ${bams}
 	mkdir -p temp
 	telescope assign ${bams}  ${retro_gtf} --max_iter 200 --theta_prior 200000 --tempdir ./temp

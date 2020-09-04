@@ -188,7 +188,7 @@ if(  params.apa3utr && (! params.salmon_index_3UTR ) ){
 		file "fa_id_relate.txt" into utr_id_file
 		
 		"""
-		set +u; source activate apa; set -u
+		set +u; source activate pipeOne_apa; set -u
 		qapa fasta -f ${fasta} output_utrs.bed output_utrs.fa
 		python3 ${baseDir}/bin/apa_3utr.py shorten_id output_utrs.fa output_utrs.shortedID.fa
 		"""
@@ -205,6 +205,7 @@ if(  params.apa3utr && (! params.salmon_index_3UTR ) ){
 		file "salmon_index_3UTR/*" into salmon_index_ch
 		
 		"""
+		set +u; source activate pipeOne_apa; set -u
 		salmon index -t transcripts.fa -i salmon_index_3UTR -p 4
 		"""
 	}
@@ -239,11 +240,13 @@ process salmon_APA {
 	if(params.single){
 					
 		"""
+		set +u; source activate pipeOne_apa; set -u
 		salmon quant -i transcripts_index -l A -r $read -p 8 -o ${id}
 		"""
 	}else{
 					
 		"""
+		set +u; source activate pipeOne_apa; set -u
 		salmon quant -i transcripts_index -l A -1 ${read[0] } -2 ${read[1] } -p 8 -o ${id}
 		"""
 	}
@@ -265,7 +268,7 @@ process qapa {
 	
 	
 	"""
-	set +u; source activate apa; set -u
+	set +u; source activate pipeOne_apa; set -u
 	python3 ${baseDir}/bin/gtf.py to_gencode2biomark5 ${utr_gtf}  db_identifiers
 	python3 ${baseDir}/bin/apa_3utr.py replace_SalmonIndex_ID ${utr_id_file} salmon
 	qapa quant --db db_identifiers salmon/*/quant_replace.sf > pau_results.txt

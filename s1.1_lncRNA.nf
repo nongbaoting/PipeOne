@@ -234,7 +234,7 @@ if ( params.hisat2_index && !params.bam ){
         
         if(ifPaired){
             """
-			set +u; source activate lncRNA; set -u
+			set +u; source activate pipeOne_lncRNA; set -u
             hisat2 -p $threads --dta  $rnastrandness  -x hisat2_index/$hisat2_base \
             -1 ${reads[0]} -2 ${reads[1]}   2> ${id}.hisat2.log | samtools sort -@ 8 - -o ${id}.hisat2.sortbycoordinate.bam 
             samtools index ${id}.hisat2.sortbycoordinate.bam
@@ -243,7 +243,7 @@ if ( params.hisat2_index && !params.bam ){
         }else{
             
             """
-			set +u; source activate lncRNA; set -u
+			set +u; source activate pipeOne_lncRNA; set -u
             hisat2 -p $threads --dta  $rnastrandness -x  hisat2_index/$hisat2_base \
             -U  ${reads}   2> ${id}.hisat2.log  | samtools sort -@ 8 - -o ${id}.hisat2.sortbycoordinate.bam
             samtools index ${id}.hisat2.sortbycoordinate.bam
@@ -291,7 +291,7 @@ process stringtie {
     }
 	
     """
-	set +u; source activate lncRNA; set -u
+	set +u; source activate pipeOne_lncRNA; set -u
     stringtie $bam $st_direction \\
 			-o ${id}_transcripts.gtf \\
 			-p $threads -G $gtf
@@ -315,7 +315,7 @@ process taco{
 	
 	
 	"""
-	set +u; source activate lncRNA; set -u
+	set +u; source activate pipeOne_lncRNA; set -u
 	ls stringtie_gtf | awk '{print "stringtie_gtf/"\$0}' > gtf_list
 	taco_run -p ${threads} -o taco_out gtf_list
 	"""
@@ -341,7 +341,7 @@ process gffcompare{
 	file "gffcmp.assembly.gtf.tmap" into gffcompare_tmap
 	
 	"""
-	set +u; source activate lncRNA; set -u
+	set +u; source activate pipeOne_lncRNA; set -u
 	#!/bin/bash
 	cat ${gtf} ${lncpedia_gtf} >all.gtf
 	gffcompare -r all.gtf assembly.gtf 
@@ -378,7 +378,7 @@ process cpat{
 	
 	if(params.species =~ /(?i)human(?-i)/){
         '''
-		set +u; source activate lncRNA; set -u
+		set +u; source activate pipeOne_py2; set -u
         cpat.py -g novel_lncRNA_candidate.fa \
                                        -x !{cpatpath}/dat/Human_Hexamer.tsv \
                                        -d !{cpatpath}/dat/Human_logitModel.RData \
@@ -387,7 +387,7 @@ process cpat{
     }else if (params.species =~ /(?i)mouse(?-i)/ ){
 		
         '''
-		set +u; source activate lncRNA; set -u
+		set +u; source activate pipeOne_py2; set -u
         cpat.py -g novel_lncRNA_candidate.fa \
                                        -x !{cpatpath}/dat/Mouse_Hexamer.tsv \
                                        -d !{cpatpath}/dat/Mouse_logitModel.RData \
@@ -397,7 +397,7 @@ process cpat{
     }else if (params.species =~/(?i)zebrafish(?-i)/){
 		
         '''
-		set +u; source activate lncRNA; set -u
+		set +u; source activate pipeOne_py2; set -u
         cpat.py -g novel_lncRNA_candidate.fa \
                                        -x !{cpatpath}/dat/zebrafish_Hexamer.tsv \
                                        -d !{cpatpath}/dat/zebrafish_logitModel.RData \
@@ -405,7 +405,7 @@ process cpat{
         '''
     }else if (params.species =~ /(?i)Fly(?-i)/) {
         '''
-		set +u; source activate lncRNA; set -u
+		set +u; source activate pipeOne_py2; set -u
         cpat.py -g novel_lncRNA_candidate.fa  \
                                        -x !{cpatpath}/dat/fly_Hexamer.tsv \
                                        -d !{cpatpath}/dat/Fly_logitModel.RData \
@@ -417,7 +417,6 @@ process cpat{
 
 process PLEK {
 	
-    validExitStatus 0,1,2
 	publishDir "${params.outdir}/coding_potential/PLEK/", mode: 'link', 
     	saveAs: { filename -> params.saveIntermediateFiles ? "$filename" : null }
 	
@@ -429,7 +428,7 @@ process PLEK {
     
 	"""
     #!/bin/bash
-	set +u; source activate lncRNA; set -u;
+	set +u; source activate pipeOne_py2; set -u;
 	PLEK.py -fasta novel_lncRNA_candidate.fa -out PLEK -thread $threads
 	ln -s PLEK PLEK.out
     printf "type\tPLEK_score\ttx_id\n" >PLEK.txt
@@ -449,7 +448,7 @@ process CPPred {
 	file "CPPred.out" into CPPred_out
     
 	"""
-	set +u; source activate lncRNA; set -u
+	set +u; source activate pipeOne_py2; set -u
     python2 ${params.CPPred}/bin/CPPred.py -i novel_lncRNA_candidate.fa \
 		-hex ${params.CPPred}/Hexamer/Human_Hexamer.tsv -r ${params.CPPred}/Human_Model/Human.range \
 		-mol ${params.CPPred}/Human_Model/Human.model -spe Human -o CPPred.out
@@ -472,7 +471,7 @@ process prepare_reference_gtf {
     
     """
     #!/bin/bash
-	set +u; source activate lncRNA; set -u
+	set +u; source activate pipeOne_lncRNA; set -u
 	gffcompare -r ${genecode_lncRNA_gtf} lncpedia.gtf 
 	awk '\$3 =="x"||\$3=="u"||\$3=="i"{print}' gffcmp.lncpedia.gtf.tmap > nonOverlap.gtf.tmap    
 	cut -f5 nonOverlap.gtf.tmap > nonOverlap_lncpedia.list
@@ -524,7 +523,7 @@ process filter_coding_potentail{
 	file "coding_potential_sum.tsv"
 	
     """
-	set +u; source activate lncRNA; set -u;
+	set +u; source activate pipeOne_py3; set -u;
 	echo "filter coding potential!"
 	python3 ${baseDir}/bin/gtf.py to_info novel_lncRNA_candidate.gtf novel_lncRNA_candidate.info
 	python3 ${baseDir}/bin/lncRNA.py combine_coding_prediction novel_lncRNA_candidate.info CPAT.out PLEK.out CPPred.out ${params.species}  novel_lncRNA.list
@@ -549,56 +548,11 @@ process filter_coding_potentail{
 }
 cal_expr_gtf.into{cal_expr_gtf; cal_expr_gtf_1; cal_expr_gtf_2;cal_expr_gtf_3;}
 
-if( params.featureCounts){
-	process featureCounts{
-		
-		tag { id }
-		publishDir "${params.outdir}/featureCounts/samples", mode: 'link'
-		
-		input:
-		set id, file(bam) from bam_featurecounts
-		file "ref_gtf" from cal_expr_gtf.collect()
-		
-		output:
-		file "${id}_gene.featureCounts.txt" into geneCounts, featureCounts_to_merge
-		file "${id}_gene.featureCounts.txt.summary" into featureCounts_logs
-	  
-		script:
-		def featureCounts_direction = 0
-		if (params.forward_stranded && !params.unstranded) {
-			featureCounts_direction = 1
-		} else if (params.reverse_stranded && !params.unstranded){
-			featureCounts_direction = 2
-		}
-		"""
-		source activate lncRNA
-		featureCounts -a ref_gtf -g gene_id -o ${id}_gene.featureCounts.txt -p -s $featureCounts_direction $bam
-	   
-		"""
-	}
 
-	process merge_featureCounts {
-		
-		publishDir "${params.outdir}/featureCounts/", mode: 'link'
-
-		input:
-		file input_files from featureCounts_to_merge.collect()
-		
-		output:
-		file 'merged_gene_counts.txt' into featureCounts_res
-
-		script:
-		"""
-		merge_featurecounts.py -o merged_gene_counts.txt -i $input_files
-		sed -i -e '1s/ENSEMBL_ID\t//' -e 's/_gene.featureCounts.txt//g' merged_gene_counts.txt
-		"""
-	}
-
-}
 
 process format_lncRNA_info{
 	publishDir "${params.outdir}/novel_lncRNA/", mode: 'link'
-	errorStrategy 'ignore'
+
     
 	input:
 	file "scripts/*" from scripts_1.collect()
@@ -612,7 +566,7 @@ process format_lncRNA_info{
 	
 	shell:
 	'''
-	set +u; source activate lncRNA; set -u
+	set +u; source activate pipeOne_py3; set -u
     gffcompare -r gencode_protein_coding.gtf all_lncRNA.gtf
 	
 	#conver to bed and colsest to bed
@@ -639,8 +593,7 @@ process format_lncRNA_info{
 
 process classify_lncRNA {
     publishDir "${params.outdir}/novel_lncRNA/classify", mode: 'link'
-    errorStrategy 'ignore'
-    
+   
     input:
     file "scripts/*" from scripts_2.collect()
     file "all_lncRNA.gtf" from all_lnc_gtf
@@ -653,7 +606,7 @@ process classify_lncRNA {
     
 	shell:
     '''
-	set +u; source activate lncRNA; set -u
+	set +u; source activate pipeOne_py3; set -u
     awk '$3=="exon" && $1 ~/^chr|^\\d/' all_lncRNA.gtf  > all_lncRNA.exon.gtf
     awk '$3=="exon"' gencode_protein_coding.gtf > gencode_protein_coding.exon.gtf
     
@@ -705,37 +658,6 @@ process classify_lncRNA {
 }
 
 
-params.datainfo = ""
-cal_deg_ch.into{cal_deg_ch;cal_deg_ch_1;cal_deg_ch_2 }
-
-if( params.datainfo && params.featureCounts ){
-	datainfo = file(params.datainfo)
-	process DEG_by_DESeq2_with_featureCounts {
-		publishDir "${params.outdir}/deg_DESeq2/featureCounts/", mode: 'link'
-		
-		input:
-		file 'merged_gene_counts.txt' from featureCounts_res.collect()
-		file "all_lncRNA.list" from cal_deg_ch.collect()
-		file "ref_gtf" from cal_expr_gtf_1.collect()
-		file "datainfo.txt" from datainfo
-		
-		output:
-		file '*tsv'
-		file '*tiff'
-		file "files_cache__"
-		
-		script:
-		"""
-		python3 ${baseDir}/bin/gtf.py get-txID-geneID ref_gtf protein_coding_and_all_lncRNA.txID_geneID.tsv
-		Rscript ${baseDir}/bin/deseq2.R merged_gene_counts.txt
-		
-		mkdir -p files_cache__
-		ls |grep -v files_cache__ |xargs -i cp -r {} files_cache__
-		"""
-	}
-
-}
-
 
 if (params.reads){
 	
@@ -750,7 +672,7 @@ if (params.reads){
 		file "salmon_index/*" into salmon_index_ch
 		
 		"""
-		# set +u; source activate lncRNA; set -u
+		set +u; source activate pipeOne_lncRNA; set -u
 		salmon index -t transcripts.fa -i salmon_index -p 4
 		"""
 	}
@@ -772,14 +694,14 @@ if (params.reads){
 		if(params.single){
 						
 			"""
-			# set +u; source activate lncRNA; set -u
+			set +u; source activate pipeOne_lncRNA; set -u
 			salmon quant -i transcripts_index -l A -r $reads -p 8 -o ${id} --gcBias
 
 			"""
 		}else{
 						
 			"""
-			# set +u; source activate lncRNA; set -u
+			set +u; source activate pipeOne_lncRNA; set -u
 			salmon quant -i transcripts_index -l A -1 ${reads[0] } -2 ${reads[1] } -p 8 -o ${id} --gcBias
 
 			"""
@@ -801,58 +723,14 @@ if (params.reads){
 		file "*tsv"
 		
 		"""
+		set +u; source activate pipeOne_py3; set -u
 		python3 ${baseDir}/bin/lncRNA.py get-txID-geneID ref_gtf protein_coding_and_all_lncRNA.txID_geneID.tsv
 		Rscript ${baseDir}/bin/tximport_salmon.R
 		# mkdir -p files_cache__
 		# ls |grep -v files_cache__ |xargs -i cp -r {} files_cache__
 		"""
 	}
-
-	salmon_tab.into{ salmon_tab; salmon_tab_1 }
 	
-	
-	if(params.datainfo){
-		process differential_anlysis_by_slueth{
-			publishDir "${params.outdir}/deg_slueth/", mode: 'link'
-			
-			input:
-			file "samples/*" from kallisto_slueth.collect()
-			file "datainfo.txt" from datainfo
-			output:
-			file "*"
-			
-			"""
-			echo test
-			"""
-		
-		}
-		
-		process DEG_by_DESeq2_with_salmon {
-			publishDir "${params.outdir}/deg_DESeq2/salmon/", mode: 'link'
-			
-			input:
-			
-			file "all_lncRNA.list" from cal_deg_ch_1.collect()
-			file "ref_gtf" from cal_expr_gtf_2.collect()
-			file "datainfo.txt" from datainfo
-			file "kallisto_gene_est_counts.tsv" from  kallisto_tab.collect()
-			
-			output:
-			file '*tsv'
-			file '*tiff'
-			file "files_cache__"
-			
-			script:
-			"""
-			python3 ${baseDir}/bin/gtf.py get-txID-geneID ref_gtf protein_coding_and_all_lncRNA.txID_geneID.tsv
-			Rscript  ${baseDir}/bin/deseq2.R kallisto_gene_est_counts.tsv
-			
-			mkdir -p files_cache__
-			ls |grep -v files_cache__ |xargs -i cp -r {} files_cache__
-			"""
-	 }
-	
-	}
 	
 }
 

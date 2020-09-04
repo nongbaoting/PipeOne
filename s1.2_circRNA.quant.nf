@@ -34,7 +34,7 @@ if ( params.fasta ){
 if ( params.gtf && params.update_GTF == false ){
     gtf = file(params.gtf)
     if( !gtf.exists() ) exit 1, "GTF file not found: ${params.gtf}"
-}else if(params.update_GTF == true){
+}else if(params.update_GTF == true ){
 	gtf = file("../s1.1_lncRNA/results/annotations_and_fasta/protein_coding_and_all_lncRNA.gtf")
 	if( !gtf.exists() ) exit 1, "file: ../s1.1_lncRNA/results/annotations_and_fasta/protein_coding_and_all_lncRNA.gtf does not found\
 	\nPlease check step s1.1_lncRNA has complete?"
@@ -285,7 +285,7 @@ process CIRIquant {
 	set "${id}/circ/${id}.ciri", "${id}/gene/", "${id}/${id}.*" into CIRIquant_file
 	
 	"""
-	set +u; source activate CIRIquant; set -u
+	set +u; source activate pipeOne_CIRIquant; set -u
 	echo "name: ${params.genome}
 	tools:
 	  bwa: \$(which bwa)
@@ -329,7 +329,7 @@ process merge_CIRIquant{
 
 	shell:
 	''' 
-	set +u; source activate CIRIquant; set -u
+	set +u; source activate pipeOne_CIRIquant; set -u
 	find -L ./CIRIquant -name "*_out.gtf"|sort |awk '{print $3, $0}' FS="/" OFS="\t" > sample_gene.lst
 	find -L ./CIRIquant -name "*.gtf"|awk '{print $3,"./CIRIquant/" $3 "/" $3 ".gtf", "C" }'  FS="/" OFS="\t" >sample_psuedo.lst
 
