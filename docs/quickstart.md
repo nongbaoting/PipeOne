@@ -7,8 +7,9 @@
 
 * Baidu Cloud Disk:
 
-	>Link: https://pan.baidu.com/s/1gbZR1LJAmuT_fmFY1UJ7sA 
-	>Extraction code: 8fnl
+	>Link: [https://pan.baidu.com/s/1gbZR1LJAmuT_fmFY1UJ7sA](https://pan.baidu.com/s/1gbZR1LJAmuT_fmFY1UJ7sA) 
+
+	>Extraction code: __8fnl__
 
 
 * Decompress the test data
@@ -40,8 +41,8 @@ retro-FPKM-divide_totalMapReads.csv
 RNA-editing-rate.csv
 ```
 
-#### Module 2: Importance Features
-We use the test table as input data, and use the result table of the previous step as input in actual applications
+#### Module 2: Feature Prioritization
+We use thess test tables as input data. in actual applications, one should use the result table of the previous step as input 
 
 ```
 mkdir s2_randomForest

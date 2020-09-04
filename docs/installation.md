@@ -10,19 +10,7 @@
    
 #### Installation
 
-1.pull down the PipeOne Docker image
-   
-```
-docker pull nongbaoting/pipeone:latest
-```
-or
-```
-docker pull registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:latest
-docker tag registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:latest nongbaoting/pipeone:latest
-```
-
-
-2.download PipeOne
+__1. Download PipeOne__
 
 ```
 git clone https://github.com/nongbaoting/PipeOne.git
@@ -37,6 +25,28 @@ cd PipeOne
 pip install -r conf/requirement.txt
 ```
 
+__2. PipeOne environment__
+
+* __Pull down the PipeOne Docker image__
+	```
+	docker pull nongbaoting/pipeone:latest
+	```
+	or
+	```
+	docker pull registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:latest
+	docker tag registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:latest nongbaoting/pipeone:latest
+	```
+
+* __or use conda environment__
+
+	```
+	cd PipeOne/INSTALL
+	bash ./install.sh
+	```
+
+
+
+
 #### Download reference data
 
 Download one of the data sets below:
@@ -45,8 +55,9 @@ Download one of the data sets below:
 
 * Baidu Cloud Disk:
 
-	>Link: https://pan.baidu.com/s/1gbZR1LJAmuT_fmFY1UJ7sA 
-	>Extraction code: 8fnl
+	>Link: [https://pan.baidu.com/s/1gbZR1LJAmuT_fmFY1UJ7sA](https://pan.baidu.com/s/1gbZR1LJAmuT_fmFY1UJ7sA)
+
+	>Extraction code: __8fnl__
 
 __Decompression and build index__
 
@@ -72,7 +83,7 @@ params {
   genomes {
    
 	"hg38" {
-		// the reference directory you need to  specify
+		// the reference directory you need to specify
 		ref_directory           = "/your/path/to/hg38_ref"
 
         // No need to change below

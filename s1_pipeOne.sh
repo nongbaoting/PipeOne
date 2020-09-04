@@ -2,9 +2,9 @@
 version=1.0.0
 function args()
 {
-	options=$(getopt -o svh --long help --long version --long reads: --long genome: \
-	--long cleaned: --long layout: --long saveIntermediateFiles --long saveIntermediateHisat2Bam \
-	--long threads: --long maxForks: --long profile: --long library: -- "$@")
+	options=$(getopt -o svh --long help --long version --long update_GTF: --long reads: --long genome: \
+	--long cleaned: --long layout: --long saveIntermediateFiles: --long saveIntermediateHisat2Bam \
+	--long threads: --long maxForks: --long profile: --long library:  -- "$@")
 	[ $? -eq 0 ] || {
 		echo "Incorrect option provided"
 		usage
@@ -26,6 +26,11 @@ function args()
 		--help)
 			HELP=1
 			;;
+		--update_GTF)
+			shift;
+			update_GTF=$1
+			;;
+		
 		--reads)
 			shift;
 			reads=$1
@@ -59,7 +64,8 @@ function args()
 			profile=$1
 			;;
 		--saveIntermediateFiles)
-			saveIntermediateFiles=1
+			shift;
+			saveIntermediateFiles=$1
 			;;
 		--saveIntermediateHisat2Bam)
 			saveIntermediateHisat2Bam=1
@@ -76,11 +82,12 @@ function args()
 
 HELP=0
 VERBOASE=0
+update_GTF="false"
 reads=""
 genome=""
 maxForks=2
 threads=8
-saveIntermediateFiles=0
+saveIntermediateFiles="false"
 saveIntermediateHisat2Bam=0
 layout="paired"
 profile="docker"
@@ -121,7 +128,8 @@ ${RED}Optional:${NOCOLOR}
   --threads	<int>	number of CPU process for each steps. default [8]
   --maxForks	<int>	max forks number of parrallel. default [2]
   --profile	<str>	execution envirenment. defualt [docker]
-  --saveIntermediateFiles	save intermediate files defualt [off]
+  --saveIntermediateFiles 	<boolean>	true or false, save intermediate files . defualt [false]
+  --update_GTF 	<boolean>		<boolean>	true or false, use customize GTF generated in step s1.1_lncRNA.nf instand of GENCODE GTF as input for step: s1.5_fusion.nf and s1.7_alternative_splicing.nf .defualt [false] 
   -h --help	print usage
 "
 exit 1
@@ -150,9 +158,13 @@ reads="$(dirname $(realpath $reads))/${reads_basename}"
 echo -e "\n${RED}--genome:${NOCOLOR} ${GREEN}$genome${NOCOLOR}"
 echo -e "${RED}--reads:${NOCOLOR} ${GREEN}\"$reads\"${NOCOLOR}\n"
 
-bash_input="--profile $profile --genome $genome  \
---layout $layout --threads $threads  --maxForks $maxForks \
+bash_input="--profile $profile \
+--genome $genome  \
+--layout $layout \
+--library $library \
+--threads $threads  --maxForks $maxForks \
 --saveIntermediateFiles $saveIntermediateFiles \
+--update_GTF $update_GTF \
 --cleaned $cleaned --reads \"$reads\""
 
 echo "bash $0  $bash_input" >one_command.sh
@@ -177,36 +189,35 @@ set_args="$set_args_base --cleaned $cleaned  --reads $reads"
 if [ "$library" = "total" ]; then
 	s2_Dir=${workDir}/s1.2_circRNA
 	mkdir -p $s2_Dir; cd $s2_Dir
-	set_args_bam="$set_args --hisat2_bam ../s1.1_lncRNA/results/hisat2/bam/*.hisat2.sortbycoordinate.bam"
-	nextflow run ${baseDir}/s1.2_circRNA.quant.nf $set_args_bam
+	nextflow run ${baseDir}/s1.2_circRNA.quant.nf $set_args --hisat2_bam "../s1.1_lncRNA/results/hisat2/bam/*.hisat2.sortbycoordinate.bam" --update_GTF $update_GTF
 fi
 
 s3_Dir=${workDir}/s1.3_APA-3TUR
 mkdir -p $s3_Dir; cd $s3_Dir
-nextflow run ${baseDir}/s1.3_APA-3TUR.nf  $set_args
+nextflow run ${baseDir}/s1.3_APA-3TUR.nf $set_args
 
 s4_Dir=${workDir}/s1.4_retrotranscriptome
 mkdir -p $s4_Dir; cd $s4_Dir
-nextflow run ${baseDir}/s1.4_retrotranscriptome.nf  $set_args
+nextflow run ${baseDir}/s1.4_retrotranscriptome.nf $set_args
 
 s5_Dir=${workDir}/s1.5_fusion
 mkdir -p $s5_Dir; cd $s5_Dir
-nextflow run ${baseDir}/s1.5_fusion.nf  $set_args
+nextflow run ${baseDir}/s1.5_fusion.nf $set_args --update_GTF $update_GTF
 
 s6_Dir=${workDir}/s1.6_rnaEditing
 mkdir -p $s6_Dir; cd $s6_Dir
-nextflow run ${baseDir}/s1.6_rnaEditing.nf  $set_args
+nextflow run ${baseDir}/s1.6_rnaEditing.nf $set_args
 
-s7_Dir=${workDir}/s1.7_alternative_splicing
+s7_Dir=${workDir}/s1.7_alternative_splicing 
 mkdir -p $s7_Dir; cd $s7_Dir
-nextflow run ${baseDir}/s1.7_alternative_splicing.nf  $set_args
+nextflow run ${baseDir}/s1.7_alternative_splicing.nf $set_args --update_GTF $update_GTF
 
 s8_Dir=${workDir}/s1.8_SNP
 mkdir -p $s8_Dir; cd $s8_Dir
-nextflow run ${baseDir}/s1.8_SNP.nf  $set_args --bam "../s1.7_alternative_splicing/results/star2pass/*.bam" 
+nextflow run ${baseDir}/s1.8_SNP.nf  $set_args_base --bam "../s1.7_alternative_splicing/results/star2pass/*.bam" 
 
 table_dir="${workDir}/00_tables"
 mkdir -p $table_dir; cd $table_dir
-source activate pipeOne_ml
+set +u; source activate pipeOne_ml; set -u
 python3 ${baseDir}/bin/summary_table.py check_tables $library
 python3 ${baseDir}/bin/summary_table.py mark_feature $library

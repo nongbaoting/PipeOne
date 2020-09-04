@@ -2,6 +2,7 @@
 
 params.arriba = "true"
 params.star_fusion = "false"
+params.update_GTF = false
 
 params.reads = ""
 
@@ -35,11 +36,16 @@ if ( params.fasta ){
 }
 
 
-if ( params.gtf ){
+if ( params.gtf && params.update_GTF == false ){
     gtf = file(params.gtf)
     if( !gtf.exists() ) exit 1, "GTF file not found: ${params.gtf}"
+}else if(params.update_GTF == true){
+	gtf = file("../s1.1_lncRNA/results/annotations_and_fasta/protein_coding_and_all_lncRNA.gtf")
+	if( !gtf.exists() ) exit 1, "file: ../s1.1_lncRNA/results/annotations_and_fasta/protein_coding_and_all_lncRNA.gtf does not found\
+	\nPlease check step s1.1_lncRNA has complete?"
+}else{
+	exit 1, "GTF file not found!"
 }
-
 
 if( params.star_index ){
     star_index = Channel
@@ -215,33 +221,33 @@ if (params.arriba == "true" ){
 		file "${id}.fusions.tsv" into arriba_out
 		file "${id}.fusions.pdf" optional true
 		
-		"""
+		shell:
+		'''
 		set +u; source activate fusion; set -u
-		
-		STAR \
-			--runThreadN ${threads} \
-			--genomeDir STARIndex --genomeLoad NoSharedMemory \
-			--readFilesIn ${reads} --readFilesCommand zcat \
-			--outStd BAM_Unsorted --outSAMtype BAM Unsorted --outSAMunmapped Within --outBAMcompression 0 \
-			--outFilterMultimapNmax 1 --outFilterMismatchNmax 3 \
-			--chimSegmentMin 10 --chimOutType WithinBAM SoftClip \
-			--chimJunctionOverhangMin 10 --chimScoreMin 1 \
-			--chimScoreDropMax 30 --chimScoreJunctionNonGTAG 0 \
-			--chimScoreSeparation 1 \
-			--alignSJstitchMismatchNmax 5 -1 5 5 --chimSegmentReadGapMax 3 | \
-		arriba \
-			-x /dev/stdin \
-			-o ${id}.fusions.tsv -O fusions.discarded.tsv \
-			-a ${fasta} -g ${gtf} -b ${blacklisted} \
+		STAR \\
+			--runThreadN !{threads} \\
+			--genomeDir STARIndex --genomeLoad NoSharedMemory \\
+			--readFilesIn !{reads} --readFilesCommand zcat \\
+			--outStd BAM_Unsorted --outSAMtype BAM Unsorted --outSAMunmapped Within --outBAMcompression 0 \\
+			--outFilterMultimapNmax 1 --outFilterMismatchNmax 3 \\
+			--chimSegmentMin 10 --chimOutType WithinBAM SoftClip \\
+			--chimJunctionOverhangMin 10 --chimScoreMin 1 \\
+			--chimScoreDropMax 30 --chimScoreJunctionNonGTAG 0 \\
+			--chimScoreSeparation 1 \\
+			--alignSJstitchMismatchNmax 5 -1 5 5 --chimSegmentReadGapMax 3 | \\
+		arriba \\
+			-x /dev/stdin \\
+			-o !{id}.fusions.tsv -O fusions.discarded.tsv \\
+			-a !{fasta} -g !{gtf} -b !{blacklisted} \\
 			-T -P
 			
-		draw_fusions.R \
-			--fusions=${id}.fusions.tsv \
-			--output=${id}.fusions.pdf \
-			--annotation=${gtf}\
-			--cytobands=${cytobands} \
-			--proteinDomains=$proteinDomains
-		"""
+		draw_fusions.R \\
+			--fusions=!{id}.fusions.tsv \\
+			--output=!{id}.fusions.pdf \\
+			--annotation=!{gtf} \\
+			--cytobands=!{cytobands} \\
+			--proteinDomains=!{proteinDomains}
+		'''
 		
 	}
 

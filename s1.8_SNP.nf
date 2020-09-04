@@ -9,6 +9,7 @@ params.single = ""
 params.genome =""
 params.saveIntermediateVariants = false
 params.saveIntermediateFiles = false
+params.update_GTF = false 
 
 params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : false
 params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
@@ -16,7 +17,6 @@ params.star_index = params.genome ? params.genomes[ params.genome ].star_index ?
 params.genome_build  = params.genome ? params.genomes[ params.genome ].genome_build ?:false :false
 params.annovar_data_dir = params.genome ? params.genomes[ params.genome ].annovar_data_dir ?:false :false
 
-GenomeAnalysisTK = file(params.GenomeAnalysisTK)
 
 def read_base = params.reads.split('/')[-1]
 def ifPaired = read_base =~/\{1,2\}/
@@ -305,8 +305,9 @@ process SplitNCigarReads  {
 	set id, "${id}.split.bam" into splitN_out
 	
 	"""
+	conda_base=`conda info --base`
 	set +u; source activate gatk3.8; set -u
-	java -jar ${params.GenomeAnalysisTK} -T SplitNCigarReads \
+	java -jar ${conda_base}/envs/gatk3.8/opt/gatk-3.8/GenomeAnalysisTK.jar -T SplitNCigarReads \
 		-R ${fasta} -I dedupped.bam -o ${id}.split.bam \
 		-rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS
 
@@ -325,8 +326,9 @@ process  Variant_calling {
 	set id, "${id}.vcf", "${id}.vcf.idx" into vcf_out
 	
 	"""
+	conda_base=`conda info --base`
 	set +u; source activate gatk3.8; set -u
-	java -jar ${params.GenomeAnalysisTK} -T HaplotypeCaller \
+	java -jar ${conda_base}/envs/gatk3.8/opt/gatk-3.8/GenomeAnalysisTK.jar -T HaplotypeCaller \
 		-R ${fasta} -I ${split_bam} \
 		-dontUseSoftClippedBases -stand_call_conf 20.0 \
 		-o ${id}.vcf
@@ -347,8 +349,9 @@ process  Variant_filtering {
 	tuple id, "${id}.output.vcf", "${id}.output.vcf.idx" into vcf_filter_out_annovar
 	
 	"""
+	conda_base=`conda info --base`
 	set +u; source activate gatk3.8; set -u
-	java -jar ${GenomeAnalysisTK} -T VariantFiltration \
+	java -jar ${conda_base}/envs/gatk3.8/opt/gatk-3.8/GenomeAnalysisTK.jar -T VariantFiltration \
 		-R ${fasta} \
 		-V ${input_vcf} \
 		-window 35 -cluster 3 \

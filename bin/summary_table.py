@@ -86,7 +86,8 @@ class RUN:
         chck_dir('00_rawdata')
         add_marks("s1.1_lncR_mRNA/prot_gene.tpm.tsv", "00_rawdata/prot_gene.tpm.csv", "mRNA")
         add_marks("s1.1_lncR_mRNA/lncR_gene.tpm.tsv", "00_rawdata/lncR_gene.tpm.csv", "lncRNA")
-        add_marks("s1.2_circRNA/circRNA_cpm.csv", "00_rawdata/circRNA_cpm.csv", "circRNA")
+        if library == "total":
+            add_marks("s1.2_circRNA/circRNA_cpm.csv", "00_rawdata/circRNA_cpm.csv", "circRNA")
         add_marks("s1.3_APA-3TUR/pau_results.filterPau-distal-proximal.txt", "00_rawdata/APA_pau-distal-proximal.csv", "APA")
         add_marks("s1.4_retrotranscriptome/FPKM-divide_totalMapReads.csv", "00_rawdata/retro-FPKM-divide_totalMapReads.csv", "Retro", sep=",")
         add_marks("s1.5_fusion/fusion_arriba_out.tsv", "00_rawdata/fusion_arriba_out.csv", "Fusion")

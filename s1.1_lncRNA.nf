@@ -302,7 +302,10 @@ process stringtie {
 
 process taco{
 	
-	publishDir "${params.outdir}/taco/", mode: 'link'
+	publishDir "${params.outdir}/taco/", mode: 'link', 
+    	saveAs: { filename -> if( params.saveIntermediateFiles  && filename =~ /gtf/ ) "$filename" 
+							  else null }
+
 	input:
 	file gtf
 	file "stringtie_gtf/*" from stringtie_gtf.collect()
@@ -320,7 +323,8 @@ process taco{
 
 // to get known annotate genes/lncRNA and novel lncRNAs
 process gffcompare{
-	publishDir "${params.outdir}/gffcompare/", mode: 'link'
+	publishDir "${params.outdir}/gffcompare/", mode: 'link',
+    	saveAs: { filename -> params.saveIntermediateFiles ? "$filename" : null }
 	
 	input:
 	file fasta
@@ -341,11 +345,8 @@ process gffcompare{
 	#!/bin/bash
 	cat ${gtf} ${lncpedia_gtf} >all.gtf
 	gffcompare -r all.gtf assembly.gtf 
-	#awk '\$3 =="x"||\$3=="u"||\$3=="i"{print}' gffcmp.assembly.gtf.tmap > novel.gtf.tmap
-    #awk '\$6  > 1 && \$10 >200 {print} ' novel.gtf.tmap > novel.lncRNA.gtf.tmap
-	#awk '\$6  == 1 && \$3=="u" && \$10 >2000 {print}' novel.gtf.tmap >>novel.lncRNA.gtf.tmap
-	#cut -f5 novel.lncRNA.gtf.tmap  >novel_lncRNA_candidate.list
-	
+
+	## get multi-exons lncRNAs or single exon length >= 2000	
 	python3 ${baseDir}/bin/lncRNA.py gffcompare_tmap gffcmp.assembly.gtf.tmap novel_lncRNA_candidate.list
 	
 	python3 ${baseDir}/bin/gtf.py get_by_trans_id assembly.gtf novel_lncRNA_candidate.list novel_lncRNA_candidate.gtf
@@ -363,7 +364,7 @@ cpatpath = params.cpatpath
 
 process cpat{
 	
-	publishDir "${params.outdir}/CPAT/", mode: 'link', 
+	publishDir "${params.outdir}/coding_potential/CPAT/", mode: 'link', 
     	saveAs: { filename -> params.saveIntermediateFiles ? "$filename" : null }
 	
 	input:
@@ -417,7 +418,7 @@ process cpat{
 process PLEK {
 	
     validExitStatus 0,1,2
-	publishDir "${params.outdir}/PLEK/", mode: 'link', 
+	publishDir "${params.outdir}/coding_potential/PLEK/", mode: 'link', 
     	saveAs: { filename -> params.saveIntermediateFiles ? "$filename" : null }
 	
 	input:
@@ -436,8 +437,9 @@ process PLEK {
 	"""
 }
 
+
 process CPPred {
-	publishDir "${params.outdir}/CPPred/", mode: 'link', 
+	publishDir "${params.outdir}/coding_potential/CPPred/", mode: 'link', 
     	saveAs: { filename -> params.saveIntermediateFiles ? "$filename" : null }
 	
 	input:
@@ -448,15 +450,15 @@ process CPPred {
     
 	"""
 	set +u; source activate lncRNA; set -u
-    python2 /opt/CPPred/bin/CPPred.py -i novel_lncRNA_candidate.fa \
-		-hex /opt/CPPred/Hexamer/Human_Hexamer.tsv -r /opt/CPPred/Human_Model/Human.range \
-		-mol /opt/CPPred/Human_Model/Human.model -spe Human -o CPPred.out
+    python2 ${params.CPPred}/bin/CPPred.py -i novel_lncRNA_candidate.fa \
+		-hex ${params.CPPred}/Hexamer/Human_Hexamer.tsv -r ${params.CPPred}/Human_Model/Human.range \
+		-mol ${params.CPPred}/Human_Model/Human.model -spe Human -o CPPred.out
 	"""
 }
 
 process prepare_reference_gtf {
     publishDir "${params.outdir}/reference_gtf_info/", mode: 'link', 
-    	saveAs: { filename -> params.saveIntermediate ? "$filename" : null }
+    	saveAs: { filename -> params.saveIntermediateFiles  ? "$filename" : null }
 	
 	input:
 	file "gencode_annotation.gtf" from gtf
@@ -486,26 +488,27 @@ known_gtf_list_ch.into{ known_gtf_list_ch; known_gtf_list_ch_1;  known_gtf_list_
 
 process filter_coding_potentail{
 
-    publishDir "${params.outdir}/filter_coding_potentail/", mode: 'link',
-		saveAs: { filename-> 
-			if( filename =~ /(list|fa|gtf)$/) filename
-			}
+    publishDir "${params.outdir}/annotations_and_fasta/", mode: 'link',
+		saveAs: { filename ->  params.saveIntermediateFiles  ? "$filename" : null }
+
 	publishDir "${params.outdir}/novel_lncRNA/", mode: 'link',
 		saveAs: { filename-> 
 			if( filename =~ /novel_lncRNA/) filename
 			}
 	
-	publishDir "${params.outdir}/novel_lncRNA/tmp/", mode: 'link'
+	publishDir "${params.outdir}/novel_lncRNA/tmp/", mode: 'link',
+		saveAs: { filename ->  params.saveIntermediateFiles  ? "$filename" : null }
+
+	publishDir "${params.outdir}/coding_potential/", mode: 'link',
+		saveAs: { filename ->  filename ==  "coding_potential_sum.tsv" ? "$filename" : null }
+
 			
-    scratch false
-	
-    
     input:
     file gtf
 	file fasta
 	file fasta_fai
     set "gencode_protein_coding.gtf", "known_lncRNA.gtf","known_lncRNA.list" from known_gtf_list_ch.collect()
-	set "novel_lncRNA_candidate.gtf","novel_lncRNA_candidate.fa" from novel_lncRNA_candidate.collect()
+	set "novel_lncRNA_candidate.gtf", "novel_lncRNA_candidate.fa" from novel_lncRNA_candidate.collect()
     file "CPAT.out" from cpat_out.collect()
     file "PLEK.out" from plekout.collect()
 	file "CPPred.out" from CPPred_out.collect()
@@ -519,17 +522,10 @@ process filter_coding_potentail{
     file "TUCP*"
 	file "all_lncRNA.list" into cal_deg_ch
 	file "coding_potential_sum.tsv"
-	//file "*"
 	
     """
 	set +u; source activate lncRNA; set -u;
 	echo "filter coding potential!"
-    #awk '\$1 == "Coding"{print \$3}' PLEK.out |cut -f2 -d '>' >PLEK.coding
-	#python3 ${baseDir}/bin/lncRNA.py cpat CPAT.out ${params.species}
-	#cat  CPAT.coding  PLEK.coding |sort -u > all_coding_potential.list
-	#cat  novel_lncRNA_candidate.fa |grep '>'|cut -d ' ' -f1 |cut -d '>' -f2 >all.list
-	#python3 ${baseDir}/bin/venn.py venn all.list all_coding_potential.list protein_coding.tmp  novel_lncRNA.list.allExons
-	
 	python3 ${baseDir}/bin/gtf.py to_info novel_lncRNA_candidate.gtf novel_lncRNA_candidate.info
 	python3 ${baseDir}/bin/lncRNA.py combine_coding_prediction novel_lncRNA_candidate.info CPAT.out PLEK.out CPPred.out ${params.species}  novel_lncRNA.list
 	
@@ -541,21 +537,12 @@ process filter_coding_potentail{
 	python3 ${baseDir}/bin/get_seq_by_id.py novel_lncRNA_candidate.fa TUCP.list TUCP.fa
 	python3 ${baseDir}/bin/gtf.py get_by_trans_id novel_lncRNA_candidate.gtf TUCP.list  TUCP.gtf
 	
-	## get multi-exons lncRNAs or single exon length >= 2000
-    #cat novel_lncRNA.gtf known_lncRNA.gtf > all_lncRNA.tmp.gtf
-	#python3 ${baseDir}/bin/gtf.py to_info all_lncRNA.tmp.gtf all_lncRNA.tmp.info
-	#awk '\$8>1' all_lncRNA.tmp.info |cut -f1 > all_lncRNA.multi.exons.list
-	#python3 ${baseDir}/bin/gtf.py get_by_trans_id all_lncRNA.tmp.gtf all_lncRNA.multi.exons.list  all_lncRNA.gtf.multiExon
-	
-	## get multi-exons novel_lncRNA
-	#python3 ${baseDir}/bin/gtf.py get_by_trans_id novel_lncRNA_candidate.gtf all_lncRNA.multi.exons.list  novel_lncRNA.gtf
-	#python3 ${baseDir}/bin/gtf.py get_id  novel_lncRNA.gtf transcript_id  novel_lncRNA.list 
-	#gffread novel_lncRNA.gtf -g ${fasta} -w novel_lncRNA.fa -W
 	
 	# for expression calculate
 	cat novel_lncRNA.list known_lncRNA.list >all_lncRNA.list
 	cat novel_lncRNA.gtf  known_lncRNA.gtf  >all_lncRNA.gtf
-    cat gencode_protein_coding.gtf novel_lncRNA.gtf known_lncRNA.gtf > protein_coding_and_all_lncRNA.gtf
+    cat gencode_protein_coding.gtf novel_lncRNA.gtf known_lncRNA.gtf > protein_coding_and_all_lncRNA.tmp.gtf
+	python3 ${baseDir}/bin/gtf.py add_gene_name protein_coding_and_all_lncRNA.tmp.gtf protein_coding_and_all_lncRNA.gtf
 	gffread all_lncRNA.gtf -g ${fasta} -w all_lncRNA.fa -W
 	gffread protein_coding_and_all_lncRNA.gtf -g ${fasta} -w protein_coding_and_all_lncRNA.fa -W
     """
@@ -627,12 +614,14 @@ process format_lncRNA_info{
 	'''
 	set +u; source activate lncRNA; set -u
     gffcompare -r gencode_protein_coding.gtf all_lncRNA.gtf
+	
 	#conver to bed and colsest to bed
 	awk '$3=="exon"{print}'  gencode_protein_coding.gtf >gencode_protein_coding.exon.gtf
 	awk '$3=="exon"{print}'  all_lncRNA.gtf             >all_lncRNA.exon.gtf
 	gtf2bed < gencode_protein_coding.exon.gtf |cut -f1-6 >gencode_protein_coding.exon.gtf.bed
 	gtf2bed < all_lncRNA.exon.gtf |cut -f1-6 >all_lncRNA.exon.gtf.bed
 	bedtools closest -a all_lncRNA.exon.gtf.bed -b gencode_protein_coding.exon.gtf.bed  -d |sort -u > cloest.txt
+	
 	#gtf to info
 	python3 !{baseDir}/bin/gtf.py to-info  all_lncRNA.gtf all_lncRNA.info
 	python3 !{baseDir}/bin/gtf.py to-info  gencode_protein_coding.gtf gencode_protein_coding.info.tsv
@@ -813,7 +802,7 @@ if (params.reads){
 		
 		"""
 		python3 ${baseDir}/bin/lncRNA.py get-txID-geneID ref_gtf protein_coding_and_all_lncRNA.txID_geneID.tsv
-		Rscript  ${baseDir}/bin/tximport_salmon.R
+		Rscript ${baseDir}/bin/tximport_salmon.R
 		# mkdir -p files_cache__
 		# ls |grep -v files_cache__ |xargs -i cp -r {} files_cache__
 		"""
@@ -866,5 +855,4 @@ if (params.reads){
 	}
 	
 }
-
 

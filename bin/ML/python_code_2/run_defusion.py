@@ -51,7 +51,7 @@ def run_defusion(low_dim, alpha, gamma, view):
     print("running lowDim=%d_alpha=%.2f_gamma=%.2f" % (low_dim, alpha, gamma))
     fout = tdir + "lowDim=%d_alpha=%.2f_gamma=%.2f.pkl" % (low_dim, alpha, gamma)
 
-    defusion_ = DeFusion(low_dim, alpha, gamma, silence=True)
+    defusion_ = DeFusion(low_dim, alpha, gamma, silence=True, set_seed=True)
     X, Z, E, convergence = defusion_.solver(D, L)
     save_result(X, Z, E, convergence, sample_id, var_names, fout)
 

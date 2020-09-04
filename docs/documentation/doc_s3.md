@@ -1,5 +1,5 @@
 
-__Module 3: Subtype Analysis__
+### __Module 3: Subtype Analysis__
 
 #### Run in one command
 
@@ -95,26 +95,31 @@ __Note:__ The `--cluster_survival_file` option is mutually exclusive with the `-
 
 
 
-#### Results
+#### Results files
 
 __main result__
+
 * `record_log_rank_test_pvalue.csv`, Survival difference of different classification results
-* `FeatureSelection` random Forest results
+
+* `FeatureSelection` Random Forest results
     * `RF_best_params_settings_for_feature_selection.csv` best Random Foerest parameter and accuracy
     * `feature*_importance.csv`  Random Foerest Feature importance
     * `RF_params_setting_record.txt` all Random Foerest parameter and accuracy
 
-__Intermediate files__
-* `NMF` results of Nonnegative matrix factorization (NMF) under different paramiters
-    `weight_*` weight matrix W of NMF
-    `X_*`      H matrix
-
 * `clusters` cluster reuslt and survival curves
     * `clusters/eval_cluster_num/lowDim=*_alpha=*_gamma=*_clusters=*_clustering.csv` Kmeans cluster base of H matrix
     * `clusters/lowDim=*_alpha=*_gamma=*_silhouette_score.png` silhouette with of cluster results
-    * `clusters/surv_curve/low_dim=2_alpha=0.01_gamma=0.00_clustering.pdf` survival plot of Kmeans cluster result which silhouette width is max
+    * `clusters/surv_curve/low_dim=2_alpha=0.01_gamma=0.00_clustering.pdf` survival plot of Kmeans cluster result 
+
+__Intermediate files__
+
+* `NMF` results of Nonnegative matrix factorization (NMF) under different paramiters
+
+    * `weight_*` weight matrix W of NMF
+    * `X_*`      H matrix
 
 * `data_randomForest` selected data for running random Forest
-    `top*` top K features in W matrix use for random forest training
+    
+    * `top*` top K features in W matrix used for random forest training
 
-* `rf_my_record.csv`
+* `rf_my_record.csv` Random Forest accuary record file

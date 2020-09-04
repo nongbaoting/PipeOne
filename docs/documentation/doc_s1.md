@@ -1,6 +1,7 @@
-__As long as the corresponding input data is provided, the three main modules can operate independently__
 
-__Module 1: RNA-seq processing__
+__Note: As long as the corresponding input data is provided, the three main modules can be operate independently__
+
+### __Module 1: RNA-seq processing__
 
 ####  Usage
 ```
@@ -21,17 +22,18 @@ Optional:
 --cleaned	<boolean>	true or false. defualt[true]
 --layout	<string>	paired or single. defualt [paired]
 --library	<string>	polyA or total. defualt [polyA]
---threads	<int>	number of CPU process for each steps. default [8]
---maxForks	<int>	max forks number of parrallel. default [2]
---profile	<str>	execution envirenment. defualt [docker]
+--threads	<int>	    number of CPU process for each steps. default [8]
+--maxForks	<int>	    max forks number of parrallel. default [2]
+--profile	<str>	    execution envirenment. defualt [docker]
 --saveIntermediateFiles	save intermediate files defualt [off]
--h --help   print usage
+--update_GTF use customized GTF generated in step s1.1_lncRNA.nf instand of GENCODE GTF as input for step: s1.5_fusion.nf and s1.7_alternative_splicing.nf . defualt [off]
+-h --help               print usage
 ```
 
 #### Output
 
 * __Files result from different programs applied to RNA-seq__
-    * 00_tables Tables from different aspect of RNA-seq
+    * 00_tables Tables from different modal of RNA-seq
     * s1.*  Program running directory
       * result result directory
       * work work directory
@@ -48,8 +50,7 @@ $ tree -L 2
 │   ├── s1.5_fusion
 │   ├── s1.6_rnaEditing
 │   ├── s1.7_alternative_splicing
-│   ├── s1.8_SNP
-│   └── t.txt
+│   └── s1.8_SNP
 ├── one_command.sh
 ├── s1.1_lncRNA
 │   ├── results
@@ -76,10 +77,9 @@ $ tree -L 2
     ├── results
     └── work
 
-34 directories, 2 files
 ```
 
-* __Tables from different aspect of RNA-seq: s1.*__
+* __Tables from different modal of RNA-seq: s1.*__
 ```
 $ ls  00_tables
 00_rawdata
@@ -93,7 +93,7 @@ s1.7_alternative_splicing
 s1.8_SNP
 ```
 
-* __Tables of different aspects of RNA-seq in one directory__, which are required in module 2 and module3
+* __Tables of different modals of RNA-seq in one directory__, which are required in module 2 and module3
 ```
 $ tree 00_tables/00_rawdata 
 00_tables/00_rawdata

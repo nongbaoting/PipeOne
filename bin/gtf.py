@@ -132,6 +132,22 @@ class GTF_circ:
 
 class GTF_exe:
 
+    def add_gene_name(self, gtf, out_gtf):
+        fo = open(out_gtf, 'w')
+        with open(gtf, 'r') as f:
+            for line in f:
+                if re.match('#', line): continue
+                if re.match('track', line): continue
+                cell = line.strip().split('\t')
+                attr = gtf_attr(cell[8])
+                if 'gene_name' not in attr:
+                    attr['gene_name'] = attr['gene_id']
+                attr_cat = gtf_attrs_cat(attr)
+                cell[8] = attr_cat
+                new_line = '\t'.join(cell)
+                fo.write(new_line + '\n')
+        fo.close()
+
     def simple(self, gtf, out):
         fo = open(out, 'w')
         mydict = defaultdict(list)

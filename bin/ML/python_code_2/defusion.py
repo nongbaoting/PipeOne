@@ -4,12 +4,17 @@ from numpy.linalg import norm
 from copy import deepcopy
 
 class DeFusion:
-    def __init__(self, low_dim, alpha, gamma, silence):
+    def __init__(self, low_dim, alpha, gamma, silence, set_seed=False):
 
         self.beta = 1
         self.lambda_ = 1
         self.nrep = 10
+        if set_seed:
+            self.seed = np.array([i * 10 for i in range(self.nrep)], dtype=int)
+        else:
+            self.seed = None
         self.step = 50
+        #self.maxiter = 10 # test only, for time saving
         self.maxiter = 1000
         self.maxinner = 5
         self.silence = silence
@@ -56,12 +61,20 @@ class DeFusion:
 
         obj_val = []
 
+        seed = self.seed
+
         for rp in range(nrep):
             # random initialization
+            # set random seed
+            if seed is not None:
+                np.random.seed(seed[rp])
             initX = np.random.uniform(0, 2, (sample_num, low_dim))
             initZ = []
             initE = []
             for k in range(view_num):
+                # set random seed
+                if seed is not None:
+                    np.random.seed(seed[rp] + k + 1)
                 initZ.append(np.random.uniform(0, 2, (low_dim, sample_dim[k])))
                 initE.append(np.zeros((sample_num, sample_dim[k])))
 

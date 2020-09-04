@@ -148,7 +148,7 @@ class MYRUN:
                 mygene_exon[qry_gene_id] = max(mygene_exon[qry_gene_id], num_exons )
 
                 mytx[qry_id] = [qry_gene_id, class_code, int(num_exons), int(tx_len) ]
-
+            ## get multi-exons lncRNAs or single exon length >= 2000	
             for tx_id in mytx:
                 gene_id, class_code, num_exons, tx_len = mytx[tx_id]
                 if gene_id in mygene_not:

@@ -1,7 +1,8 @@
+
 import numpy as np
 import pandas as pd
 # from scipy.io import savemat
-import os, fire, re, sys
+import os, fire, re
 from sklearn.model_selection import train_test_split
 from collections import Counter
 
@@ -19,7 +20,7 @@ def select_top_k_var(df, topk):
     var = df.var(axis=0, skipna=True)
     var = var.fillna(0)
     sort_id = np.argsort(-var.values)
-    df_out = df.iloc[:, sort_id[0: topk] ]
+    df_out = df.iloc[:, sort_id[0: topk]]
     return df_out
 
 def select_top_k_nonzero_ratio(df, topk):
@@ -43,7 +44,7 @@ def select_top_k_nonzero_ratio(df, topk):
 # step 3: rearrange samples
 
 def get_sample_head_idx(df):
-    sample_head = re.compile("Run$|Sample$", re.IGNORECASE)
+    sample_head = re.compile("Run|Sample")
     for i, c in enumerate(df.columns):
         if sample_head.match(c):
             return i
@@ -53,7 +54,7 @@ def sub_feature_samples(indir, train_dir, sample_info, outdir):
     sinfo = pd.read_csv(sample_info)
     chck_dir(outdir)
     for entry in os.scandir(indir):
-        #print(entry.name)
+        print(entry.name)
         if re.search("clustering", entry.name): continue
         dat = pd.read_csv(entry.path, header=0, index_col=0)
         datT = dat.T
@@ -79,18 +80,9 @@ def samllSample_train_test_split(sample_df, test_size=0.3, random_state=2):
 
 class MYRUN_procRaw:
 
-    def proc(self, rawdir , sample_info, var_topk = 1000 ):
-        tdir = "./data/proc/"
+    def proc(self, rawdir ,  sample_info, var_topk = 1000, tdir = "./data/proc/" ):
+        #tdir = "./data/proc/"
         chck_dir(tdir)
-        exist_sample = []
-        data_len = 0
-
-        clinical_df = pd.read_csv(sample_info, header=0, index_col=None)
-        sample_idx = get_sample_head_idx(clinical_df)
-        #sample_id = clinical_df['Run']
-        sample_id = set(clinical_df.iloc[:, sample_idx] ) ## 之后修改,用固定位置
-        input_len = len(sample_id)
-
         for entry in os.scandir(rawdir):
             if not re.search("csv$", entry.path): continue
             fileA = entry.name
@@ -98,37 +90,24 @@ class MYRUN_procRaw:
             # fiA = "./data/rawdata/" + fileA + ".csv" #### 可以改成os.scandir
             dfA = pd.read_csv(fiA, header=0, index_col=0)
             dfA = dfA.T
-            data_len = len(dfA.index )
-            
-            common_sample = list( set(dfA.index).intersection(sample_id))
-            common_sample.sort()
-
-            if len(exist_sample) == 0:
-                exist_sample = common_sample
-            elif common_sample != exist_sample:
-                sys.exit(f"file {entry.name} contain different column compare to other tables, please make sure that all tables have identical column names")
-            else:
-                print(f"get top {var_topk} most variance features from file: {entry.name}" )
-            
             # rearrange
-            common_sample = pd.Series(common_sample, name="Sample")
-            dfA = dfA.reindex(common_sample, fill_value=0)
+            clinical_fi = sample_info
+            clinical_df = pd.read_csv(clinical_fi, header=0, index_col=None)
+
+            sample_idx = get_sample_head_idx(clinical_df)
+            #sample_id = clinical_df['Run']
+            sample_id = clinical_df.iloc[:,sample_idx] ### 之后修改,用固定位置
+            #print(sample_id)
+
+            dfA = dfA.reindex(sample_id, fill_value=0)
             dfA = fill_na(dfA)
             # var_topk = 1000 ##### 可以改
             dfA_nonzero = select_top_k_var(dfA, var_topk)
 
             foutA = os.path.join( tdir, f'proc_{fileA}' )  #### 输出
             dfA_nonzero.to_csv(foutA, header=True, index=True)
-        
-        print(f'\nNumber of samples in input sample info: {input_len}')
-        print(f'Number of samples in feature data set : {data_len}')
-        print(f'Number of common samples              : {len(exist_sample)}')
 
-        common_fi = "./data/common_sample_info.csv"
-        cli_common = clinical_df[ clinical_df["Sample"].isin(exist_sample) ]
-        cli_common.to_csv(common_fi, index=False )
-
-    def train_test_split(self, indir, sample_info, test_size=0.3, random_state=2):
+    def train_test_split(self, rawdir, sample_info, test_size=0.3, random_state=2):
         sinfo = pd.read_csv(sample_info)
         train_dir, test_dir = "./data/train_dir/", "./data/test_dir/"
         chck_dir(train_dir); chck_dir(test_dir)
@@ -136,15 +115,15 @@ class MYRUN_procRaw:
         sinfo_train.to_csv("./data/train_dir/train_sample_clustering.csv", index=False)
         sinfo_test.to_csv("./data/test_dir/test_sample_clustering.csv", index=False)
 
-        for entry in os.scandir(indir):
+        for entry in os.scandir(rawdir):
             print(entry.name)
             dat = pd.read_csv(entry.path, header=0, index_col=0)
             fi_name_out = f'proc_{entry.name}'
             train_fi = os.path.join(train_dir, fi_name_out)
             test_fi  = os.path.join(test_dir, fi_name_out)
 
-            sub_train = dat.reindex(index=sinfo_train.loc[:, 'Sample'], fill_value=0)
-            sub_test = dat.reindex(index=sinfo_test.loc[:, 'Sample'], fill_value=0)
+            sub_train = dat.reindex(index=sinfo_train.loc[:,'Sample'], fill_value=0)
+            sub_test  = dat.reindex(index=sinfo_test.loc[:, 'Sample'], fill_value=0)
 
             sub_train.to_csv(train_fi)
             sub_test.to_csv(test_fi)
@@ -169,7 +148,7 @@ class MYRUN_procRaw:
         train_dir  = "./data/proc/"
         test_dir   = "./data/test_proc/"
         #os.system(f'rm -rf {train_dir} {test_dir}')
-        myrun.proc(rawdir ,  "train_sample_clustering.csv",  var_topk , train_dir )
+        myrun.proc(rawdir ,  "train_sample_clustering.csv",  var_topk, train_dir )
         sub_feature_samples(rawdir, train_dir, "test_sample_clustering.csv", test_dir)
         os.system(f"cp train_sample_clustering.csv {train_dir}")
 

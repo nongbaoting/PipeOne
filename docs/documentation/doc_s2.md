@@ -1,5 +1,5 @@
 
-__Module 2: Importance Features__
+### __Module 2: Feature Prioritization__
 
 #### Run in One Command
 ```
@@ -48,8 +48,6 @@ feature_n,value,value,value,value,...,value
 ```
 
 Note that each file is in csv comma separated format.
-
-
 
 
 #### Run Module 2  step by step
@@ -111,16 +109,18 @@ python3 /home/nbt2/pipe/PipeOne/bin/ML/python_code_2/subset_sample_nong.py subse
     --sample_info   sample information file
     --tdir Output directory
 
-
-
 __3. Run the main program__
 
 ```
-python3 ${baseDir}/bin/ML/main_randomForest.py --threads 8 --train_dir ./data/train_dir --test_dir ./data/test_dir
+python3 ${baseDir}/bin/ML/main_randomForest.py --threads 8 --train_dir ./data/train_dir --test_dir ./data/test_dir \
+--n_estimators "3,5,7,10,20,30,50,100" --max_depth "2,3,4,7,10" --min_samples_split "2,3,4,5,7"
 ```
-    --threads   number of threads to use
+    --threads   number of threads to use. default [8]
     --train_dir Training data directory
     --test_dir  Testing data directory
+    --n_estimators  number of decision trees. default ["3,5,7,10,20,30,50,100"]
+    --max_depth maximum depth for each decision tree. default ["2,3,4,7,10"]
+    --min_samples_split  minimum samples required for tree node splitting. default ["2,3,4,5,7"]
 
 
 __4. add gene info to  results (optional)__

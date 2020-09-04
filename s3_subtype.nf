@@ -39,7 +39,6 @@ process clustering_and_eval{
     stageInMode 'copy'
     publishDir "./results",  mode: 'copy'
 
-
     input:
     file "*" from next_step.collect()
     file "data/sample.cli.csv" from clinical

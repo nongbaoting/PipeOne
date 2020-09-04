@@ -2,7 +2,7 @@
 params.bam  = ""
 params.sra  = ""
 params.reads = ""
-
+params.update_GTF = false 
 params.genome = ""
 params.cleaned  = false
 params.saveIntermediateFiles = false
@@ -45,9 +45,16 @@ if ( params.fasta ){
 }
 
 
-if ( params.gtf ){
+
+if ( params.gtf && params.update_GTF == false ){
     gtf = file(params.gtf)
     if( !gtf.exists() ) exit 1, "GTF file not found: ${params.gtf}"
+}else if(params.update_GTF == true){
+	gtf = file("../s1.1_lncRNA/results/annotations_and_fasta/protein_coding_and_all_lncRNA.gtf")
+	if( !gtf.exists() ) exit 1, "file: ../s1.1_lncRNA/results/annotations_and_fasta/protein_coding_and_all_lncRNA.gtf does not found\
+	\nPlease check step s1.1_lncRNA has complete?"
+}else{
+	exit 1, "GTF file not found!"
 }
 
 
