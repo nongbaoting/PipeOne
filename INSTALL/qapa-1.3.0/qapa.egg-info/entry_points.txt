@@ -1,0 +1,3 @@
+[console_scripts]
+qapa = qapa.qapa:main
+

@@ -341,7 +341,7 @@ process gffcompare{
 	file "gffcmp.assembly.gtf.tmap" into gffcompare_tmap
 	
 	"""
-	set +u; source activate pipeOne_lncRNA; set -u
+	set +u; source activate pipeOne_py3; set -u
 	#!/bin/bash
 	cat ${gtf} ${lncpedia_gtf} >all.gtf
 	gffcompare -r all.gtf assembly.gtf 
@@ -471,7 +471,7 @@ process prepare_reference_gtf {
     
     """
     #!/bin/bash
-	set +u; source activate pipeOne_lncRNA; set -u
+	set +u; source activate pipeOne_py3; set -u
 	gffcompare -r ${genecode_lncRNA_gtf} lncpedia.gtf 
 	awk '\$3 =="x"||\$3=="u"||\$3=="i"{print}' gffcmp.lncpedia.gtf.tmap > nonOverlap.gtf.tmap    
 	cut -f5 nonOverlap.gtf.tmap > nonOverlap_lncpedia.list

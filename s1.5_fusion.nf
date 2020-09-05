@@ -223,29 +223,29 @@ if (params.arriba == "true" ){
 		
 		shell:
 		'''
-		set +u; source activate fusion; set -u
-		STAR \\
-			--runThreadN !{threads} \\
-			--genomeDir STARIndex --genomeLoad NoSharedMemory \\
-			--readFilesIn !{reads} --readFilesCommand zcat \\
-			--outStd BAM_Unsorted --outSAMtype BAM Unsorted --outSAMunmapped Within --outBAMcompression 0 \\
-			--outFilterMultimapNmax 1 --outFilterMismatchNmax 3 \\
-			--chimSegmentMin 10 --chimOutType WithinBAM SoftClip \\
-			--chimJunctionOverhangMin 10 --chimScoreMin 1 \\
-			--chimScoreDropMax 30 --chimScoreJunctionNonGTAG 0 \\
-			--chimScoreSeparation 1 \\
-			--alignSJstitchMismatchNmax 5 -1 5 5 --chimSegmentReadGapMax 3 | \\
-		arriba \\
-			-x /dev/stdin \\
-			-o !{id}.fusions.tsv -O fusions.discarded.tsv \\
-			-a !{fasta} -g !{gtf} -b !{blacklisted} \\
+		set +u; source activate pipeOne_fusion; set -u
+		STAR \
+			--runThreadN !{threads} \
+			--genomeDir STARIndex --genomeLoad NoSharedMemory \
+			--readFilesIn !{reads} --readFilesCommand zcat \
+			--outStd BAM_Unsorted --outSAMtype BAM Unsorted --outSAMunmapped Within --outBAMcompression 0 \
+			--outFilterMultimapNmax 1 --outFilterMismatchNmax 3 \
+			--chimSegmentMin 10 --chimOutType WithinBAM SoftClip \
+			--chimJunctionOverhangMin 10 --chimScoreMin 1 \
+			--chimScoreDropMax 30 --chimScoreJunctionNonGTAG 0 \
+			--chimScoreSeparation 1 \
+			--alignSJstitchMismatchNmax 5 -1 5 5 --chimSegmentReadGapMax 3 | \
+		arriba \
+			-x /dev/stdin \
+			-o !{id}.fusions.tsv -O fusions.discarded.tsv \
+			-a !{fasta} -g !{gtf} -b !{blacklisted} \
 			-T -P
 			
-		draw_fusions.R \\
-			--fusions=!{id}.fusions.tsv \\
-			--output=!{id}.fusions.pdf \\
-			--annotation=!{gtf} \\
-			--cytobands=!{cytobands} \\
+		draw_fusions.R \
+			--fusions=!{id}.fusions.tsv \
+			--output=!{id}.fusions.pdf \
+			--annotation=!{gtf} \
+			--cytobands=!{cytobands} \
 			--proteinDomains=!{proteinDomains}
 		'''
 		

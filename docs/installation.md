@@ -18,11 +18,8 @@ git clone https://github.com/nongbaoting/PipeOne.git
 
 If you only want to run Module 2 or Module 3, install conda environment is adequate
 ```
-conda create -n pipeOne_ml python=3.6
-source activate pipeOne_ml
-
-cd PipeOne
-pip install -r conf/requirement.txt
+cd PipeOne/INSTALL
+conda create  --name pipeOne_ml --file ymls/pipeOne_ml.yml
 ```
 
 __2. PipeOne environment__
@@ -39,6 +36,7 @@ __2. PipeOne environment__
 
 * __or use conda environment__
 
+	To ensure a successful installation, we recommend that you run each command step by step in a shell script `install.sh`
 	```
 	cd PipeOne/INSTALL
 	bash ./install.sh

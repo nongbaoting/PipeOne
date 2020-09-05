@@ -196,7 +196,7 @@ process sprint{
 	file "${id}.SPRINT_identified_all.res" into sprint_res
 	
 	"""
-	set +u; source activate RnaEditing; set -u
+	set +u; source activate pipeOne_RnaEditing; set -u
 	if [[ "${reads[0]}"  =~ gz\$|bzip2\$ ]]; then
 		echo "decompressing fastq files ..."
 		zcat  ${reads[0]} > read_1.fq
@@ -235,7 +235,7 @@ process merge_A2I {
 	tuple "SPRINT_all.annovar.csv", "SPRINT_A2I.annovar.csv", "SPrint_A2I_table.annovar.csv" into merge_out
 	
 	"""
-	set +u; source activate pipeOne_ml; set -u
+	set +u; source activate pipeOne_py3; set -u
 	python3 ${baseDir}/bin/rnaEditing.py cat SPRINT_all.tsv SPRINT_A2I.tsv results
 	
 	# supported reads for A to I rna-editing is 5
@@ -243,7 +243,7 @@ process merge_A2I {
 
 	# annovar annotate rnaEditing
 	cut -f1-4 SPRINT_all.tsv |awk 'NR !=1 {split(\$4, a, ""); print \$1,\$3,\$3, a[1],a[2] }' OFS="\t" > rnaEditing_pos.txt
-	annotate_variation.pl -geneanno -dbtype refGene -buildver hg38 rnaEditing_pos.txt annovar_db
+	perl ${params.annovar_BinDir}/annotate_variation.pl -geneanno -dbtype refGene -buildver hg38 rnaEditing_pos.txt annovar_db
 	python3 ${baseDir}/bin/rnaEditing.py add_tab_anno rnaEditing_pos.txt.variant_function SPrint_A2I_table.tsv SPrint_A2I_table.annovar.csv
 	python3 ${baseDir}/bin/rnaEditing.py add_res_anno rnaEditing_pos.txt.variant_function SPRINT_all.tsv SPRINT_all.annovar.csv
 	python3 ${baseDir}/bin/rnaEditing.py add_res_anno rnaEditing_pos.txt.variant_function SPRINT_A2I.tsv SPRINT_A2I.annovar.csv

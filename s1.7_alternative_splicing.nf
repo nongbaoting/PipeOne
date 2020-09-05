@@ -231,6 +231,7 @@ if (params.reads || params.sra ){
 		file "${id}.SJ.out.tab" into star_1_out
 			
 		"""
+		set +u; source activate pipeOne_py3; set -u
 		STAR 	--runThreadN ${params.threads } \\
 				--genomeDir STARIndex \\
 				--outSAMtype None \\
@@ -244,8 +245,8 @@ if (params.reads || params.sra ){
 				--outFilterMismatchNmax 10 \\
 				--alignIntronMax 500000 \\
 				--alignMatesGapMax 1000000 \\
-				--sjdbScore 2 \\
-		chmod -R a+rw .   
+				--sjdbScore 2
+		
 		"""
 		
 	}
@@ -267,15 +268,15 @@ if (params.reads || params.sra ){
 		file "STARIndex_2pass/*" into STARIndex_2pass
 		
 		"""
+		set +u; source activate pipeOne_py3; set -u
 		find star_junction -type f |xargs -i cat {} > SJ.out.tab
-		
 		genomeDir=STARIndex_2pass
 		mkdir \$genomeDir
 		STAR --runMode genomeGenerate --genomeDir \$genomeDir \\
 			--genomeFastaFiles ${fasta} \\
 			--sjdbGTFfile ${gtf} \\
 			 --sjdbFileChrStartEnd SJ.out.tab  --runThreadN  ${params.threads}
-		chmod -R a+rw  .
+		
 		"""
 	}
 
@@ -295,6 +296,7 @@ if (params.reads || params.sra ){
 		set "${id}.bam", "${id}.bam.bai" into bams_bai
 		
 		"""
+		set +u; source activate pipeOne_py3; set -u
 		STAR --runThreadN ${params.threads } \\
 			--genomeDir STARIndex \\
 			--readFilesIn ${reads} \\
@@ -315,7 +317,7 @@ if (params.reads || params.sra ){
 			
 		mv ${id}.Aligned.sortedByCoord.out.bam ${id}.bam
 		samtools index ${id}.bam
-		chmod -R a+rw  .
+		
 		"""
 	}
 
@@ -345,6 +347,7 @@ if (params.reads || params.sra ){
 		set "${id}.bam", "${id}.bam.bai" into bams_bai
 		
 		"""
+		set +u; source activate pipeOne_py3; set -u
 		samtools index ${bam}
 		"""
 	}
@@ -371,7 +374,7 @@ process Single_graphs_for_generate_gtf_pickle {
 	file "${gtf}.pickle" into gtf_pickle
 	
 	"""
-	set +u; source activate AS; set -u
+	set +u; source activate pipeOne_AS; set -u
 	spladder build -o spladder_out \\
                    -a ${gtf} \\
                    -b ${test_bam} \\
@@ -406,7 +409,7 @@ process Single_graphs {
 	file "spladder_out/spladder/genes_graph_conf3.${id}.pickle" into graphs_all_merge, graphs_all_quant
 	set id, "spladder_out/spladder/genes_graph_conf3.${id}.pickle" into graphs_ch 
 	"""
-	set +u; source activate AS; set -u
+	set +u; source activate pipeOne_AS; set -u
 	spladder build -o spladder_out \\
                    -a ${gtf} \\
                    -b ${bam} \\
@@ -433,7 +436,7 @@ process Merged_graph {
 	//file "*.hdf5" into mergeGraph_hdf5_ch, hdf5_all
 	
 	"""
-	set +u; source activate AS; set -u
+	set +u; source activate pipeOne_AS; set -u
 	ls |grep "bam\$" > alignments.txt
 	mkdir -p  spladder_out/tmp
 	
@@ -496,7 +499,7 @@ process Quant_each {
 	
 	
 	"""
-	set +u; source activate AS; set -u
+	set +u; source activate pipeOne_AS; set -u
 	spladder build -o spladder_out -a ${gtf} -b ${id}.bam \\
                    --merge-strat merge_graphs \\
                    --no-extract-ase \\
@@ -527,7 +530,7 @@ process QuantAll_and_EventCalling{
 	file "spladder_out/merge_graphs*" into spladder_out
 	
 	"""
-	set +u; source activate AS; set -u
+	set +u; source activate pipeOne_AS; set -u
 	ls |grep "bam\$" > alignments.txt
 	mkdir -p  spladder_out/tmp
 	
@@ -566,6 +569,7 @@ process PSI_table{
 	
 	shell:
 	''' 
+	set +u; source activate pipeOne_py3; set -u
 	mkdir -p  spladder_PSI/
 	for i in `ls spladder_out/*.confirmed.txt.gz`
 	do

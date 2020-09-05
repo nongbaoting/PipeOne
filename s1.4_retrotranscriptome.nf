@@ -279,6 +279,7 @@ process merge_telescope{
 	
 	script:
 	"""
+	set +u; source activate pipeOne_py3; set -u
 	python3 ${baseDir}/bin/retro.py merge telescope.rawCount.tsv  out/
 	python3 ${baseDir}/bin/gtf.py to_info ${retro_gtf} transcripts.info.tsv
 	Rscript ${baseDir}/bin/retro_fpkm.R 

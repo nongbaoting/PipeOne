@@ -214,6 +214,7 @@ if(params.reads || params.sra ){
 		file "${id}.SJ.out.tab" into star_1_out
 		
 		"""
+		set +u; source activate pipeOne_py3; set -u
 		STAR --runThreadN ${params.threads} --genomeDir STARIndex \
 			--readFilesIn ${reads}  --readFilesCommand zcat \
 			--outFileNamePrefix	${id}.
@@ -234,6 +235,7 @@ if(params.reads || params.sra ){
 		file "STARIndex_2pass/*" into STARIndex_2pass
 		
 		"""
+		set +u; source activate pipeOne_py3; set -u
 		find star_junction -type f |xargs -i cat {} > SJ.out.tab
 		
 		genomeDir=STARIndex_2pass
@@ -256,6 +258,7 @@ if(params.reads || params.sra ){
 		set id, file("${id}.Aligned.out.sam") into star_2pass_out
 		
 		"""
+		set +u; source activate pipeOne_py3; set -u
 		STAR --genomeDir STARIndex_2pass --runThreadN  ${params.threads} \
 			--readFilesIn ${reads} --readFilesCommand zcat \
 			--outFileNamePrefix	${id}.
@@ -275,7 +278,7 @@ process picard_AddOrReplaceReadGroups_MarkDuplicates {
 	set id, "${id}.dedupped.bam" into picard_out
 	
 	"""
-	set +u; source activate gatk3.8; set -u
+	set +u; source activate pipeOne_gatk3.8; set -u
 	picard AddOrReplaceReadGroups \
 		I=${star2pass_sam} \
 		O=${id}.rg_added_sorted.bam \
@@ -306,8 +309,8 @@ process SplitNCigarReads  {
 	
 	"""
 	conda_base=`conda info --base`
-	set +u; source activate gatk3.8; set -u
-	java -jar ${conda_base}/envs/gatk3.8/opt/gatk-3.8/GenomeAnalysisTK.jar -T SplitNCigarReads \
+	set +u; source activate pipeOne_gatk3.8; set -u
+	java -jar \${conda_base}/envs/gatk3.8/opt/gatk-3.8/GenomeAnalysisTK.jar -T SplitNCigarReads \
 		-R ${fasta} -I dedupped.bam -o ${id}.split.bam \
 		-rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS
 
@@ -327,8 +330,8 @@ process  Variant_calling {
 	
 	"""
 	conda_base=`conda info --base`
-	set +u; source activate gatk3.8; set -u
-	java -jar ${conda_base}/envs/gatk3.8/opt/gatk-3.8/GenomeAnalysisTK.jar -T HaplotypeCaller \
+	set +u; source activate pipeOne_gatk3.8; set -u
+	java -jar \${conda_base}/envs/gatk3.8/opt/gatk-3.8/GenomeAnalysisTK.jar -T HaplotypeCaller \
 		-R ${fasta} -I ${split_bam} \
 		-dontUseSoftClippedBases -stand_call_conf 20.0 \
 		-o ${id}.vcf
@@ -350,8 +353,8 @@ process  Variant_filtering {
 	
 	"""
 	conda_base=`conda info --base`
-	set +u; source activate gatk3.8; set -u
-	java -jar ${conda_base}/envs/gatk3.8/opt/gatk-3.8/GenomeAnalysisTK.jar -T VariantFiltration \
+	set +u; source activate pipeOne_gatk3.8; set -u
+	java -jar \${conda_base}/envs/gatk3.8/opt/gatk-3.8/GenomeAnalysisTK.jar -T VariantFiltration \
 		-R ${fasta} \
 		-V ${input_vcf} \
 		-window 35 -cluster 3 \
@@ -381,9 +384,9 @@ process variant_AnnotateAnnovar {
     
     
     """
-	set +u; source activate gatk3.8; set -u
-	convert2annovar.pl -format vcf4 -filter PASS --allsample ${id}.output.vcf --outfile avinput 1> conv.log 2>&1
-	table_annovar.pl avinput.${id}.avinput  annovar_db \
+	set +u; source activate pipeOne_gatk3.8; set -u
+	perl ${params.annovar_BinDir}/convert2annovar.pl -format vcf4 -filter PASS --allsample ${id}.output.vcf --outfile avinput 1> conv.log 2>&1
+	perl ${params.annovar_BinDir}/table_annovar.pl avinput.${id}.avinput  annovar_db \
 		--buildver ${params.genome_build} --remove --protocol $gene_based \
 		--operation $operation -nastring . \
 		-out ${id} --thread ${params.threads} 1> SnpIndel_annovar.log 2>&1
@@ -401,6 +404,7 @@ process To_gene_base_table {
 	file "snp.geneBase.tsv"
 
 	"""
+	set +u; source activate pipeOne_py3; set -u
 	python3 ${baseDir}/bin/SNP.py gene_base_table snp.geneBase.tsv annovar_res
 	"""
 }

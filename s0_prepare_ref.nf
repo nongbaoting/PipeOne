@@ -27,7 +27,7 @@ process bowtie2_build {
     file "bowtie2_index"
 
     """
-    set +u; source activate telescope; set -u
+    set +u; source activate pipeOne_telescope; set -u
     mkdir -p bowtie2_index
     bowtie2-build --threads ${threads}  ${fasta} bowtie2_index/bowtie2_base
     """
@@ -47,7 +47,7 @@ process sprint_index {
     file "genome*"
 
     """
-    set +u; source activate RnaEditing; set -u
+    set +u; source activate pipeOne_RnaEditing; set -u
     mkdir -p sprint_index; cd sprint_index
     cp ../genome.fa genome.fa
     sprint prepare -t ../genome.gtf genome.fa bwa
@@ -67,6 +67,7 @@ process star_index{
     file "STAR_index"
 
     """
+    set +u; source activate pipeOne_py3; set -u
     mkdir STAR_index; cd STAR_index
     STAR --runMode genomeGenerate --runThreadN ${threads} --genomeDir . --genomeFastaFiles ../genome.fa --sjdbGTFfile ../genome.gtf
     """
@@ -86,7 +87,7 @@ process hisat2_build {
     file "hisat2_index"
 
     """
-    set +u; source activate lncRNA; set -u
+    set +u; source activate pipeOne_lncRNA; set -u
     # hisat2_extract_splice_sites.py genome.gtf >splice.txt
     # hisat2_extract_exons.py genome.gtf >exon.txt
     mkdir hisat2_index; cd hisat2_index
@@ -107,7 +108,7 @@ process bwa_index{
     file "bwa_index"
 
     """
-    set +u; source activate RnaEditing; set -u
+    set +u; source activate pipeOne_RnaEditing; set -u
     mkdir -p bwa_index
     bwa index -p bwa_index/bwa_index   ${fasta}
     
