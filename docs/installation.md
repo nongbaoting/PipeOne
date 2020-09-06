@@ -4,9 +4,7 @@
 2. [Nextflow](https://www.nextflow.io/) (version >= 19.10.0)
 3. Docker
 4. [conda](https://docs.conda.io/en/latest/miniconda.html)
-5. [7z](https://www.7-zip.org/download.html)
-
-	   `sudo apt install p7zip-full p7zip-rar`
+5. [7z](https://www.7-zip.org/download.html) `sudo apt install p7zip-full p7zip-rar`
    
 #### Installation
 
@@ -25,16 +23,17 @@ conda create  --name pipeOne_ml --file ymls/pipeOne_ml.yml
 __2. PipeOne environment__
 
 * __Pull down the PipeOne Docker image__
-	```
-	docker pull nongbaoting/pipeone:conda
-	```
-	
-	or 
-	```
-	docker pull registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:conda
 
-	docker tag registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:conda nongbaoting/pipeone:conda
-	```
+```
+docker pull nongbaoting/pipeone:conda
+```
+
+__or __
+```
+docker pull registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:conda
+
+docker tag registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:conda nongbaoting/pipeone:conda
+```
 
 * __or use conda environment__
 
