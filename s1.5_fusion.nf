@@ -261,6 +261,7 @@ if (params.arriba == "true" ){
 		path "fusion_arriba_out.tsv"
 		
 		"""
+		set +u; source activate pipeOne_fusion; set -u
 		python3 ${baseDir}/bin/fusion.py arriba_table fusion_arriba_out.tsv arriba_out/
 		"""
 	}

@@ -26,12 +26,12 @@ __2. PipeOne environment__
 
 * __Pull down the PipeOne Docker image__
 	```
-	docker pull nongbaoting/pipeone:latest
+	docker pull nongbaoting/pipeone:conda
 	```
 	or
 	```
-	docker pull registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:latest
-	docker tag registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:latest nongbaoting/pipeone:latest
+	docker pull registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:conda
+	docker tag registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:conda nongbaoting/pipeone:conda
 	```
 
 * __or use conda environment__

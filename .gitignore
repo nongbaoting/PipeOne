@@ -3,3 +3,4 @@ _static
 _templates
 site/
 __pycache__
+.idea

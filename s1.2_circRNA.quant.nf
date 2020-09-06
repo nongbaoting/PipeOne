@@ -240,7 +240,7 @@ if( params.hisat2_bam) {
 		
 		if( ifPaired ){
 			"""
-			set +u; source activate lncRNA; set -u
+			set +u; source activate pipeOne_lncRNA; set -u
 			hisat2 -p $threads --dta  $rnastrandness  -x hisat2_index/$hisat2_base \
 			-1 ${reads[0]} -2 ${reads[1]}   2> ${id}.hisat2.log | samtools sort -@ 8 - -o ${id}.hisat2.sortbycoordinate.bam 
 			samtools index ${id}.hisat2.sortbycoordinate.bam
@@ -249,7 +249,7 @@ if( params.hisat2_bam) {
 		}else{
 			
 			"""
-			set +u; source activate lncRNA; set -u
+			set +u; source activate pipeOne_lncRNA; set -u
 			hisat2 -p $threads --dta  $rnastrandness -x  hisat2_index/$hisat2_base \
 			-U  ${reads}   2> ${id}.hisat2.log  | samtools sort -@ 8 - -o ${id}.hisat2.sortbycoordinate.bam
 			samtools index ${id}.hisat2.sortbycoordinate.bam
@@ -323,9 +323,9 @@ process merge_CIRIquant{
 	path "CIRIquant/*" from CIRIquant_out.collect()
 
 	output:
-	tuple path("circRNA_info.csv"), path("circRNA_bsj.csv"), path("circRNA_ratio.csv"), path("gene_count_matrix.csv")
+	tuple path("circRNA_info.csv"), path("circRNA_bsj.csv"), path("circRNA_ratio.csv"),path("library_info.csv"), path("gene_count_matrix.csv") into res_tab
 	tuple path("sample_gene.lst"), path("sample_psuedo.lst")
- 	path "circRNA_cpm.csv"
+ 	
 
 	shell:
 	''' 
@@ -340,8 +340,23 @@ process merge_CIRIquant{
                  --ratio circRNA_ratio.csv
 
 	prepDE.py -i sample_gene.lst
-	Rscript  !{baseDir}/bin/circRNA_cpm.R
+	
 	'''
 }
 
+process CPM {
+	publishDir "${params.outdir}/CIRIquant/", mode: 'link'
+
+	input:
+	tuple path("circRNA_info.csv"), path("circRNA_bsj.csv"), path("circRNA_ratio.csv"),path("library_info.csv"), path("gene_count_matrix.csv") from res_tab.collect()
+	
+	output:
+	path "circRNA_cpm.csv"
+
+	"""
+	set +u; source activate pipeOne_py3; set -u
+	Rscript  ${baseDir}/bin/circRNA_cpm.R
+	"""
+
+}
 
