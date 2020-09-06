@@ -28,20 +28,21 @@ __2. PipeOne environment__
 docker pull nongbaoting/pipeone:conda
 ```
 
-__or __
+__or__
 ```
 docker pull registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:conda
 
 docker tag registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:conda nongbaoting/pipeone:conda
 ```
 
-* __or use conda environment__
+* __or use conda environment instead of docker__
 
-	To ensure a successful installation, we recommend that you run each command step by step in a shell script `install.sh`
-	```
-	cd PipeOne/INSTALL
-	bash ./install.sh
-	```
+To ensure a successful installation, we recommend that you run each command step by step in a shell script `install.sh`
+
+```
+cd PipeOne/INSTALL
+bash ./install.sh
+```
 
 
 

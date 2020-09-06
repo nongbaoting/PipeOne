@@ -24,7 +24,7 @@ Optional:
 --library	<string>	polyA or total. defualt [polyA]
 --threads	<int>	    number of CPU process for each step. default [8]
 --maxForks	<int>	    max forks number of parrallel. default [2]
---profile	<str>	    execution envirenment, e.g. docker, conda, singularity. defualt [docker]
+--profile	<str>	    execution envirenment, e.g. docker, conda. defualt [docker]
 --saveIntermediateFiles	save intermediate files defualt [off]
 --update_GTF use customized GTF generated in step s1.1_lncRNA.nf instand of GENCODE GTF as input for step: s1.2_circRNA.quant.nf, s1.5_fusion.nf and s1.7_alternative_splicing.nf . defualt [off]
 -h --help               print usage
