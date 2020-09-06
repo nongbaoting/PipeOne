@@ -28,9 +28,11 @@ __2. PipeOne environment__
 	```
 	docker pull nongbaoting/pipeone:conda
 	```
+	
 	or 
 	```
 	docker pull registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:conda
+
 	docker tag registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:conda nongbaoting/pipeone:conda
 	```
 

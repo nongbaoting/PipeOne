@@ -487,8 +487,8 @@ known_gtf_list_ch.into{ known_gtf_list_ch; known_gtf_list_ch_1;  known_gtf_list_
 
 process filter_coding_potentail{
 
-    publishDir "${params.outdir}/annotations_and_fasta/", mode: 'link',
-		saveAs: { filename ->  params.saveIntermediateFiles  ? "$filename" : null }
+    publishDir "${params.outdir}/annotations_and_fasta/", mode: 'link'
+		
 
 	publishDir "${params.outdir}/novel_lncRNA/", mode: 'link',
 		saveAs: { filename-> 
