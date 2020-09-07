@@ -27,6 +27,7 @@ conda create -y -n pipeOne_fusion python=3 STAR=2.7.3a arriba fire
 ## editing
 conda env create  --name pipeOne_RnaEditing --file ymls/pipeOne_RnaEditing.yml
 ###  install sprint
+git clone https://github.com/jumphone/SPRINT.git
 cd SPRINT
 conda activate pipeOne_RnaEditing
 python setup.py install
