@@ -46,6 +46,7 @@ conda activate base
 
 ## machine learning
 conda env create  --name pipeOne_ml --file ymls/pipeOne_ml.yml
+R -e 'install.packages(c("survival", "survminer", "ggplot2", "tidyverse"))'
 
 ## packages we have download and include in the current directory
 # git clone https://github.com/jumphone/SPRINT.git
@@ -66,6 +67,4 @@ conda env create  --name pipeOne_ml --file ymls/pipeOne_ml.yml
 #  rm -rf  *gz *bz2
 
 
-#  R -e 'install.packages(c("optparse", "dplyr", "data.table", "stringr"))'
-
-#  tidyverse ggplot2 survminer survival
+# R
