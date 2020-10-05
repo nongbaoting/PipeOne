@@ -2,7 +2,7 @@
 
 params.arriba = "true"
 params.star_fusion = "false"
-params.update_GTF = false
+params.update_GTF = 0
 
 params.reads = ""
 
@@ -36,10 +36,10 @@ if ( params.fasta ){
 }
 
 
-if ( params.gtf && params.update_GTF == false ){
+if ( params.gtf && params.update_GTF == 0 ){
     gtf = file(params.gtf)
     if( !gtf.exists() ) exit 1, "GTF file not found: ${params.gtf}"
-}else if(params.update_GTF == true){
+}else if(params.update_GTF == 1){
 	gtf = file("../s1.1_lncRNA/results/annotations_and_fasta/protein_coding_and_all_lncRNA.gtf")
 	if( !gtf.exists() ) exit 1, "file: ../s1.1_lncRNA/results/annotations_and_fasta/protein_coding_and_all_lncRNA.gtf does not found\
 	\nPlease check step s1.1_lncRNA has complete?"

@@ -7,7 +7,7 @@ from collections import defaultdict
 
 class Venn:
 
-    def venn(self, file1, file2,out,out_rev, col1=0,col2=0,header1=0,header2=0):
+    def venn(self, file1, file2,out,out_rev, col1=0, col2=0, header1=0, header2=0):
         lines1 = open(file1,'r').read().strip().split('\n')
         lines2 = open(file2, 'r').read().strip().split('\n')
 

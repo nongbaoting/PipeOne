@@ -11,7 +11,7 @@ params.bwa_index = params.genome ? params.genomes[ params.genome ].bwa_index ?:f
 params.hisat2_index = params.genome ? params.genomes[ params.genome ].hisat2_index ?:false :false
 params.threads = 12
 params.saveIntermediateFiles = false
-params.update_GTF =  false
+params.update_GTF =  0
 
 threads = params.threads
 bwa_index = params.bwa_index
@@ -31,18 +31,16 @@ if ( params.fasta ){
 }
 
 
-if ( params.gtf && params.update_GTF == false ){
+if ( params.gtf && params.update_GTF == 0 ){
     gtf = file(params.gtf)
     if( !gtf.exists() ) exit 1, "GTF file not found: ${params.gtf}"
-}else if(params.update_GTF == true ){
+}else if(params.update_GTF == 1 ){
 	gtf = file("../s1.1_lncRNA/results/annotations_and_fasta/protein_coding_and_all_lncRNA.gtf")
 	if( !gtf.exists() ) exit 1, "file: ../s1.1_lncRNA/results/annotations_and_fasta/protein_coding_and_all_lncRNA.gtf does not found\
 	\nPlease check step s1.1_lncRNA has complete?"
 }else{
 	exit 1, "GTF file not found!"
 }
-
-
 
 
 if ( params.bwa_index  ){

@@ -2,7 +2,7 @@
 version=1.0.0
 function args()
 {
-	options=$(getopt -o svh --long help --long version --long update_GTF: --long reads: --long genome: \
+	options=$(getopt -o svh --long help --long version --long update_GTF --long reads: --long genome: \
 	--long cleaned: --long layout: --long saveIntermediateFiles: --long saveIntermediateHisat2Bam \
 	--long threads: --long maxForks: --long profile: --long library:  -- "$@")
 	[ $? -eq 0 ] || {
@@ -27,8 +27,8 @@ function args()
 			HELP=1
 			;;
 		--update_GTF)
-			shift;
-			update_GTF=$1
+			
+			update_GTF=1
 			;;
 		
 		--reads)
@@ -153,8 +153,8 @@ if [  "$genome" = '' ] || [ "$reads" = '' ]; then
 	usage
 fi
 
-reads_basename=$(basename $reads)
-reads="$(dirname $(realpath $reads))/${reads_basename}"
+#reads_basename=$(basename $reads)
+#reads="$(dirname $(realpath $reads))/${reads_basename}"
 echo -e "\n${RED}--genome:${NOCOLOR} ${GREEN}$genome${NOCOLOR}"
 echo -e "${RED}--reads:${NOCOLOR} ${GREEN}\"$reads\"${NOCOLOR}\n"
 
@@ -218,6 +218,8 @@ nextflow run ${baseDir}/s1.8_SNP.nf  $set_args_base --bam "../s1.7_alternative_s
 
 table_dir="${workDir}/00_tables"
 mkdir -p $table_dir; cd $table_dir
-set +u; source activate pipeOne_ml; set -u
+conda_base=`conda info --base`
+source ${conda_base}/etc/profile.d/conda.sh
+set +u; conda activate pipeOne_ml; set -u
 python3 ${baseDir}/bin/summary_table.py check_tables $library
 python3 ${baseDir}/bin/summary_table.py mark_feature $library

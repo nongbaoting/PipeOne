@@ -206,7 +206,7 @@ class GTF_exe:
                 fo.write(new_line + '\n')
         fo.close()
 
-    def get_by_trans_id(self,gtf,info, out, info_column=0):
+    def get_by_trans_id(self, gtf, info, out, info_column=0):
         reg_sp = re.compile('\s')
         fo = open(out, 'w')
         lines = open(info, 'r').read().strip().split('\n')
@@ -223,7 +223,7 @@ class GTF_exe:
                     fo.write(line)
         fo.close()
 
-    def get_by_gene_id(self,gtf, info, out, info_column=0):
+    def get_by_gene_id(self, gtf, info, out, info_column=0):
         reg_sp = re.compile('\s')
         fo = open(out, 'w')
         lines = open(info, 'r').read().strip().split('\n')
@@ -277,10 +277,11 @@ class GTF_exe:
                 if re.match('track', line): continue
                 cell = line.strip().split('\t')
                 if int(cell[3]) >= int(cell[4]): continue
+                if cell[2] != 'exon': continue
                 attr = gtf_attr(cell[8])
                 new_attr = defaultdict(str)
                 new_attr['transcript_id'] = attr['transcript_id']
-                new_attr['gene_id'] = attr['gene_id']
+                new_attr['gene_id'] = 'G' + attr['gene_id']
                 attr_cat = gtf_attrs_cat(new_attr)
                 cell[8] = attr_cat
                 new_line = '\t'.join(cell)
@@ -340,7 +341,7 @@ class GTF_exe:
                 fo.write(new_line + '\n')
         fo.close()
 
-    def to_info(self,gtf,out_tsv):
+    def to_info(self, gtf, out_tsv):
         f = open(gtf, 'r')
         genedict = defaultdict(list)
         for line in f:
@@ -802,6 +803,36 @@ class GTF_exe:
                 tx_id_stable = exon.transcript_id.split('.')[0]
                 fo.write('\t'.join([gene_id_stable, tx_id_stable, exon.gene_type, exon.transcript_type , exon.gene_name] ) + '\n')
 
+    def to_txDict(self, gtf, out):
+        geneDict = defaultdict(list)
+        with open(gtf, 'r') as f:
+            for line in f:
+                if re.match('#', line): continue
+                if re.match('track', line): continue
 
+                cell = line.strip().split('\t')
+                if cell[2] != 'exon': continue
+                exon = EXON(cell)
+                if exon.transcript_id in geneDict:
+                    start = min(geneDict[exon.transcript_id][3], exon.start - 1)
+                    end = max(geneDict[exon.transcript_id][4], exon.end)
+                    geneDict[exon.transcript_id] = [exon.chrom, exon.source, exon.feature, start, end, exon.strand,exon.score,  exon.frame, exon.gene_name]
+                else:
+                    geneDict[exon.transcript_id] = [exon.chrom, exon.source, exon.feature, exon.start, exon.end, exon.score, exon.strand,  exon.frame,  exon.gene_name]
+
+        gtfDict  = defaultdict(list)
+        for tx_id in geneDict:
+            chrom, source, feature, start, end, score, strand,  frame,  gene_name =geneDict[tx_id] 
+            gtfDict["Chromosome"].append(chrom)
+            gtfDict["Source"].append(source)
+            gtfDict["Feature"].append(feature)
+            gtfDict["Start"].append(start)
+            gtfDict["End"].append(end)
+            gtfDict["Score"].append(score)
+            gtfDict["Strand"].append(strand)
+            gtfDict["Frame"].append(frame)
+            gtfDict["gene_name"].append(gene_name)
+            gtfDict["transcript_id"].append(tx_id)
+        
 if __name__ == '__main__':
     fire.Fire(GTF_exe)

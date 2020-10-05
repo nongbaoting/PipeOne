@@ -53,7 +53,7 @@ Download one of the data sets below:
 
 * [google drive](https://drive.google.com/drive/folders/1XX9NgpUTRj4llgJq6dGen__-qq4qJ-c0?usp=sharing)
 
-* Baidu Cloud Disk:
+* or Baidu Cloud Disk:
 
 	>Link: [https://pan.baidu.com/s/1gbZR1LJAmuT_fmFY1UJ7sA](https://pan.baidu.com/s/1gbZR1LJAmuT_fmFY1UJ7sA)
 

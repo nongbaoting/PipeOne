@@ -14,8 +14,8 @@ class DeFusion:
         else:
             self.seed = None
         self.step = 50
-        self.maxiter = 10 # test only, for time saving
-        # self.maxiter = 1000
+        #self.maxiter = 10 # test only, for time saving
+        self.maxiter = 1000
         self.maxinner = 5
         self.silence = silence
 

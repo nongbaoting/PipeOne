@@ -111,6 +111,7 @@ if(params.reads ){
 			if(! ifPaired ){
 				println("fastp single-end!")
 				"""
+				set +u; source activate pipeOne_lncRNA; set -u
 				if [ "${reads}" == "${id}.fastp.fq.gz" ];
 				then
 					echo "input raw reads name and output clean name are identical, please check your input files!"
@@ -123,6 +124,7 @@ if(params.reads ){
 			{
 				println("fastp paired!")
 				"""
+				set +u; source activate pipeOne_lncRNA; set -u
 				if [ "${reads[0]}" == "${id}.R1.fastp.fq.gz" ];
 				then
 					echo "input raw reads name and output clean reads name are identical, please check your input files!"
@@ -521,7 +523,8 @@ process filter_coding_potentail{
     file "TUCP*"
 	file "all_lncRNA.list" into cal_deg_ch
 	file "coding_potential_sum.tsv"
-	
+	path "novel_lncRNA.gtf" into novel_gtf
+
     """
 	set +u; source activate pipeOne_py3; set -u;
 	echo "filter coding potential!"
@@ -562,7 +565,7 @@ process format_lncRNA_info{
 	
 	output:
 	set "all_lncRNA_info.tsv", "novel_lncRNA_info.tsv" into lncRNA_res
-	file "protein_coding_and_all_lncRNA.info.tsv"
+	file "protein_coding_and_all_lncRNA.info.tsv" 
 	
 	shell:
 	'''
@@ -592,10 +595,10 @@ process format_lncRNA_info{
 
 
 process classify_lncRNA {
+
     publishDir "${params.outdir}/novel_lncRNA/classify", mode: 'link'
    
     input:
-    file "scripts/*" from scripts_2.collect()
     file "all_lncRNA.gtf" from all_lnc_gtf
     //file "" from protein_coding_gtf
     // actually, I only need "gencode_protein_coding.gtf"
@@ -650,7 +653,7 @@ process classify_lncRNA {
 	python3 !{baseDir}/bin/gtf.py to-info  gencode_protein_coding.gtf gencode_protein_coding.info.tsv
    
     ## output "lncRNA_class_closest_PCG.tsv"
-    python3 scripts/lncRNA_classify.py final lncRNA_classification.txt \
+    python3 !{baseDir}/bin/lncRNA_classify.py final lncRNA_classification.txt \
     closest.txt closest_sense.txt all_lncRNA.info gencode_protein_coding.info.tsv
     
     cat lncRNA_class_closest_PCG.tsv |awk 'NR==1 || $1 ~/^TU/' > novel_lncRNA_info.tsv
@@ -721,6 +724,7 @@ if (params.reads){
 		file "salmon_gene_est_counts.tsv" into salmon_tab
 		// file "files_cache__"
 		file "*tsv"
+		file "gene_id.keep.txt" into gene_id_keep
 		
 		"""
 		set +u; source activate pipeOne_py3; set -u
@@ -731,6 +735,31 @@ if (params.reads){
 		"""
 	}
 	
+	process epxressed_gene_summary{
+
+		publishDir "${params.outdir}/novel_lncRNA/expressed", mode: 'link',
+		saveAs: { filename-> 
+			if( filename =~ /novel_lncRNA/) filename
+			}
+
+		input:
+		file "gene_id.keep.txt" from gene_id_keep
+		path "protein_coding_and_all_lncRNA.gtf" from cal_expr_gtf
+		path "novel_lncRNA.gtf" from novel_gtf 
+
+		output:
+		tuple path("protein_coding_and_all_lncRNA.info.expressed.tsv"), path("novel_lncRNA.info.expressed.tsv")
+		tuple path("protein_coding_and_all_lncRNA.expressed.gtf"),     path("novel_lncRNA.expressed.gtf")
+
+		"""
+		set +u; source activate pipeOne_py3; set -u
+		python3 ${baseDir}/bin/gtf.py  get_by_gene_id --gtf novel_lncRNA.gtf --info gene_id.keep.txt --out novel_lncRNA.expressed.gtf
+		python3 ${baseDir}/bin/gtf.py  get_by_gene_id --gtf protein_coding_and_all_lncRNA.gtf --info gene_id.keep.txt --out protein_coding_and_all_lncRNA.expressed.gtf
+		python3 ${baseDir}/bin/gtf.py  to-info  --gtf protein_coding_and_all_lncRNA.expressed.gtf --out_tsv protein_coding_and_all_lncRNA.info.expressed.tsv
+		python3 ${baseDir}/bin/gtf.py  to-info  --gtf novel_lncRNA.expressed.gtf --out_tsv novel_lncRNA.info.expressed.tsv
+		"""
+
+	}
 	
 }
 

@@ -49,6 +49,7 @@ conda activate base
 conda env create  --name pipeOne_ml --file ymls/pipeOne_ml.yml
 R -e 'install.packages(c("survival", "survminer", "ggplot2", "tidyverse"))'
 
+
 ## packages we have download and include in the current directory
 # git clone https://github.com/jumphone/SPRINT.git
 
@@ -66,6 +67,5 @@ R -e 'install.packages(c("survival", "survminer", "ggplot2", "tidyverse"))'
 # tar -xvf GenomeAnalysisTK-3.8-1-0-gf15c1c3ef.tar.bz2
 
 #  rm -rf  *gz *bz2
-
 
 # R
