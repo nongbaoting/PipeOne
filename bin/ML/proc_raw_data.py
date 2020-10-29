@@ -87,7 +87,7 @@ class MYRUN_procRaw:
         input_len = len(sample_id)
 
         for entry in os.scandir(rawdir):
-            if not re.search("csv$", entry.path): continue
+            #if not re.search("csv|txt|tsv$", entry.path): continue
             fileA = entry.name
             fiA = entry.path
             # fiA = "./data/rawdata/" + fileA + ".csv" #### 可以改成os.scandir

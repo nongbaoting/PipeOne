@@ -65,7 +65,9 @@ def save_feature_importance(X, y, feature_name, tree_num, max_depth, min_samples
 
 def myRF(ddir = "./data_randomForest",  tdir = "./FeatureSelection/"):
 
-    tdir = "./FeatureSelection/"
+    ddir = ddir.rstrip("/") + "/"
+    tdir = tdir.rstrip('/') + "/"
+    #tdir = "./FeatureSelection/"
     chck_dir(tdir)
     data_assemble = ["top50", "top100", "top200", "proc"]
     #data_assemble  = ["proc"]

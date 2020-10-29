@@ -179,6 +179,7 @@ if ( params.sprint_index  ){
 params.sprint_tmp = "false"
 
 process sprint{
+	
 	publishDir "${params.outdir}/sprint/", mode: 'link',
 		saveAs: {filename -> 
 			if (filename =~ /SPRINT_identified_all.res/) "res/${filename}"

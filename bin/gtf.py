@@ -646,7 +646,7 @@ class GTF_exe:
                     fo.write('\t'.join([attr['protein_id'], attr['gene_name'], attr['gene_id']]) + '\n')
         fo.close()
 
-    def to_bed(self, gtf, out, only_exon=1):
+    def to_bed(self, gtf, out, only_exon=1, name = 'gene_id'):
         '''
         :param gtf:
         :param out:
@@ -660,9 +660,19 @@ class GTF_exe:
                 cell = line.strip().split('\t')
                 if cell[2] != 'exon' and only_exon: continue
                 exon = EXON(cell)
-                bed = [exon.chrom, str(exon.start - 1), str(exon.end), exon.transcript_id, exon.score, exon.strand]
+                feature_id = exon.transcript_id
+                if name == 'gene_id': 
+                    feature_id = exon.gene_id
+                elif name == 'transcript_id':  
+                    feature_id = exon.transcript_id
+                elif name == 'gene_name':
+                    feature_id = exon.gene_name
+
+                bed = [exon.chrom, str(exon.start - 1), str(exon.end), feature_id, exon.score, exon.strand]
                 fo.write('\t'.join(bed) + '\n')
         fo.close()
+
+
     def to_bed_PLAIDOH(self, out, gtf, expr):
         exprDict = defaultdict(list)
         header = ['#CHR', 'START', 'STOP', 'NAME', 'TYPE']

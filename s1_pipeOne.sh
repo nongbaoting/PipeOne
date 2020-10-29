@@ -206,7 +206,7 @@ nextflow run ${baseDir}/s1.5_fusion.nf $set_args --update_GTF $update_GTF
 
 s6_Dir=${workDir}/s1.6_rnaEditing
 mkdir -p $s6_Dir; cd $s6_Dir
-nextflow run ${baseDir}/s1.6_rnaEditing.nf $set_args
+#nextflow run ${baseDir}/s1.6_rnaEditing.nf $set_args
 
 s7_Dir=${workDir}/s1.7_alternative_splicing 
 mkdir -p $s7_Dir; cd $s7_Dir

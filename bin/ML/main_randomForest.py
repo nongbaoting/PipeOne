@@ -4,7 +4,7 @@ import os,fire
 from collections import defaultdict
 
 def main(threads = 12, train_dir = "./data/train_dir/", test_dir ="./data/test_dir/", 
-    n_estimators="3,5,7,10,20,30,50,100", max_depth="2,3,4,7,10", min_samples_split = "2,3,4,5,7",
+    n_estimators=[3,5,7,10,20,30,50,100], max_depth=[2,3,4,7,10], min_samples_split = [2,3,4,5,7],
     max_features = 'auto', random_state = 42):
 
     logfi = "./log.txt"  # log file, record key points in the whole process
@@ -29,9 +29,10 @@ def main(threads = 12, train_dir = "./data/train_dir/", test_dir ="./data/test_d
     X_test , y_test , feature_name_t = load_data(test_dir )
     X_train, X_test = np.nan_to_num(X_train), np.nan_to_num(X_test)
     #print(y_train)
-    parameters = {"n_estimators": [ int(i) for i in n_estimators.split(',') ],
-                "max_depth": [ int(i) for i in max_depth.split(',') ],
-                "min_samples_split": [ int(i) for i in min_samples_split.split(',') ],
+    print(n_estimators)
+    parameters = {"n_estimators": [ int(i) for i in n_estimators ],
+                "max_depth": [ int(i) for i in max_depth ],
+                "min_samples_split": [ int(i) for i in min_samples_split ],
                 "class_weight": [None, "balanced", "balanced_subsample"]
                 }
 
@@ -76,7 +77,7 @@ def main(threads = 12, train_dir = "./data/train_dir/", test_dir ="./data/test_d
         feature_validation.select_topk_feature(feature_importance, feature_name, topk)
 
         # find the best parameter settings with top k features in training set.
-        max_features = 'auto'
+        #max_features = 'auto'
         val_best_estimator, val_best_params, val_best_score, val_train_sen, val_train_spec \
              = feature_validation.do_grid_search(parameters, cv, n_jobs, max_features =  max_features, random_state = random_state)
         

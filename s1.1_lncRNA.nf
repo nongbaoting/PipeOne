@@ -575,8 +575,15 @@ process format_lncRNA_info{
 	#conver to bed and colsest to bed
 	awk '$3=="exon"{print}'  gencode_protein_coding.gtf >gencode_protein_coding.exon.gtf
 	awk '$3=="exon"{print}'  all_lncRNA.gtf             >all_lncRNA.exon.gtf
-	gtf2bed < gencode_protein_coding.exon.gtf |cut -f1-6 >gencode_protein_coding.exon.gtf.bed
-	gtf2bed < all_lncRNA.exon.gtf |cut -f1-6 >all_lncRNA.exon.gtf.bed
+	# gtf2bed < gencode_protein_coding.exon.gtf |cut -f1-6 >gencode_protein_coding.exon.gtf.bed
+	# gtf2bed < all_lncRNA.exon.gtf |cut -f1-6 >all_lncRNA.exon.gtf.bed
+
+	python3 !{baseDir}/bin/gtf.py to-bed all_lncRNA.exon.gtf all_lncRNA.exon.gtf.bed.tmp
+	python3 !{baseDir}/bin/gtf.py to-bed gencode_protein_coding.exon.gtf gencode_protein_coding.exon.gtf.bed.tmp
+
+	sort -k1,1 -k2,2n gencode_protein_coding.exon.gtf.bed.tmp >gencode_protein_coding.exon.gtf.bed
+	sort -k1,1 -k2,2n all_lncRNA.exon.gtf.bed.tmp > all_lncRNA.exon.gtf.bed
+
 	bedtools closest -a all_lncRNA.exon.gtf.bed -b gencode_protein_coding.exon.gtf.bed  -d |sort -u > cloest.txt
 	
 	#gtf to info
@@ -595,7 +602,7 @@ process format_lncRNA_info{
 
 
 process classify_lncRNA {
-
+	stageInMode 'copy'
     publishDir "${params.outdir}/novel_lncRNA/classify", mode: 'link'
    
     input:
@@ -613,9 +620,13 @@ process classify_lncRNA {
     awk '$3=="exon" && $1 ~/^chr|^\\d/' all_lncRNA.gtf  > all_lncRNA.exon.gtf
     awk '$3=="exon"' gencode_protein_coding.gtf > gencode_protein_coding.exon.gtf
     
-    gtf2bed < all_lncRNA.exon.gtf |cut -f1-6 > novel_final.bed.a
-    gtf2bed < gencode_protein_coding.exon.gtf |cut -f1-6 >annot.bed.b
-    sort -k1,1 -k2,2n novel_final.bed.a >novel_final.bed
+    # gtf2bed < all_lncRNA.exon.gtf |cut -f1-6 > novel_final.bed.a
+    # gtf2bed < gencode_protein_coding.exon.gtf |cut -f1-6 > annot.bed.b
+
+	python3 !{baseDir}/bin/gtf.py to-bed all_lncRNA.exon.gtf novel_final.bed.a
+	python3 !{baseDir}/bin/gtf.py to-bed gencode_protein_coding.exon.gtf annot.bed.b
+	
+    sort -k1,1 -k2,2n novel_final.bed.a >novel_final.bed 
     sort -k1,1 -k2,2n annot.bed.b >annot.bed
 
     python3 !{baseDir}/bin/gtf.py  to-gene-bed gencode_protein_coding.exon.gtf annot_gene.bed.a

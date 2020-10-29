@@ -30,7 +30,7 @@ def split_params(NMF_param):
     return (int(low_dim_), float(alpha_), float(gamma_) )
 
 def split_fileName_params(fileName):
-    low_dim, alpha, gamma, cluster_n = [i.split('=')[1] for i in fileName.split('_')]
+    low_dim, alpha, gamma, cluster_n = [i.split('=')[1] for i in fileName.split('_')[0:4]]
     return (int(low_dim), float(alpha),float(gamma),int(cluster_n) )
 
 def select_topK( topK_importance='50,100,200', outdir = "./data_randomForest", cluster_survival_file = "record_log_rank_test_pvalue.csv", 
@@ -38,7 +38,7 @@ def select_topK( topK_importance='50,100,200', outdir = "./data_randomForest", c
     
     if os.path.exists(cluster_file):
         cluster_fi = cluster_file
-        low_dim, alpha, gamma = split_fileName_params( os.path.basename(cluster_file) )
+        low_dim, alpha, gamma, cluster_n = split_fileName_params( os.path.basename(cluster_file) )
     elif os.path.exists(cluster_survival_file):
         consist = pd.read_csv(cluster_survival_file)
         consist = consist.sort_values(by='logRankTest_pvalue' )

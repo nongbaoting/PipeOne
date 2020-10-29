@@ -9,7 +9,7 @@ from joblib import Parallel, delayed
 
 def chck_dir(dirs):
     if not os.path.exists(dirs):
-        os.makedirs(dirs)
+        os.makedirs(dirs, exist_ok=True)
 
 
 def save_result(X, Z, E, convergence, sample_id, var_names, fout):
@@ -84,7 +84,7 @@ def MYRUN_DF(threads ):
             view.append(the_view)
     print(view)
 
-    Parallel(n_jobs=threads)(delayed(run_defusion)(params_["low_dim"],
+    Parallel(n_jobs=threads)(delayed(run_defusion)( params_["low_dim"],
                                                     params_["alpha"],
                                                     params_["gamma"], view) for params_ in params_grid)
 

@@ -8,7 +8,7 @@ from sklearn.metrics import confusion_matrix
 
 def chck_dir(dir):
     if not os.path.exists(dir):
-        os.makedirs(dir)
+        os.makedirs(dir,exist_ok=True)
 
 def sensitivity_specificity(y_true, y_pred):
     """
@@ -46,7 +46,7 @@ def loo_validation(tree_num, max_depth, min_samples_split, X, y):
 
         clf = RandomForestClassifier(n_estimators=tree_num,
                                      max_depth=max_depth,
-                                     min_samples_split=min_samples_split, random_state=0, n_jobs=4)
+                                     min_samples_split=min_samples_split, random_state=0, n_jobs=24)
         clf.fit(X_train, y_train)
         y_predict = clf.predict(X_test)
         if 1.0 * y_predict[0] == 1.0 * y_test[0]:
@@ -59,7 +59,7 @@ def loo_validation(tree_num, max_depth, min_samples_split, X, y):
 
     clf_train = RandomForestClassifier(n_estimators=tree_num,
                                        max_depth=max_depth,
-                                       min_samples_split=min_samples_split, random_state=0, n_jobs=4)
+                                       min_samples_split=min_samples_split, random_state=0, n_jobs= 24)
     clf_train.fit(X, y)
     y_train_pred = clf_train.predict(X)
     train_acc = accuracy_score(y, y_train_pred)

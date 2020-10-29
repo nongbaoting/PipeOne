@@ -10,7 +10,6 @@ params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : fals
 params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
 params.star_index = params.genome ? params.genomes[ params.genome ].star_index ?:false :false
 
-
 params.threads = 16
 
 scripts = Channel.fromPath("$baseDir/scripts/*")
@@ -43,7 +42,6 @@ if ( params.fasta ){
 	fasta_dict = file(fasta_dict_path)
     if( !fasta.exists() ) exit 1, "Fasta file not found: ${params.fasta}"
 }
-
 
 
 if ( params.gtf && params.update_GTF == 0 ){
@@ -283,6 +281,9 @@ if (params.reads || params.sra ){
 
 	process star_2_pass{
 		tag {id}
+		
+		errorStrategy 'ignore'
+
 		publishDir "${params.outdir}/star2pass", mode: 'link'
 		
 		input:
@@ -313,7 +314,7 @@ if (params.reads || params.sra ){
 			--outFilterMismatchNmax 10 \\
 			--alignIntronMax 500000 \\
 			--alignMatesGapMax 1000000 \\
-			--sjdbScore 2 
+			--sjdbScore 2 --limitBAMsortRAM 1443648494946
 			
 		mv ${id}.Aligned.sortedByCoord.out.bam ${id}.bam
 		samtools index ${id}.bam
@@ -397,7 +398,7 @@ process Single_graphs_for_generate_gtf_pickle {
 // println	 text_blue('hello ') + graph_one.collect()
 
 process Single_graphs {
-	
+	label 'moreParralle'
 	tag {id}
 	
 	input:
@@ -484,7 +485,7 @@ quant_ch.into{ quant_ch; quant_ch_merge; m_print }
 
 process Quant_each {
 	
-	
+	label 'moreParralle'
 	input:
 	
 	file "spladder_out/spladder/genes_graph_conf3.merge_graphs.pickle" from graph_merge

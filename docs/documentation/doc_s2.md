@@ -68,7 +68,7 @@ python3 ${baseDir}/bin/ML/proc_raw_data.py proc --rawdir 00_rawdata  --sample_in
 __2. Divide data into test set and training set__
 
 ```
-python3 ${baseDir}/bin/ML/proc_raw_data.py train_test_split --indir ../data/proc  --sample_info s1_sample_info-tumor-normal.csv
+python3 ${baseDir}/bin/ML/proc_raw_data.py train_test_split --indir ./data/proc  --sample_info ./data/common_sample_info.csv
 ```
     --indir The output of the previous step
     --sample_info   sample information file
