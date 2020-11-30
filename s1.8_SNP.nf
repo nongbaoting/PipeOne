@@ -6,7 +6,7 @@ params.reads = ""
 params.cleaned  = false
 params.threads = 8
 params.single = ""
-params.genome =""
+params.genome = ""
 params.saveIntermediateVariants = false
 params.saveIntermediateFiles = false
 params.update_GTF = false 
@@ -279,12 +279,12 @@ process picard_AddOrReplaceReadGroups_MarkDuplicates {
 	
 	"""
 	set +u; source activate pipeOne_gatk3.8; set -u
-	picard AddOrReplaceReadGroups \
+	picard -Xmx50g AddOrReplaceReadGroups \
 		I=${star2pass_sam} \
 		O=${id}.rg_added_sorted.bam \
 		SO=coordinate RGID=${id} RGLB=mRNA RGPL=illumina RGPU=HiSeq RGSM=${id}
 	
-	picard MarkDuplicates \
+	picard -Xmx50g MarkDuplicates \
 		I=${id}.rg_added_sorted.bam \
 		O=${id}.dedupped.bam  \
 		CREATE_INDEX=true \
@@ -310,7 +310,7 @@ process SplitNCigarReads  {
 	"""
 	conda_base=`conda info --base`
 	set +u; source activate pipeOne_gatk3.8; set -u
-	java -jar \${conda_base}/envs/pipeOne_gatk3.8/opt/gatk-3.8/GenomeAnalysisTK.jar -T SplitNCigarReads \
+	java -Xmx50g -jar \${conda_base}/envs/pipeOne_gatk3.8/opt/gatk-3.8/GenomeAnalysisTK.jar -T SplitNCigarReads \
 		-R ${fasta} -I dedupped.bam -o ${id}.split.bam \
 		-rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS
 
@@ -331,7 +331,7 @@ process  Variant_calling {
 	"""
 	conda_base=`conda info --base`
 	set +u; source activate pipeOne_gatk3.8; set -u
-	java -jar \${conda_base}/envs/pipeOne_gatk3.8/opt/gatk-3.8/GenomeAnalysisTK.jar -T HaplotypeCaller \
+	java -Xmx50g -jar \${conda_base}/envs/pipeOne_gatk3.8/opt/gatk-3.8/GenomeAnalysisTK.jar -T HaplotypeCaller \
 		-R ${fasta} -I ${split_bam} \
 		-dontUseSoftClippedBases -stand_call_conf 20.0 \
 		-o ${id}.vcf
@@ -354,7 +354,7 @@ process  Variant_filtering {
 	"""
 	conda_base=`conda info --base`
 	set +u; source activate pipeOne_gatk3.8; set -u
-	java -jar \${conda_base}/envs/pipeOne_gatk3.8/opt/gatk-3.8/GenomeAnalysisTK.jar -T VariantFiltration \
+	java -Xmx50g -jar \${conda_base}/envs/pipeOne_gatk3.8/opt/gatk-3.8/GenomeAnalysisTK.jar -T VariantFiltration \
 		-R ${fasta} \
 		-V ${input_vcf} \
 		-window 35 -cluster 3 \
@@ -395,6 +395,7 @@ process variant_AnnotateAnnovar {
 
 
 process To_gene_base_table {
+	
 	publishDir "${params.outdir}/annovar_table/", mode: 'link'
 
 	input:

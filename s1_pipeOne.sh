@@ -2,7 +2,7 @@
 version=1.0.0
 function args()
 {
-	options=$(getopt -o svh --long help --long version --long update_GTF --long reads: --long genome: \
+	options=$(getopt -o svh --long help --long version --long update_GTF --long scratch: --long reads: --long genome: \
 	--long cleaned: --long layout: --long saveIntermediateFiles: --long saveIntermediateHisat2Bam \
 	--long threads: --long maxForks: --long profile: --long library:  -- "$@")
 	[ $? -eq 0 ] || {
@@ -30,7 +30,10 @@ function args()
 			
 			update_GTF=1
 			;;
-		
+		--scratch)
+			shift;
+		   scratch=$1
+		   ;;
 		--reads)
 			shift;
 			reads=$1
@@ -87,7 +90,7 @@ reads=""
 genome=""
 maxForks=2
 threads=8
-saveIntermediateFiles="false"
+saveIntermediateFiles=false
 saveIntermediateHisat2Bam=0
 layout="paired"
 profile="docker"
@@ -165,6 +168,7 @@ bash_input="--profile $profile \
 --threads $threads  --maxForks $maxForks \
 --saveIntermediateFiles $saveIntermediateFiles \
 --update_GTF $update_GTF \
+--scratch $scratch \
 --cleaned $cleaned --reads \"$reads\""
 
 echo "bash $0  $bash_input" >one_command.sh
@@ -223,3 +227,4 @@ source ${conda_base}/etc/profile.d/conda.sh
 set +u; conda activate pipeOne_ml; set -u
 python3 ${baseDir}/bin/summary_table.py check_tables $library
 python3 ${baseDir}/bin/summary_table.py mark_feature $library
+conda deactivate pipeOne_ml

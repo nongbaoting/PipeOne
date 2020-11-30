@@ -1,10 +1,11 @@
 
 #### Prerequisites
-1. Java (version >= 1.7)
-2. [Nextflow](https://www.nextflow.io/) (version >= 19.10.0)
-3. Docker
-4. [conda](https://docs.conda.io/en/latest/miniconda.html)
-5. [7z](https://www.7-zip.org/download.html) `sudo apt install p7zip-full p7zip-rar`
+1. Docker
+2. [conda](https://docs.conda.io/en/latest/miniconda.html)
+3. Java (version >= 1.7)
+4. [Nextflow](https://www.nextflow.io/) (version >= 19.10.0)
+5. R
+6. [7z](https://www.7-zip.org/download.html) `sudo apt install p7zip-full p7zip-rar`
    
 #### Installation
 
@@ -12,12 +13,6 @@ __1. Download PipeOne__
 
 ```
 git clone https://github.com/nongbaoting/PipeOne.git
-```
-
-If you only want to run Module 2 or Module 3, install conda environment is adequate
-```
-cd PipeOne/INSTALL
-conda create  --name pipeOne_ml --file ymls/pipeOne_ml.yml
 ```
 
 __2. PipeOne environment__
@@ -28,12 +23,27 @@ __2. PipeOne environment__
 docker pull nongbaoting/pipeone:conda
 ```
 
+
 __or__
 ```
 docker pull registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:conda
 
 docker tag registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:conda nongbaoting/pipeone:conda
 ```
+
+* __Install conda environment__
+```
+cd PipeOne/INSTALL
+conda env create   --name pipeOne_ml --file ymls/pipeOne_ml.yml
+```
+
+__3. R packages and python environment__
+```
+conda env create  --name pipeOne_ml --file ymls/pipeOne_ml.yml
+R -e 'install.packages(c("survival", "survminer", "ggplot2", "tidyverse", "data.table"))'
+```
+
+
 
 * __or use conda environment instead of docker__
 
@@ -45,19 +55,18 @@ bash ./install.sh
 ```
 
 
-
-
 #### Download reference data
 
 Download one of the data sets below:
 
-* [google drive](https://drive.google.com/drive/folders/1XX9NgpUTRj4llgJq6dGen__-qq4qJ-c0?usp=sharing)
+* [ google drive ](https://drive.google.com/drive/folders/1XX9NgpUTRj4llgJq6dGen__-qq4qJ-c0?usp=sharing)
 
 * or Baidu Cloud Disk:
 
 	>Link: [https://pan.baidu.com/s/1gbZR1LJAmuT_fmFY1UJ7sA](https://pan.baidu.com/s/1gbZR1LJAmuT_fmFY1UJ7sA)
 
 	>Extraction code: __8fnl__
+
 
 __Decompression and build index__
 
@@ -111,7 +120,6 @@ params {
 		utr_gtf					=  genecode_gtf
 		annovar_data_dir		= "${ref_directory}/annovar_db"
 
-
 		// generate by prepare_ref.nf
 		star_index 	       		= "${ref_directory}/STAR_index"
 		bwa_index		        = "${ref_directory}/bwa_index/bwa_index"
@@ -119,11 +127,8 @@ params {
 		sprint_index 			= "${ref_directory}/sprint_index/genome.fa"
 		hisat2_index  			= "${ref_directory}/hisat2_index/genome"
 
-		
-		
 	}
 	  
-   
   }
 
 }

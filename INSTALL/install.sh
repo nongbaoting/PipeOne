@@ -47,7 +47,7 @@ conda activate base
 
 ## machine learning
 conda env create  --name pipeOne_ml --file ymls/pipeOne_ml.yml
-R -e 'install.packages(c("survival", "survminer", "ggplot2", "tidyverse"))'
+R -e 'install.packages(c("survival", "survminer", "ggplot2", "tidyverse", "data.table"))'
 
 
 ## packages we have download and include in the current directory

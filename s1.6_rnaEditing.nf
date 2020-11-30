@@ -176,7 +176,7 @@ if ( params.sprint_index  ){
 	
 }
 
-params.sprint_tmp = "false"
+params.sprint_tmp = false
 
 process sprint{
 	
