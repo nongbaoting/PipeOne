@@ -6,56 +6,16 @@
 4. [Nextflow](https://www.nextflow.io/) (version >= 19.10.0)
 5. R
 6. [7z](https://www.7-zip.org/download.html) `sudo apt install p7zip-full p7zip-rar`
-   
-#### Installation
 
+
+#### Download
 __1. Download PipeOne__
 
 ```
 git clone https://github.com/nongbaoting/PipeOne.git
 ```
 
-__2. PipeOne environment__
-
-* __Pull down the PipeOne Docker image__
-
-```
-docker pull nongbaoting/pipeone:conda
-```
-
-
-__or__
-```
-docker pull registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:conda
-
-docker tag registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:conda nongbaoting/pipeone:conda
-```
-
-* __Install conda environment__
-```
-cd PipeOne/INSTALL
-conda env create   --name pipeOne_ml --file ymls/pipeOne_ml.yml
-```
-
-__3. R packages and python environment__
-```
-conda env create  --name pipeOne_ml --file ymls/pipeOne_ml.yml
-R -e 'install.packages(c("survival", "survminer", "ggplot2", "tidyverse", "data.table"))'
-```
-
-
-
-* __or use conda environment instead of docker__
-
-To ensure a successful installation, we recommend that you run each command step by step in a shell script `install.sh`
-
-```
-cd PipeOne/INSTALL
-bash ./install.sh
-```
-
-
-#### Download reference data
+__2. Download reference and testing data__
 
 Download one of the data sets below:
 
@@ -66,6 +26,48 @@ Download one of the data sets below:
 	>Link: [https://pan.baidu.com/s/1gbZR1LJAmuT_fmFY1UJ7sA](https://pan.baidu.com/s/1gbZR1LJAmuT_fmFY1UJ7sA)
 
 	>Extraction code: __8fnl__
+
+
+
+#### Installation
+
+
+
+__1. PipeOne environment__
+
+Pull down the PipeOne Docker image
+
+```
+docker pull nongbaoting/pipeone:conda
+```
+or
+```
+docker pull registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:conda
+
+docker tag registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:conda nongbaoting/pipeone:conda
+```
+
+__2. Install conda environment__
+```
+cd PipeOne/INSTALL
+conda env create  --name pipeOne_ml --file ymls/pipeOne_ml.yml
+```
+
+__3. R packages__
+```
+R -e 'install.packages(c("survival", "survminer", "ggplot2", "tidyverse", "data.table"), dependencies = TRUE )'
+```
+
+
+
+#####___or use conda environment instead of docker___
+
+```
+cd PipeOne/INSTALL
+bash ./install.sh
+```
+To ensure a successful installation, we recommend that you run each command step by step in a shell script `install.sh`
+
 
 
 __Decompression and build index__
