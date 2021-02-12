@@ -15,12 +15,14 @@ def find_best_params(X, y, params_grid, record_fi):
                                                    params_["max_depth"],
                                                    params_['min_samples_split'], X, y) for params_ in all_params)
         acc_all, train_acc_all, sensitivity_all, specificity_all = zip(*res)
-        for acc, train_acc, sensitivity, specificity,params in zip(acc_all, train_acc_all, sensitivity_all, specificity_all,all_params):
+        for acc, train_acc, sensitivity, specificity,params in zip(acc_all, train_acc_all, sensitivity_all, specificity_all, all_params):
             #acc, train_acc, sensitivity, specificity = loo_validation(params["tree_num"], params["max_depth"],
             #                                                          params["min_samples_split"], X, y)
-            line = "In tree_num={:d}, max_depth={:d}, min_samples_split={:d}, train_acc={:.4f}, loo_acc={:.4f}, sensitivity={:.4f}, specificity={:.4f}".format(
-                params["tree_num"], params["max_depth"], params["min_samples_split"], train_acc, acc, sensitivity,
-                specificity)
+            # line = "In tree_num={:d}, max_depth={:d}, min_samples_split={:d}, train_acc={:.4f}, loo_acc={:.4f}, sensitivity={:.4f}, specificity={:.4f}".format(
+            #     params["tree_num"], params["max_depth"], params["min_samples_split"], train_acc, acc, sensitivity,
+            #     specificity)
+            line = "In tree_num={:d}, max_depth={:d}, min_samples_split={:d}, train_acc={:.4f}, loo_acc={:.4f}".format(
+                params["tree_num"], params["max_depth"], params["min_samples_split"], train_acc, acc)
             #print(line)
             fout.write(line + "\n")
 
@@ -69,8 +71,8 @@ def myRF(ddir = "./data_randomForest",  tdir = "./FeatureSelection/"):
     tdir = tdir.rstrip('/') + "/"
     #tdir = "./FeatureSelection/"
     chck_dir(tdir)
-    data_assemble = ["top50", "top100", "top200", "proc"]
-    #data_assemble  = ["proc"]
+    #data_assemble = ["top50", "top100", "top200", "proc"]
+    data_assemble  = ["proc"]
     #data_assemble = ["top50", "top100", "top200"]
 
     data_dir = ["%s/%s/" % (ddir, s) for s in data_assemble]
@@ -92,7 +94,6 @@ def myRF(ddir = "./data_randomForest",  tdir = "./FeatureSelection/"):
     topk_for_eval_record = []
 
     for i in range(len(data_assemble)):
-
         X, y, feature_name = load_data(data_dir[i])
         res = find_best_params(X, y, params_grid, record_fi[i] )
         # res = [10,3,4,1]
@@ -117,7 +118,7 @@ def myRF(ddir = "./data_randomForest",  tdir = "./FeatureSelection/"):
             X_imp, new_feature_name = select_top_imp_feature(X, feature_imp, feature_name, topk)
             fout = tdir + "feature(%s)_importance_top%d_for_retraining.csv" \
                 % ([data_assemble[i], "all"][data_assemble[i] == "proc"], topk)
-            acc, train_acc,sensitivity, specificity = eval_topk_RF_feature(X_imp, y, new_feature_name, best_tree_num,
+            acc, train_acc, sensitivity, specificity = eval_topk_RF_feature(X_imp, y, new_feature_name, best_tree_num,
                                                 best_max_depth, best_min_samples_split, fout)
 
             line = "In {:s}, set tree_num={:d}, max_depth={:d}, min_samples_split={:d}, " \
@@ -128,7 +129,7 @@ def myRF(ddir = "./data_randomForest",  tdir = "./FeatureSelection/"):
             topk_for_eval_record.append(line)
 
     best_params_record_df = pd.DataFrame.from_dict(best_params_record)
-    best_params_record_df.to_csv(tdir+"RF_best_params_settings_for_feature_selection.csv", index=False)
+    best_params_record_df.to_csv(tdir + "RF_best_params_settings_for_feature_selection.csv", index=False)
 
     topk_for_eval_fout = tdir + "eval_RF_topk_features.txt"
 

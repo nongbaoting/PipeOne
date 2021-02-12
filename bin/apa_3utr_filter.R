@@ -13,7 +13,7 @@ names(TPM)[1] =  "gene_id"
 
 
 ## filter TPM >3 in 50% of samples
-tpm4apa = TPM[ rowSums(TPM[,-1] >3) >= ( (dim(TPM)[2] -1 )* 0.9 ), ]
+tpm4apa = TPM[ rowSums(TPM[,-1] >3) >= ( (dim(TPM)[2] -1 )* 0.5 ), ]
 info4apa = allInfo %>% filter(gene_id %in% tpm4apa$gene_id )
 
 apa %>% filter(Length <= 100 ) -> apa.exclude

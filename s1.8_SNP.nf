@@ -310,6 +310,7 @@ process SplitNCigarReads  {
 	"""
 	conda_base=`conda info --base`
 	set +u; source activate pipeOne_gatk3.8; set -u
+	samtools index dedupped.bam
 	java -Xmx50g -jar \${conda_base}/envs/pipeOne_gatk3.8/opt/gatk-3.8/GenomeAnalysisTK.jar -T SplitNCigarReads \
 		-R ${fasta} -I dedupped.bam -o ${id}.split.bam \
 		-rf ReassignOneMappingQuality -RMQF 255 -RMQT 60 -U ALLOW_N_CIGAR_READS

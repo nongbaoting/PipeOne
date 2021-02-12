@@ -74,9 +74,9 @@ for (low_dim_ in low_dim){
         res$table <- res$table + theme(axis.line = element_blank())
         # res$plot <- res$plot + labs(title = "Survival Curves")
 
-        #curve_path <- paste0('./data/surv_curve/',sprintf('low_dim=%d_alpha=%.2f_gamma=%.2f_clustering.png',low_dim_, alpha_, gamma_))
+        #curve_path <- paste0('./data/surv_curve/',sprintf('lowDim=%d_alpha=%.2f_gamma=%.2f_clustering.png',low_dim_, alpha_, gamma_))
         #ggsave(curve_path, print(res))
-        curve_path <- paste0(outdir, sprintf('low_dim=%d_alpha=%.2f_gamma=%.2f__clusters=%d_clustering.pdf',low_dim_, alpha_, gamma_, cluster_num_) )
+        curve_path <- paste0(outdir, sprintf('lowDim=%d_alpha=%.2f_gamma=%.2f__clusters=%d_clustering.pdf',low_dim_, alpha_, gamma_, cluster_num_) )
         pdf(file = curve_path )
         print(res)
         dev.off()
@@ -89,13 +89,10 @@ for (low_dim_ in low_dim){
       
     }
     }
-    
   
 }
 
 close(fout)
-
-
 
 silhoutte = read_csv("./clusters/eval_cluster_num/silhoutte_score_summary_2.csv")
 as_tibble(re_df) %>% mutate(significant = logRankTest_pvalue <0.05 ) %>%

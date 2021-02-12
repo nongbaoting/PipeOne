@@ -242,10 +242,10 @@ process telescope_bowtie2 {
 	maxForks 10
 	
 	tag {id}
-	errorStrategy 'ignore'
+	// errorStrategy 'ignore'
 	maxRetries 2
 	
-	publishDir "${params.outdir}/telescope/telescope/tsv/", mode: 'link'
+	publishDir "${params.outdir}/telescope/telescope/tsv/", mode: 'copy'
 		
 	input:
 	set id, file(bams) from bowtie2_out
@@ -267,7 +267,7 @@ process telescope_bowtie2 {
 
 process merge_telescope{
 	errorStrategy 'ignore'
-	publishDir "${params.outdir}/telescope/", mode: 'link'
+	publishDir "${params.outdir}/telescope/", mode: 'copy'
 	
 	input:
 	file retro_gtf

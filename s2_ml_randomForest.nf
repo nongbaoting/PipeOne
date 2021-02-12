@@ -18,7 +18,8 @@ Channel
 
 process proc_and_split_train_test_sample {
     publishDir "./results",  mode: 'copy'
-
+    stageInMode 'copy'
+    
     input:
     file "s1_sample_info-tumor-normal.csv" from sample_info
     file "00_rawdata/*" from tables.collect()

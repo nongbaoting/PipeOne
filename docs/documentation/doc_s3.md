@@ -109,7 +109,7 @@ __main result__
 
 * `clusters` cluster reuslt and survival curves
     * `clusters/eval_cluster_num/lowDim=*_alpha=*_gamma=*_clusters=*_clustering.csv` Kmeans cluster base of H matrix
-    * `clusters/lowDim=*_alpha=*_gamma=*_silhouette_score.png` silhouette with of cluster results
+    * `clusters/eval_cluster_num/lowDim=*_alpha=*_gamma=*_silhouette_score.png` silhouette with of cluster results
     * `clusters/surv_curve/low_dim=2_alpha=0.01_gamma=0.00_clustering.pdf` survival plot of Kmeans cluster result 
 
 __Intermediate files__

@@ -3,8 +3,6 @@
 ref_directory = "./"
 params.fasta  = "${ref_directory}/hg38.fa"
 params.genecode_gtf = "${ref_directory}/gencode.v32.gtf"
-
-
 params.threads = 12
 threads = params.threads
 println params.fasta
@@ -12,12 +10,12 @@ println params.fasta
 fasta = check_file(params.fasta)
 gtf = check_file(params.genecode_gtf)
 
-
 // bowtie2 index for s4_retrotranscriptome telescope 
-
 
 process bowtie2_build {
     label 'prepare'
+    label 'bigCPU'
+    
     
     publishDir "./", mode: 'copy'
     input:
@@ -32,19 +30,20 @@ process bowtie2_build {
     bowtie2-build --threads ${threads}  ${fasta} bowtie2_index/bowtie2_base
     """
 }
-
 // bwa index for s2_circRNA, s6_RNAediting
 
 process sprint_index {
     label 'prepare'
+   
 
-    publishDir "./sprint_index/", mode: 'copy'
+    publishDir "./", mode: 'copy',
+        saveAs: {filename -> "$filename"}
     input:
     file "genome.fa" from fasta
     file "genome.gtf" from gtf 
 
     output:
-    file "genome*"
+    path "sprint_index/genome*"
 
     """
     set +u; source activate pipeOne_RnaEditing; set -u
@@ -54,9 +53,9 @@ process sprint_index {
     """
     }
 
-
 process star_index{
     label 'prepare'
+    label 'bigMEM'
 
     publishDir "./", mode: 'copy'
     input:
@@ -73,10 +72,9 @@ process star_index{
     """
 }
 
-
-
 process hisat2_build {
     label 'prepare'
+    label 'bigMEM'
 
     publishDir "./", mode: 'copy'
     input:
@@ -97,7 +95,6 @@ process hisat2_build {
 
 }
 
-
 process bwa_index{
     label 'prepare'
     publishDir "./", mode: 'copy'
@@ -110,8 +107,7 @@ process bwa_index{
     """
     set +u; source activate pipeOne_RnaEditing; set -u
     mkdir -p bwa_index
-    bwa index -p bwa_index/bwa_index   ${fasta}
-    
+    bwa index -p bwa_index/bwa_index ${fasta}
     """
     
 }

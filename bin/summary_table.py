@@ -72,15 +72,15 @@ class RUN:
 
         ## s6_rnaEditing
         chck_dir("s1.6_rnaEditing")
-        os.system(f"cp ../s1.6_rnaEditing/results/sprint/Merge/SPrint_A2I_table.annovar.csv s1.6_rnaEditing/SPrint_A2I_table.annovar.csv")
+        #os.system(f"cp ../s1.6_rnaEditing/results/sprint/Merge/SPrint_A2I_table.annovar.csv s1.6_rnaEditing/SPrint_A2I_table.annovar.csv")
 
         ## s7 AS
         chck_dir("s1.7_alternative_splicing")
         os.system(f"cp ../s1.7_alternative_splicing/results/spladder_out_table/*confirmed.psi.txt.gz s1.7_alternative_splicing/")
 
         ## s8_SNP
-        chck_dir("s1.8_SNP")
-        os.system(f"cp ../s1.8_SNP/results/annovar_table/snp.geneBase.tsv s1.8_SNP/snp.geneBase.tsv")
+        # chck_dir("s1.8_SNP")
+        # os.system(f"cp ../s1.8_SNP/results/annovar_table/snp.geneBase.tsv s1.8_SNP/snp.geneBase.tsv")
 
     def mark_feature(self, library = 'polyA'):
         chck_dir('00_rawdata')
@@ -91,14 +91,14 @@ class RUN:
         add_marks("s1.3_APA-3TUR/pau_results.filterPau-distal-proximal.txt", "00_rawdata/APA_pau-distal-proximal.csv", "APA")
         add_marks("s1.4_retrotranscriptome/FPKM-divide_totalMapReads.csv", "00_rawdata/retro-FPKM-divide_totalMapReads.csv", "Retro", sep=",")
         add_marks("s1.5_fusion/fusion_arriba_out.tsv", "00_rawdata/fusion_arriba_out.csv", "Fusion")
-        add_marks("s1.6_rnaEditing/SPrint_A2I_table.annovar.csv", "00_rawdata/RNA-editing-rate.csv", "RNAEditing",sep=",")
+        #add_marks("s1.6_rnaEditing/SPrint_A2I_table.annovar.csv", "00_rawdata/RNA-editing-rate.csv", "RNAEditing",sep=",")
 
         for entry in os.scandir("s1.7_alternative_splicing"):
             if re.search(".*confirmed.psi.txt.gz", entry.name ):
                 new_name = re.sub("txt.gz$", 'csv', entry.name)
                 add_marks(entry.path , f"00_rawdata/{new_name}", "AS")
 
-        add_marks("s1.8_SNP/snp.geneBase.tsv", "00_rawdata/snp.geneBase.csv", "SNP")
+        # add_marks("s1.8_SNP/snp.geneBase.tsv", "00_rawdata/snp.geneBase.csv", "SNP")
 
     def rename_sample(self,sample_sheet):
         outdir = "./00_rawdata_tcga"

@@ -27,11 +27,7 @@ Download one of the data sets below:
 
 	>Extraction code: __8fnl__
 
-
-
 #### Installation
-
-
 
 __1. PipeOne environment__
 
@@ -70,7 +66,7 @@ To ensure a successful installation, we recommend that you run each command step
 
 
 
-__Decompression and build index__
+#### Prepare reference  index
 
 ```
 7z x hg38_ref.7z
@@ -83,7 +79,7 @@ rm -rf work result
 ```
 
 
-#### Configuration
+__Configuration__
 Modify the program configuration file `PipeOne/conf/genomes.config`,  change the line below:
 
 `ref_directory = ""` change to `ref_directory = "/your/path/to/hg38_ref"`

@@ -213,7 +213,7 @@ if ( params.hisat2_index && !params.bam ){
         tag {id}
         publishDir "${params.outdir}/hisat2/", mode: 'link',
             saveAs: {filename -> 
-                if(filename =~ /bam/   )  "bam/$filename"
+                if(filename =~ /bam/ && params.saveIntermediateFiles  )  "bam/$filename"
                 else if (filename =~/log/) "logs/${filename}"
 				else null
                 }

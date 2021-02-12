@@ -219,6 +219,8 @@ if (params.reads || params.sra ){
 	read_ch.into{ reads_star; read_star_2pass;  reads_print }
 
 	process star_1_pass {
+		publishDir "${params.outdir}/star1pass", mode: 'link'
+
 		tag {id}
 		input:
 		set id, file(reads) from reads_star
@@ -510,8 +512,6 @@ process Quant_each {
 				   -c 3
 	"""
 }
-
-
 
 
 process QuantAll_and_EventCalling{

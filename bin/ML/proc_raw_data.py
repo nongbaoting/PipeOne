@@ -65,6 +65,7 @@ def sub_feature_samples(indir, train_dir, sample_info, outdir):
     os.system(f"cp {sample_info} {outdir}/dat_sample_clustering.csv")
 
 def samllSample_train_test_split(sample_df, test_size=0.3, random_state=2):
+
     train, test = pd.DataFrame(), pd.DataFrame()
     for group_ in set(sample_df["Group"]):
         the_df = sample_df[ sample_df["Group"] == group_ ]
@@ -72,6 +73,16 @@ def samllSample_train_test_split(sample_df, test_size=0.3, random_state=2):
         train = train.append(train_, ignore_index=True )
         test = test.append(test_, ignore_index=True)
     return train, test
+
+def choose_samples(sample_df, test_0 = 12, test_1 = 20):
+    df_test_0 = sample_df[ sample_df["Group"] ==  0 ].sample( n = test_0 )
+    df_test_1 = sample_df[ sample_df["Group"] ==  1 ].sample( n = test_1 )
+    test = df_test_0.append(df_test_1)
+    train_idx = sample_df.index.isin(test.index) == False
+    train = sample_df.loc[ train_idx , ]
+ 
+    return train, test
+
 class MYRUN_procRaw:
 
     def proc(self, rawdir , sample_info, var_topk = 1000 ):
@@ -138,14 +149,14 @@ class MYRUN_procRaw:
             train_fi = os.path.join(train_dir, fi_name_out)
             test_fi  = os.path.join(test_dir, fi_name_out)
 
-            sub_train = dat.reindex(index=sinfo_train.loc[:, 'Sample'], fill_value=0)
-            sub_test = dat.reindex(index=sinfo_test.loc[:, 'Sample'], fill_value=0)
+            sub_train = dat.reindex(index = sinfo_train.loc[:, 'Sample'], fill_value=0)
+            sub_test  = dat.reindex(index  = sinfo_test.loc[:, 'Sample'], fill_value=0)
 
             sub_train.to_csv(train_fi)
             sub_test.to_csv(test_fi)
 
 
-    def proc_sep_train_test(self, rawdir, sample_fi, var_topk =1000 ,test_size = 0.3 ):
+    def proc_sep_train_test(self, rawdir, sample_fi, var_topk = 1000 ,test_size = 0.3 ):
         sample_df = pd.read_csv(sample_fi).rename(str.capitalize, axis=1)
 
         if "Group" not in sample_df.columns :
@@ -160,13 +171,34 @@ class MYRUN_procRaw:
         test_df.to_csv("test_sample_clustering.csv", index=False)
 
         myrun = MYRUN_procRaw()
-
         train_dir  = "./data/proc/"
         test_dir   = "./data/test_proc/"
         #os.system(f'rm -rf {train_dir} {test_dir}')
         myrun.proc(rawdir ,  "train_sample_clustering.csv",  var_topk , train_dir )
         sub_feature_samples(rawdir, train_dir, "test_sample_clustering.csv", test_dir)
         os.system(f"cp train_sample_clustering.csv {train_dir}")
+
+    def proc_sep_leave_test(self, rawdir, sample_fi, test_0 = 12, test_1 = 20,  var_topk = 1000):
+        sample_df = pd.read_csv(sample_fi).rename(str.capitalize, axis=1)
+
+        if "Group" not in sample_df.columns :
+            print( f"Your provide file {sample_fi} must contain header: Group")
+            exit(1)
+
+        train_df, test_df = choose_samples(sample_df, test_0 = 12, test_1 = 20)
+
+        print(Counter(train_df.loc[:, "Group"]))
+        print(Counter(test_df.loc[:, "Group"]))
+        train_df.to_csv("train_sample_clustering.csv", index=False)
+        test_df.to_csv("test_sample_clustering.csv", index=False)
+
+        # myrun = MYRUN_procRaw()
+        # train_dir  = "./data/proc/"
+        # test_dir   = "./data/test_proc/"
+        # myrun.proc(rawdir ,  "train_sample_clustering.csv",  var_topk )
+        # sub_feature_samples(rawdir, train_dir, "test_sample_clustering.csv", test_dir)
+        # os.system(f"cp train_sample_clustering.csv {train_dir}")
+
 
 
 if __name__ == '__main__':

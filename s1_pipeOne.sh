@@ -85,13 +85,14 @@ function args()
 
 HELP=0
 VERBOASE=0
-update_GTF="false"
+update_GTF=0
 reads=""
 genome=""
 maxForks=2
 threads=8
 saveIntermediateFiles=false
 saveIntermediateHisat2Bam=0
+scratch="false"
 layout="paired"
 profile="docker"
 cleaned="false"
@@ -132,7 +133,7 @@ ${RED}Optional:${NOCOLOR}
   --maxForks	<int>	max forks number of parrallel. default [2]
   --profile	<str>	execution envirenment. defualt [docker]
   --saveIntermediateFiles 	<boolean>	true or false, save intermediate files . defualt [false]
-  --update_GTF 	<boolean>		<boolean>	true or false, use customize GTF generated in step s1.1_lncRNA.nf instand of GENCODE GTF as input for step: s1.5_fusion.nf and s1.7_alternative_splicing.nf .defualt [false] 
+  --update_GTF 	<boolean>	<boolean>	true or false, use customize GTF generated in step s1.1_lncRNA.nf instand of GENCODE GTF as input for step: s1.5_fusion.nf and s1.7_alternative_splicing.nf .defualt [false] 
   -h --help	print usage
 "
 exit 1
@@ -175,7 +176,7 @@ echo "bash $0  $bash_input" >one_command.sh
 
 set_args_base="-resume -profile $profile --genome $genome \
 --layout $layout --threads $threads --maxForks $maxForks \
---saveIntermediateFiles $saveIntermediateFiles"
+--saveIntermediateFiles $saveIntermediateFiles --scratch $scratch "
 
 
 s1_Dir=${workDir}/s1.1_lncRNA
@@ -218,7 +219,7 @@ nextflow run ${baseDir}/s1.7_alternative_splicing.nf $set_args --update_GTF $upd
 
 s8_Dir=${workDir}/s1.8_SNP
 mkdir -p $s8_Dir; cd $s8_Dir
-nextflow run ${baseDir}/s1.8_SNP.nf  $set_args_base --bam "../s1.7_alternative_splicing/results/star2pass/*.bam" 
+nextflow run ${baseDir}/s1.8_SNP.nf  $set_args_base --bam "../s1.7_alternative_splicing/results/star2pass/*.bam"
 
 table_dir="${workDir}/00_tables"
 mkdir -p $table_dir; cd $table_dir
@@ -227,4 +228,4 @@ source ${conda_base}/etc/profile.d/conda.sh
 set +u; conda activate pipeOne_ml; set -u
 python3 ${baseDir}/bin/summary_table.py check_tables $library
 python3 ${baseDir}/bin/summary_table.py mark_feature $library
-conda deactivate pipeOne_ml
+conda deactivate
