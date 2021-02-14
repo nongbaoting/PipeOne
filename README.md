@@ -2,7 +2,8 @@
 
 # PipeOne integrates multi-modal data from RNA-seq to identify disease features and clinically-relevant subtypes
 
-![](https://img.shields.io/badge/License-MIT-brightgreen)
+![](https://img.shields.io/badge/license-MIT-brightgreen)
+[![Documentation Status](https://readthedocs.org/projects/pipeone/badge/?version=latest)](https://pipeone.readthedocs.io/en/latest/?badge=latest)
 [![](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A520.07.1.5413-brightgreen)](https://www.nextflow.io/)
 
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
