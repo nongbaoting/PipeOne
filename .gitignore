@@ -4,3 +4,4 @@ _templates
 site/
 __pycache__
 .idea
+.gitignore
