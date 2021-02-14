@@ -44,10 +44,14 @@ RNA-editing-rate.csv
 #### Module 2: Feature Prioritization
 We use thess test tables as input data. in actual applications, one should use the result table of the previous step as input 
 
-```
+```bash
 mkdir s2_randomForest
 cd s2_randomForest
-nextflow run /your/path/to/PipeOne/s2_ml_randomForest.nf  -profile docker --sample_info ../test_dat/s2_tables/s1_sample_info-tumor-normal.csv --rawdir ../test_dat/s2_tables/00_rawdata --var_topK 100  --threads 8
+nextflow run /home/nbt2/pipe/dev/pipeOne-v2/s2_RF.nf  -profile docker \
+    --rawdir ../test_dat/s2_tables/00_rawdata  \
+    --sample_info ../test_dat/s2_tables/s1_sample_info-tumor-normal.csv \
+    --gene_info ../test_dat/s2_tables/protein_coding_and_all_lncRNA.info.tsv
+
 ```
 
 __Results__:
@@ -59,10 +63,13 @@ results/data/feature_importance-addName.csv
 results/data/discriminative_power_of_topk_feature.csv 
 
 #### Module 3: Subtype Analysis
-```
+```bash
 mkdir s3_subtype
 cd s3_subtype
-nextflow run /your/path/to/PipeOne/s3_subtype.nf -resume -profile docker --rawdir ../test_dat/s3_subtype/00_rawdata --clinical ../test_dat/s3_subtype/KIRP_cli.OS.csv --var_topK 100
+nextflow run ~/pipe/dev/pipeOne-v2/s3_Subtype.nf -profile docker \
+	--rawdir ../test_dat/s3_subtype/00_rawdata/ \
+	--clinical ../test_dat/s3_subtype/KIRP_cli.OS.csv 
+
 ```
 Note: We select the top 100 features with the largest variance in each table to facilitate the test program; in real operation, it should be a larger number, such as 1000
 

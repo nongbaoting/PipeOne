@@ -2,26 +2,30 @@
 ### __Module 2: Feature Prioritization__
 
 #### Run in One Command
+```bash
+mkdir s2
+cd s2
+baseDir=/your/path/to/PipeOne/
+nextflow run ${baseDir}/s2_RF.nf  -profile docker \
+    --rawdir ../test_dat/s2_tables/00_rawdata  \
+    --sample_info ../test_dat/s2_tables/s1_sample_info-tumor-normal.csv \
+    --gene_info ../test_dat/s2_tables/protein_coding_and_all_lncRNA.info.tsv
 ```
-mkdir s2_randomForest
-cd s2_randomForest
-nextflow run /your/path/to/PipeOne/s2_ml_randomForest.nf  -profile docker --sample_info ../test_dat/s2_tables/s1_sample_info-tumor-normal.csv --rawdir ../test_dat/s2_tables/00_rawdata --var_topK 1000  --threads 8
-```
+
 __Options__
 
-```
+```bash
+--rawdir  directory contain RNA-seq result tables produced in module 1
 --sample_info <str> The sample_info file must contains two columns, the column names are Sample and Group
 --var_topK <int> top K most variance features. default 1000
-
 ```
 
 1.sample_info
-   
+
     The sample_info file must contains two columns, the column names are Sample and Group
 
-    For Example
-
-```
+For Example
+```bash
 $ cat sample_info.csv
 Sample,Group
 sample_1,0
@@ -38,7 +42,7 @@ Note: There are only two types of group values, use 0 represents normal, 1 repre
 
     For Example:
 
-```
+```bash
 $ cat table.csv
 feature_id,sample_1,sample_2,sample3...,sample_n
 feature_1,value,value,value,value,...,value
@@ -54,12 +58,13 @@ Note that each file is in csv comma separated format.
 
 __1. get top K variance features__
   
-```
+```bash
 source activate pipeOne_ml
 baseDir="/your/path/to/PipeOne/"
 python3 ${baseDir}/bin/ML/proc_raw_data.py proc --rawdir 00_rawdata  --sample_info s1_sample_info-tumor-normal.csv --var_topk 1000 --tdir ./data/proc/
     
 ```
+
     --rawdir  RNA-seq result table, such as expression level (TPM value), RNA editing rate, fusion event, etc.
     --sample_info   sample information file
     --var_topk  top K most variance features

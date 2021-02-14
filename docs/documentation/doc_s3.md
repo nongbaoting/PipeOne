@@ -10,7 +10,7 @@ nextflow run /your/path/to/PipeOne/s3_subtype.nf -resume -profile docker --rawdi
 ```
 Required: 
 
-    --rawdir <str>  directory contain RNA-seq result table, such as expression level (TPM value), RNA editing rate, fusion event, etc.
+    --rawdir <str>  directory contain RNA-seq result tables produce in module 1
     --clinical <str> Clinical information file
 
 Optional:

@@ -1,1 +1,0 @@
-../bin/fastx_trimLen.py

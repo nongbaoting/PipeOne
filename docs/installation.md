@@ -29,36 +29,24 @@ Download one of the data sets below:
 
 #### Installation
 
-__1. PipeOne environment__
+__ Using docker__
 
 Pull down the PipeOne Docker image
 
-```
+```bash
 docker pull nongbaoting/pipeone:conda
 ```
 or
-```
+```bash
 docker pull registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:conda
 
 docker tag registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:conda nongbaoting/pipeone:conda
 ```
 
-__2. Install conda environment__
-```
-cd PipeOne/INSTALL
-conda env create  --name pipeOne_ml --file ymls/pipeOne_ml.yml
-```
-
-__3. R packages__
-```
-R -e 'install.packages(c("survival", "survminer", "ggplot2", "tidyverse", "data.table"), dependencies = TRUE )'
-```
-
-
 
 #####___or use conda environment instead of docker___
 
-```
+```bash
 cd PipeOne/INSTALL
 bash ./install.sh
 ```
@@ -68,23 +56,18 @@ To ensure a successful installation, we recommend that you run each command step
 
 #### Prepare reference  index
 
-```
+__Uncompressed reference data__
+```bash
 7z x hg38_ref.7z
 cd hg38_ref
-## build index
-main_code_path=/your/path/to/PipeOne/
-nextflow run ${main_code_path}/s0_prepare_ref.nf -resume -profile docker --threads 4 
-## Delete intermediate files
-rm -rf work result
 ```
 
-
 __Configuration__
+
 Modify the program configuration file `PipeOne/conf/genomes.config`,  change the line below:
 
 `ref_directory = ""` change to `ref_directory = "/your/path/to/hg38_ref"`
-
-```
+```vim
 params {
 
   genomes {
@@ -132,4 +115,15 @@ params {
 }
 
 ```
+
+
+
+__building index__
+```
+main_code_path=/your/path/to/PipeOne/
+nextflow run ${main_code_path}/s1_RNAseq.nf -profile docker --genome hg38 --prepare_ref
+## Delete intermediate files
+rm -rf work result
+```
+
 

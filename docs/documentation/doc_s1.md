@@ -7,8 +7,9 @@ __Note: As long as the corresponding input data is provided, the three main modu
 ```
 mkdir s1_pipeone_raw
 cd s1_pipeone_raw
-bash /your/path/to/PipeOne/s1_pipeOne.sh --reads "../test_dat/s1_RNA-seq/*.R{1,2}.fastp.fq.gz" --genome hg38 --cleaned true
+nextflow run ~/pipe/dev/pipeOne-v2/s1_RNAseq.nf -profile docker --genome hg38 --reads "../test_dat/s1_RNA-seq/*.R{1,2}.fastp.fq.gz"
 ```
+
 #### Options
 Require:
 ```
@@ -19,97 +20,86 @@ Require:
 
 Optional:
 ```
---cleaned	<boolean>	true or false. defualt[true]
---layout	<string>	paired or single. defualt [paired]
---library	<string>	polyA or total. defualt [polyA]
---threads	<int>	    number of CPU process for each step. default [8]
---maxForks	<int>	    max forks number of parrallel. default [2]
---profile	<str>	    execution envirenment, e.g. docker, conda. defualt [docker]
---saveIntermediateFiles	save intermediate files defualt [off]
---update_GTF use customized GTF generated in step s1.1_lncRNA.nf instand of GENCODE GTF as input for step: s1.2_circRNA.quant.nf, s1.5_fusion.nf and s1.7_alternative_splicing.nf . defualt [off]
+--run_s1 choose programs to proceed use comma to seperate different programs. defualt ['1,2,3,4,5,6,7,8']
+        1 represent task 'mRNA_lncRNA',
+        2 represent task 'circRNA',
+        3 represent task 'APA',
+        4 represent task 'RetroTrans',
+        5 represent task 'Fusion',
+        6 represent task 'RNAediting',
+        7 represent task 'AS',
+        8 represent task 'SNP'.
+        user could use the task number or task name or even, such as '1,2,RetroTrans,Fusion,RNAediting,AS,8'.
+--cleaned   true or false. defualt[true]
+--singleEnd paired or single. defualt [paired]
+--library   <string>	polyA or total. defualt [polyA]
+--max_cpus  <int>	    number of CPU process for each step. default [24]
+--max_memory    <string>   max max_memory for processing. default [ 128.GB]
+--max_time  <string>   number of hours for program to proceed. default [2400.h]
+--maxForks  <int>	    max forks number of parrallel. default [2]
+--saveIntermediateFiles save intermediate files defualt [off]
+--update_GTF    use customized GTF generated in step s1.1_lncRNA.nf instand of GENCODE GTF as input for step: s1.2_circRNA.quant.nf, s1.5_fusion.nf and s1.7_alternative_splicing.nf . defualt [off]
 -h --help               print usage
 ```
 
 #### Output
 
 * __Files result from different programs applied to RNA-seq__
-    * 00_tables Tables from different modal of RNA-seq
-    * s1.*  Program running directory
-      * result result directory
-      * work work directory
+    * __s1.*__, results of different submodules
+    * __tables__, all tables from different modal of RNA-seq, which are required in module 2 and module3
 
-```
-$ tree -L 2
+```bash
+-> % tree -L 2 results
 .
-├── 00_tables
-│   ├── 00_rawdata
-│   ├── s1.1_lncR_mRNA
-│   ├── s1.2_circRNA
-│   ├── s1.3_APA-3TUR
-│   ├── s1.4_retrotranscriptome
-│   ├── s1.5_fusion
-│   ├── s1.6_rnaEditing
-│   ├── s1.7_alternative_splicing
-│   └── s1.8_SNP
-├── one_command.sh
-├── s1.1_lncRNA
-│   ├── results
-│   └── work
+├── pipeline_info
+│   ├── pipeline_report.html
+│   ├── pipeline_timeline.html
+│   └── pipeline_trace.txt
+├── s1.0_QC
+│   └── fastp
+├── s1.1_mRNA_lncRNA
+│   ├── annotations_and_fasta
+│   ├── coding_potential
+│   ├── gffcompare
+│   ├── hisat2
+│   ├── novel_lncRNA
+│   ├── reference_gtf_info
+│   ├── salmon
+│   ├── stringtie
+│   └── taco
 ├── s1.2_circRNA
-│   ├── results
-│   └── work
-├── s1.3_APA-3TUR
-│   ├── results
-│   └── work
-├── s1.4_retrotranscriptome
-│   ├── results
-│   └── work
-├── s1.5_fusion
-│   ├── results
-│   └── work
-├── s1.6_rnaEditing
-│   ├── results
-│   └── work
-├── s1.7_alternative_splicing
-│   ├── results
-│   └── work
-└── s1.8_SNP
-    ├── results
-    └── work
-
-```
-
-* __Tables from different modal of RNA-seq: s1.*__
-```
-$ ls  00_tables
-00_rawdata
-s1.1_lncR_mRNA
-s1.2_circRNA
-s1.3_APA-3TUR
-s1.4_retrotranscriptome
-s1.5_fusion
-s1.6_rnaEditing
-s1.7_alternative_splicing
-s1.8_SNP
-```
-
-* __Tables of different modals of RNA-seq in one directory__, which are required in module 2 and module3
-```
-$ tree 00_tables/00_rawdata 
-00_tables/00_rawdata
-├── APA_pau-distal-proximal.csv
-├── circRNA_cpm.csv
-├── lncR_gene.tpm.csv
-├── merge_graphs_alt_3prime_C3.confirmed.psi.csv
-├── merge_graphs_alt_5prime_C3.confirmed.psi.csv
-├── merge_graphs_exon_skip_C3.confirmed.psi.csv
-├── merge_graphs_intron_retention_C3.confirmed.psi.csv
-├── merge_graphs_mult_exon_skip_C3.confirmed.psi.csv
-├── merge_graphs_mutex_exons_C3.confirmed.psi.csv
-├── prot_gene.tpm.csv
-├── retro-FPKM-divide_totalMapReads.csv
-├── RNA-editing-rate.csv
-└── snp.geneBase.csv
-
-0 directories, 13 files
+│   └── CIRIquant
+├── s1.3_APA
+│   ├── apa_3utr
+│   ├── pau_results.filterPau-distal-proximal.txt
+│   ├── pau_results.filterPau.txt
+│   └── salmon
+├── s1.4_RetroTrans
+│   ├── bowtie2
+│   └── telescope
+├── s1.5_Fusion
+│   └── arriba
+├── s1.6_RNAediting
+│   └── sprint
+├── s1.7_AS
+│   ├── spladder_out
+│   ├── spladder_out_table
+│   └── STAR
+├── s1.8_SNP
+│   ├── annovar_table
+│   ├── variantAnnotateAnnovar
+│   └── Variant_filtering
+└── tables
+    ├── APA_pau-distal-proximal.csv
+    ├── circRNA_CPM.csv
+    ├── lncR_gene.tpm.csv
+    ├── merge_graphs_alt_3prime_C3.confirmed.psi.csv
+    ├── merge_graphs_alt_5prime_C3.confirmed.psi.csv
+    ├── merge_graphs_exon_skip_C3.confirmed.psi.csv
+    ├── merge_graphs_intron_retention_C3.confirmed.psi.csv
+    ├── merge_graphs_mult_exon_skip_C3.confirmed.psi.csv
+    ├── merge_graphs_mutex_exons_C3.confirmed.psi.csv
+    ├── prot_gene.tpm.csv
+    ├── retro-FPKM-divide_totalMapReads.csv
+    └── snp.geneBase.csv
 ```
