@@ -1,6 +1,6 @@
 
 #### Prerequisites
-1. Docker or [conda](https://docs.conda.io/en/latest/miniconda.html)
+1. [Docker](https://www.docker.com/) or [conda](https://docs.conda.io/en/latest/miniconda.html)
 3. Java (version >= 1.7)
 4. [Nextflow](https://www.nextflow.io/) (version >= 20.07.1.5413)
 5. R
