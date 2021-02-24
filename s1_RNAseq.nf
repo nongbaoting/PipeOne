@@ -54,48 +54,50 @@ workflow {
         runList = params.run_s1.toString().split(',')
         QC(ch_reads)
         reads = QC.out.reads
-    }
+    
 
-    if( runList.contains('1') || runList.contains('mRNA_lncRNA') ){  
-        mRNA_lncRNA(reads)
-        if(params.update_GTF){
-            gtf = mRNA_lncRNA.out.gtf
+        if( runList.contains('1') || runList.contains('mRNA_lncRNA') ){  
+            mRNA_lncRNA(reads)
+            if(params.update_GTF){
+                gtf = mRNA_lncRNA.out.gtf
+            }
+        } 
+
+        if( runList.contains('2') || runList.contains('circRNA' )    ){
+
+            if( runList.contains('1') || runList.contains('mRNA_lncRNA') ){
+                CircRNA_CIRIquant_bam( reads, mRNA_lncRNA.out.bam, gtf)
+            }else{
+                CircRNA_CIRIquant_fastq(reads, gtf )
+            }
+        } 
+
+        if( runList.contains('3') || runList.contains('APA' )         ){ 
+            if( runList.contains('1') || runList.contains('mRNA_lncRNA') ){
+                APA(reads, mRNA_lncRNA.out.tpm)
+            }else{
+                APA_salmonGene(reads )
+            }
+        } 
+
+        if( runList.contains('4') || runList.contains('RetroTrans')  ){ RetroTrans(reads) }
+
+        if( runList.contains('5') || runList.contains('Fusion')      ){ Fusion(reads, gtf) }
+
+        if( runList.contains('6') || runList.contains('RNAediting')  ){ RNAediting(reads) }
+
+        if( runList.contains('7') || runList.contains('AS')          ){ AS(reads, gtf) }
+
+    
+        if( runList.contains('8') || runList.contains('SNP')         ){ 
+
+            if( runList.contains('7') || runList.contains('AS') ){
+                SNPbam(AS.out.id_bam)
+            }else{
+                SNPfastq(reads)
+            }
         }
-    } 
 
-    if( runList.contains('2') || runList.contains('circRNA' )    ){
-
-        if( runList.contains('1') || runList.contains('mRNA_lncRNA') ){
-             CircRNA_CIRIquant_bam( reads, mRNA_lncRNA.out.bam, gtf)
-        }else{
-             CircRNA_CIRIquant_fastq(reads, gtf )
-        }
-    } 
-
-    if( runList.contains('3') || runList.contains('APA' )         ){ 
-        if( runList.contains('1') || runList.contains('mRNA_lncRNA') ){
-             APA(reads, mRNA_lncRNA.out.tpm)
-        }else{
-             APA_salmonGene(reads )
-        }
-    } 
-
-    if( runList.contains('4') || runList.contains('RetroTrans')  ){ RetroTrans(reads) }
-
-    if( runList.contains('5') || runList.contains('Fusion')      ){ Fusion(reads, gtf) }
-
-    if( runList.contains('6') || runList.contains('RNAediting')  ){ RNAediting(reads) }
-
-    if( runList.contains('7') || runList.contains('AS')          ){ AS(reads, gtf) }
-
-   
-    if( runList.contains('8') || runList.contains('SNP')         ){ 
-
-        if( runList.contains('7') || runList.contains('AS') ){
-            SNPbam(AS.out.id_bam)
-        }else{
-            SNPfastq(reads)
-        }
     }
 
 }

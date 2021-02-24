@@ -1,21 +1,25 @@
 
-__Note: As long as the corresponding input data is provided, the three main modules can be operate independently__
+__Note: As long as the corresponding input data is provided, these three main modules can be operate independently__
 
 ### __Module 1: RNA-seq processing__
 
 ####  Usage
 ```
-mkdir s1_pipeone_raw
-cd s1_pipeone_raw
-nextflow run ~/pipe/dev/pipeOne-v2/s1_RNAseq.nf -profile docker --genome hg38 --reads "../test_dat/s1_RNA-seq/*.R{1,2}.fastp.fq.gz"
+mkdir s1
+cd s1
+baseDir=/your/path/to/PipeOne/
+nextflow run ${baseDir}/s1_RNAseq.nf \
+	-profile docker \
+	--genome hg38 \
+	--reads "../test_dat/s1_RNA-seq/*.R{1,2}.fastp.fq.gz"
 ```
 
 #### Options
 Require:
 ```
---reads  <string>     FASTQ gzip files, for example: "/home/reads/*_R{1,2}.fastq.gz"
+--reads  <string>   The FASTQ gzip files, for example: "/home/reads/*_R{1,2}.fastq.gz"
 
---genome <string>     Genome version defined in conf/igenomes.config
+--genome <string>   Genome version defined in conf/igenomes.config
 ```
 
 Optional:
@@ -29,7 +33,7 @@ Optional:
         6 represent task 'RNAediting',
         7 represent task 'AS',
         8 represent task 'SNP'.
-        user could use the task number or task name or even, such as '1,2,RetroTrans,Fusion,RNAediting,AS,8'.
+        user could use the task number or task name, such as '1,2,RetroTrans,Fusion,RNAediting,AS,8'.
 --cleaned   true or false. defualt[true]
 --singleEnd paired or single. defualt [paired]
 --library   <string>	polyA or total. defualt [polyA]

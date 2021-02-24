@@ -7,7 +7,7 @@
 */
 nextflow.enable.dsl=2
 // defined params
-params.outdir_sub = params.outdir + "/s3_Subtype"
+params.outdir_sub = params.outdir 
 params.rawdir = ""
 params.clinical = ""
 params.var_topK = 1000

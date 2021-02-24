@@ -19,16 +19,20 @@
 
 #### Module 1: RNA-seq processing
 ```
-mkdir s1_pipeone_raw
-cd s1_pipeone_raw
-bash /your/path/to/PipeOne/s1_pipeOne.sh --reads "../test_dat/s1_RNA-seq/*.R{1,2}.fastp.fq.gz" --genome hg38 --cleaned true
-```
+mkdir s1
+cd s1
+baseDir=/your/path/to/PipeOne/
+nextflow run ${baseDir}/s1_RNAseq.nf  -resume -profile docker \
+        --genome hg38 \
+        --reads "../test_dat/s1_RNA-seq/*_{1,2}.fq.gz"
 
+```
+__Results__:
 Tables for different aspects of RNA-seq:
-
 ```
-$ ls 00_tables/00_rawdata
+$ ls -1 results/tables 
 APA_pau-distal-proximal.csv
+circRNA_CPM.csv
 lncR_gene.tpm.csv
 merge_graphs_alt_3prime_C3.confirmed.psi.csv
 merge_graphs_alt_5prime_C3.confirmed.psi.csv
@@ -38,16 +42,17 @@ merge_graphs_mult_exon_skip_C3.confirmed.psi.csv
 merge_graphs_mutex_exons_C3.confirmed.psi.csv
 prot_gene.tpm.csv
 retro-FPKM-divide_totalMapReads.csv
-RNA-editing-rate.csv
+snp.geneBase.csv
 ```
 
 #### Module 2: Feature Prioritization
 We use thess test tables as input data. in actual applications, one should use the result table of the previous step as input 
 
 ```bash
-mkdir s2_randomForest
-cd s2_randomForest
-nextflow run /home/nbt2/pipe/dev/pipeOne-v2/s2_RF.nf  -profile docker \
+mkdir s2
+cd s2
+baseDir=/your/path/to/PipeOne/
+nextflow run ${baseDir}/s2_RF.nf -profile docker \
     --rawdir ../test_dat/s2_tables/00_rawdata  \
     --sample_info ../test_dat/s2_tables/s1_sample_info-tumor-normal.csv \
     --gene_info ../test_dat/s2_tables/protein_coding_and_all_lncRNA.info.tsv
@@ -64,13 +69,19 @@ results/data/discriminative_power_of_topk_feature.csv
 
 #### Module 3: Subtype Analysis
 ```bash
-mkdir s3_subtype
-cd s3_subtype
-nextflow run ~/pipe/dev/pipeOne-v2/s3_Subtype.nf -profile docker \
+mkdir s3
+cd s3
+baseDir=/your/path/to/PipeOne/
+nextflow run ${baseDir}/s3_Subtype.nf -profile docker \
 	--rawdir ../test_dat/s3_subtype/00_rawdata/ \
-	--clinical ../test_dat/s3_subtype/KIRP_cli.OS.csv 
-
+	--clinical ../test_dat/s3_subtype/KIRP_cli.OS.csv \
+	--test 
 ```
-Note: We select the top 100 features with the largest variance in each table to facilitate the test program; in real operation, it should be a larger number, such as 1000
+Note: parameter `--test` is use for test running only, should not be use in real execution.
+
+__Results__:
+results/record_log_rank_test_pvalue.csv
+
+results/FeatureSelection
 
 __[For detail](../documentation/doc_s1)__

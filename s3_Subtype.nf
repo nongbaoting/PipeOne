@@ -11,13 +11,13 @@ params.test = false
 
 // include funtions must be placed after params !
 include {Header; mkdir_tmp; check_file; input_reads; get_base_index; get_dir_files } from "${baseDir}/modules/functions.nf"
-include { Subtype } from  "${baseDir}/modules/subworkflow/s3_NMF.nf"
+include {Subtype} from  "${baseDir}/modules/subworkflow/s3_NMF.nf"
 
 log.info Header()
 mkdir_tmp('./tmp')
 
 workflow {
-    println( params.test)
-    Subtype()
 
+    Subtype()
+    
 }

@@ -95,7 +95,7 @@ for (low_dim_ in low_dim){
 close(fout)
 
 silhoutte = read_csv("./clusters/eval_cluster_num/silhoutte_score_summary_2.csv")
-as_tibble(re_df) %>% mutate(significant = logRankTest_pvalue <0.05 ) %>%
- left_join(silhoutte) %>% arrange(logRankTest_pvalue)  -> re_df
+as_tibble(re_df) %>% mutate(significant = logRankTest_pvalue < 0.05 ) %>%
+  left_join( silhoutte ) %>% arrange( desc(mean_siloutte_width ) )  -> re_df
  
 write_csv(re_df, record_file_csv)

@@ -41,7 +41,7 @@ def select_topK( topK_importance='50,100,200', outdir = "./data_randomForest", c
         low_dim, alpha, gamma, cluster_n = split_fileName_params( os.path.basename(cluster_file) )
     elif os.path.exists(cluster_survival_file):
         consist = pd.read_csv(cluster_survival_file)
-        consist = consist.sort_values(by='logRankTest_pvalue' )
+        consist = consist[consist.significant == True ].sort_values(by='mean_siloutte_width' , ascending=False)
         NMF_param, cluster = consist.iloc[0,0:2]
         low_dim, alpha, gamma = split_params(NMF_param)
         cluster_fi =  "./clusters/eval_cluster_num/%s_clusters=%d_clustering.csv" % (NMF_param, cluster)
@@ -51,6 +51,7 @@ def select_topK( topK_importance='50,100,200', outdir = "./data_randomForest", c
     chck_dir(outdir); 
     os.system(f'cp -r ./data/proc/  {outdir}/')
     os.system(f'cp {cluster_fi}  {outdir}/proc/')
+    os.system(f'cp {cluster_fi}  {outdir}/')
     proc_file_lst = get_matrix_files("./data/proc/")
     topk_ls = [int(i) for i in topK_importance.split(',') ]
     for topk in topk_ls:

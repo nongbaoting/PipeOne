@@ -114,15 +114,15 @@ def main(threads = 12, train_dir = "./data/train_dir/", test_dir ="./data/test_d
         # f.write(chck8+"\n")
         # print(chck8)
 
-    eval_df = pd.DataFrame.from_dict(eval_dict)
-    eval_df_fout = data_dir + "discriminative_power_of_topk_feature.csv"
-    eval_df.to_csv(eval_df_fout, index=False, header=True)
+    # eval_df = pd.DataFrame.from_dict(eval_dict)
+    # eval_df_fout = data_dir + "discriminative_power_of_topk_feature.csv"
+    # eval_df.to_csv(eval_df_fout, index=False, header=True)
 
-    eval_df2 = pd.DataFrame.from_dict(eval_dt)
-    eval_df2_fout = data_dir + "discriminative_power_of_topk_feature.2.csv"
-    eval_df2.to_csv(eval_df2_fout, index=False, header=True)
+    eval_df2 = pd.DataFrame.from_dict( eval_dt )
+    eval_df2_fout = data_dir + "discriminative_power_of_topk_feature.csv"
+    eval_df2.to_csv(eval_df2_fout, index=False, header=True )
 
-    f.write("Evalution metric is saved in "+eval_df_fout + "\n")
+    f.write("Evalution metric is saved in " + eval_df2_fout + "\n")
     f.close()
     #
     # f.close()

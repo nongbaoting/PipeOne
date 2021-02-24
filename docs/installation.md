@@ -3,7 +3,6 @@
 1. [Docker](https://www.docker.com/) or [conda](https://docs.conda.io/en/latest/miniconda.html)
 3. Java (version >= 1.7)
 4. [Nextflow](https://www.nextflow.io/) (version >= 20.07.1.5413)
-5. R
 6. [7z](https://www.7-zip.org/download.html) `sudo apt install p7zip-full p7zip-rar`
 
 
@@ -28,18 +27,12 @@ Download one of the data sets below:
 
 #### Installation
 
-__ Using docker__
+__Using docker__
 
 Pull down the PipeOne Docker image
 
 ```bash
-docker pull nongbaoting/pipeone:conda
-```
-or
-```bash
-docker pull registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:conda
-
-docker tag registry.cn-shenzhen.aliyuncs.com/nongbaoting/pipeone:conda nongbaoting/pipeone:conda
+docker pull nongbaoting/pipeone:latest
 ```
 
 

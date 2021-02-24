@@ -62,7 +62,5 @@ class RUN:
                 new_name = re.sub("txt.gz$", 'csv', entry.name)
                 add_marks(entry.path , f"{new_name}", "AS")
 
-
-
 if __name__ == '__main__':
     fire.Fire(RUN)

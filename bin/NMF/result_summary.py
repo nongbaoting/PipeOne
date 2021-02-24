@@ -3,7 +3,8 @@
 # @Time    : 2020/6/30 14:35
 # @author  : Baoting Nong'
 # @email   : 523135753@qq.com'
-import fire, os,re
+
+import fire, os, re
 import pandas as pd
 
 def get_geneName(feature_name, gdict):
@@ -33,7 +34,6 @@ def get_geneName(feature_name, gdict):
 class myResult_summary:
 
     def feature(self, rf_res_fi, ginfo_fi ):
-
         #rf_res_fi = "/home/nbt2/proj/2020-TCGA/proc/KIRP/00_tables/pipeOne/FeatureSelection/feature(all)_importance.csv"
         #ginfo_fi = "/home/nbt2/proj/2020-TCGA/proc/KIRP/s1_lncRNA/results/novel_lncRNA/protein_coding_and_all_lncRNA.info.tsv"
         rf_fi_base = os.path.basename(rf_res_fi)
@@ -42,7 +42,7 @@ class myResult_summary:
         out_fi = os.path.join(rf_fi_dir, rf_fi_base)
         rf_res = pd.read_csv(rf_res_fi)
         ginfo = pd.read_csv(ginfo_fi, sep="\t")
-        gg = ginfo[['gene_id', 'gene_name']]
+        gg = ginfo[ ['gene_id', 'gene_name'] ]
         from collections import defaultdict
         gdict = defaultdict(str)
         for i in range(len(gg)):

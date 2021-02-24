@@ -6,10 +6,10 @@ nav:
     - Home: index.md
     - Installation and Setup: installation.md
     - Quick Start: quickstart.md
-    - 'Documentation': 
-        - 'Module 1: RNA-seq processing': documentation/doc_s1.md
-        - 'Module 2: Feature Prioritization':    documentation/doc_s2.md
-        - 'Module 3: Subtype Analysis':       documentation/doc_s3.md
+    - Documentation: 
+                - 'Module 1: RNA-seq processing': documentation/doc_s1.md
+                - 'Module 2: Feature Prioritization':    documentation/doc_s2.md
+                - 'Module 3: Subtype Analysis':       documentation/doc_s3.md
     - About: about.md
 theme: 'readthedocs'
 plugins:

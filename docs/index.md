@@ -16,7 +16,6 @@ RNA sequencing (RNA-seq) represents one of the most widely-used technologies to 
 <img src = "./Figs/s0.png", width = "800">
 
 #### Module 1: RNA-seq Processing
-
 -----
 
 <img src = "./Figs/s1.png", width = "800">

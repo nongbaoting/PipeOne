@@ -8,7 +8,7 @@
 
 nextflow.enable.dsl=2
 // defined params
-params.outdir_sub = params.outdir + "/s2_Features"
+params.outdir_sub = params.outdir 
 params.rawdir = ""
 params.sample_info = ""
 params.gene_info = ""
@@ -27,12 +27,12 @@ sample_info = check_file(params.sample_info, '--sample_info')
 Channel
     .fromPath("${params.rawdir}/*.csv")
     .ifEmpty { exit 1, "files not found: ${params.rawdir}" }
-    .set{tables}
+    .set{ tables }
 
 workflow RF {
    
     main:
-    proc(tables.collect(), sample_info)
+    proc(tables.collect(), sample_info )
 
     if(params.test_size ){
 
@@ -44,7 +44,7 @@ workflow RF {
     if(params.gene_info){
 
         gene_info = check_file(params.gene_info, '--gene_info')
-        add_gene_name(RandomForest.out.feature, gene_info)
+        add_gene_name( RandomForest.out.feature, gene_info )
     }
     
 

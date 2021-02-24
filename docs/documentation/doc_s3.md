@@ -4,9 +4,12 @@
 #### Run in one command
 
 ```
-mkdir s3_subtype
-cd s3_subtype
-nextflow run /your/path/to/PipeOne/s3_subtype.nf -resume -profile docker --rawdir ../test_dat/s3_subtype/00_rawdata --clinical ../test_dat/s3_subtype/KIRP_cli.OS.csv --var_topK 1000 
+mkdir s3
+cd s3
+baseDir=/your/path/to/PipeOne/
+nextflow run ${baseDir}/s3_Subtype.nf -profile docker \
+	--rawdir ../test_dat/s3_subtype/00_rawdata/ \
+	--clinical ../test_dat/s3_subtype/KIRP_cli.OS.csv 
 ```
 Required: 
 
@@ -17,11 +20,11 @@ Optional:
     
     --var_topK <int>  top K most variance features. default [1000]
     -- cluster_range <str> cluster of to test in Kmeans default ["3-8"]
-    --threads <int> number of threads to use default [24]
     
 
---clinical Clinical information
-The clinical  file must have three columns, the column names are Sample, Event, Time_to_event
+`--clinical` Clinical information
+The clinical  file must contain three columns, the column names are Sample, Event, Time_to_event
+For example
 ```
 $ head KIRP_cli.OS.csv
 Sample,Event,Time_to_event
@@ -44,11 +47,11 @@ __1. select topK variance features and run NMF__
 source activate pipeOne_ml
 baseDir=/path/to/PipeOne/
 
-python3 ${baseDir}/bin/ML/python_code_2/proc_raw_data.py proc --rawdir 00_rawdata/ --sample_info sample.cli.csv --var_topk 1000
+python3 ${baseDir}/bin/NMF/proc_raw_data.py proc --rawdir 00_rawdata/ --sample_info sample.cli.csv --var_topk 1000
 
 ## defusion
-python3 ${baseDir}/bin/ML/python_code_2/run_defusion.py --threads 24
-python3 ${baseDir}/bin/ML/python_code_2/check_convergence.py 
+python3 ${baseDir}/bin/NMF/run_defusion.py --threads 24
+python3 ${baseDir}/bin/NMF/check_convergence.py 
 ```
 
 __Options__
@@ -60,22 +63,24 @@ __Options__
 
 __2. clustering and eval__
 ```
-python3 ${baseDir}/bin/ML/python_code_2/eval_cluster_num.py --cluster_range "3-8"
-Rscript ${baseDir}/bin/ML/python_code_2/survival_eval.R ./data/sample.cli.csv ./clusters/surv_curve/ "3-8"
+python3 ${baseDir}/bin/NMF/eval_cluster_num.py --cluster_range "3-8"
+Rscript ${baseDir}/bin/NMF/survival_eval.R ./data/sample.cli.csv ./clusters/surv_curve/ "3-8"
 ```
 
 __Options__
 
     --cluster_range <str> cluster of to test in Kmeans default['3-8']
 
-Script `survival_eval.R` need three mandotory inputs: __clinical information file__,  
-__cluster_result__ which produce by script `eval_cluster_num.py`, and __cluster_range__ same as --cluster_range
+Script `survival_eval.R` need three mandotory inputs:
+* __clinical information file__,  
+* __cluster_result__ which produce by script `eval_cluster_num.py`
+* __cluster_range__ same as --cluster_range
 
 
 __3. select features__
 ```
-python3 ${baseDir}/bin/ML/python_code_2/select_topk_nong.py 
-python3 ${baseDir}/bin/ML/python_code_2/find_best_RFparams.py 
+python3 ${baseDir}/bin/NMF/select_topk_nong.py 
+python3 ${baseDir}/bin/NMF/find_best_RFparams.py 
 ```
 
 __Options__
@@ -91,10 +96,8 @@ __Note:__ The `--cluster_survival_file` option is mutually exclusive with the `-
 
 `find_best_RFparams.py`
 
-    --ddir  input direcotry generate by last step. default ./data_randomForest
+    --ddir  input direcotry generate by last step, default ./data_randomForest
     --tdir output directory default ./FeatureSelection/
-
-
 
 #### Results files
 
@@ -110,11 +113,11 @@ __main result__
 * `clusters` cluster reuslt and survival curves
     * `clusters/eval_cluster_num/lowDim=*_alpha=*_gamma=*_clusters=*_clustering.csv` Kmeans cluster base of H matrix
     * `clusters/eval_cluster_num/lowDim=*_alpha=*_gamma=*_silhouette_score.png` silhouette with of cluster results
-    * `clusters/surv_curve/low_dim=2_alpha=0.01_gamma=0.00_clustering.pdf` survival plot of Kmeans cluster result 
+    * `clusters/surv_curve/low_dim=*_alpha=*_gamma=*_clustering.pdf` survival plot of Kmeans cluster results 
 
 __Intermediate files__
 
-* `NMF` results of Nonnegative matrix factorization (NMF) under different paramiters
+* `NMF` results of Non-negative matrix factorization (NMF) under different parameters
 
     * `weight_*` weight matrix W of NMF
     * `X_*`      H matrix

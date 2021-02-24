@@ -32,9 +32,9 @@ process clustering_and_eval{
     path "data/sample.cli.csv"
 
     output:
-    tuple path("00_rawdata"),  path("clusters"),   path("data"), 
-        path("NMF"),  path("record_log_rank_test_pvalue.csv"),  
-        path("record_log_rank_test_pvalue.log.txt") 
+    tuple path("00_rawdata"), path("clusters"), path("data"), 
+        path("NMF"), path("record_log_rank_test_pvalue.csv"),  
+        path("record_log_rank_test_pvalue.log.txt")
 
     """
     set +u; source activate pipeOne_ml; set -u
@@ -73,7 +73,7 @@ workflow NMF{
     main:
     defusion(tables.collect(), clinical)
     clustering_and_eval( defusion.out.collect(), clinical )
-    features_selection(clustering_and_eval.out.collect() )
+    features_selection(  clustering_and_eval.out.collect() )
 
     
 }
