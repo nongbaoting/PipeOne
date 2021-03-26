@@ -50,7 +50,8 @@ process Single_graphs {
 }
 
 process Merged_graph {
-	
+	publishDir "${params.outdir_sub}/spladder_out/", mode: 'link'
+
 	input:
 	path "spladder_out/spladder/*" 
 	path "*"  
@@ -119,7 +120,7 @@ process QuantAll_and_EventCalling{
 	path gtf_pickle
 	
 	output:
-	path "spladder_out/merge_graphs*" 
+	path "spladder_out/*" 
 	
 	"""
 	set +u; source activate pipeOne_AS; set -u

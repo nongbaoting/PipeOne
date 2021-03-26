@@ -20,32 +20,68 @@ process sprint{
 	path "${id}" optional true 
 	path "${id}.SPRINT_identified_all.res", emit: tsv
 	
-	"""
-	set +u; source activate pipeOne_RnaEditing; set -u
-	if [[ "${reads[0]}"  =~ gz\$|bzip2\$ ]]; then
-		echo "decompressing fastq files ..."
-		zcat  ${reads[0]} > read_1.fq
-		zcat  ${reads[1]} > read_2.fq
-	else
-		echo "ln files ..."
-		ln -s ${reads[0]}  read_1.fq
-		ln -s ${reads[1]}  read_2.fq
-	fi
-	
-	mkdir -m 775 -p tmp
-	sprint main -rp ${sprint_repeat} -c 1 -p ${task.cpus} -1 read_1.fq -2 read_2.fq sprint_index/${sprint_base} tmp bwa samtools
-	#sprint main -rp ${sprint_repeat} -c 1 -p ${task.cpus} -1 ${reads[0]} -2 ${reads[1] } sprint_index/${sprint_base} tmp bwa samtools
-	
-	cp tmp/SPRINT_identified_all.res ${id}.SPRINT_identified_all.res
-	
-	rm read_1.fq read_2.fq
-	if [[ "${params.sprint_tmp}" == "true" ]];then
-		ln -s tmp ${id}
-	else
-		rm -rf tmp
-	fi
-	
-	"""
+	script:
+	if(! params.singleEnd){
+		"""
+		set +u; source activate pipeOne_RnaEditing; set -u
+		if [[ "${reads[0]}"  =~ gz\$|bzip2\$ ]]; then
+			echo "decompressing fastq files ..."
+			zcat  ${reads[0]} > read_1.fq
+			zcat  ${reads[1]} > read_2.fq
+		else
+			echo "ln files ..."
+			ln -s ${reads[0]}  read_1.fq
+			ln -s ${reads[1]}  read_2.fq
+		fi
+		
+		mkdir -m 775 -p tmp
+		sprint main -rp ${sprint_repeat} -c 1 -p ${task.cpus} -1 read_1.fq -2 read_2.fq sprint_index/${sprint_base} tmp bwa samtools
+		#sprint main -rp ${sprint_repeat} -c 1 -p ${task.cpus} -1 ${reads[0]} -2 ${reads[1] } sprint_index/${sprint_base} tmp bwa samtools
+		
+		cp tmp/SPRINT_identified_all.res ${id}.SPRINT_identified_all.res
+		
+		rm read_1.fq read_2.fq
+		if [[ "${params.sprint_tmp}" == "true" ]];then
+			ln -s tmp ${id}
+		else
+			rm -rf tmp
+		fi
+		
+		"""
+	}else if(params.singleEnd){
+		"""
+		set +u; source activate pipeOne_RnaEditing; set -u
+		if [[ "${reads[0]}"  =~ gz\$|bzip2\$ ]]; then
+			echo "decompressing fastq files ..."
+			zcat  ${reads[0]} > read_1.fq
+			
+		else
+			echo "ln files ..."
+			ln -s ${reads[0]}  read_1.fq
+			
+		fi
+		
+		mkdir -m 775 -p tmp
+		sprint main -rp ${sprint_repeat} -c 1 -p ${task.cpus} -1 read_1.fq sprint_index/${sprint_base} tmp bwa samtools
+		#sprint main -rp ${sprint_repeat} -c 1 -p ${task.cpus} -1 ${reads[0]}  sprint_index/${sprint_base} tmp bwa samtools
+		
+		cp tmp/SPRINT_identified_all.res ${id}.SPRINT_identified_all.res
+		
+		rm read_1.fq 
+		if [[ "${params.sprint_tmp}" == "true" ]];then
+			ln -s tmp ${id}
+		else
+			rm -rf tmp
+		fi
+		
+		"""
+
+	}else{
+		println("input reads or configure error!" )
+		println("Your reads: " + reads)
+		println("Your Configure --singleEnd " + params.singleEnd )
+		exit(1)
+	}
 }
 
 params.miniEditing_reads = 10

@@ -30,7 +30,7 @@ process bowtie2_tele {
 		samtools sort -@ 2 - -o ${id}.bowtie2.sortbycoordinate.bam
 		samtools flagstat  ${id}.bowtie2.sortbycoordinate.bam >stat.${id}.log
 		"""
-	}else if (! params.singleEnd && reads.size() == 1 ){
+	}else if ( params.singleEnd ){
 		"""
 		set +u; source activate pipeOne_telescope; set -u
 		bowtie2  -p ${task.cpus} -U ${reads} -x bowtie2_index/${bowtie2_base} \\
@@ -41,7 +41,7 @@ process bowtie2_tele {
 	}else{
 		println("input reads or configure error!" )
 		println("Your reads: " + reads)
-		println("Your Configure ifPaired " + params.singleEnd )
+		println("Your Configure --singleEnd " + params.singleEnd )
 		exit(1)
 	}
 

@@ -116,16 +116,19 @@ workflow GATK {
 	
     main:
     picard_RG_MD( bam )
+	
 	SplitNCigarReads(
 		picard_RG_MD.out,
 		fasta,  
 		fasta_fai,
 		fasta_dict )
+
 	Variant_calling(
 		SplitNCigarReads.out,
 		fasta,  
 		fasta_fai,
 		fasta_dict )
+
 	Variant_filtering(
 		Variant_calling.out,
 		fasta,  

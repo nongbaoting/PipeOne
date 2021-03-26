@@ -42,7 +42,7 @@ docker pull nongbaoting/pipeone:latest
 cd PipeOne/INSTALL
 bash ./install.sh
 ```
-To ensure a successful installation, we recommend that you run each command step by step in a shell script `install.sh`
+To ensure a successful installation, we recommend that you run each command step by step in the shell script `install.sh`
 
 
 
@@ -112,8 +112,8 @@ params {
 
 __building index__
 ```
-main_code_path=/your/path/to/PipeOne/
-nextflow run ${main_code_path}/s1_RNAseq.nf -profile docker --genome hg38 --prepare_ref
+baseDir=/your/path/to/PipeOne/
+nextflow run ${baseDir}/s1_RNAseq.nf -profile docker --genome hg38 --prepare_ref
 ## Delete intermediate files
 rm -rf work result
 ```

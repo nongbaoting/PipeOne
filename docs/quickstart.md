@@ -12,10 +12,7 @@
 	>Extraction code: __8fnl__
 
 
-* Decompress the test data
-`
-7z x  test_dat.7z
-`
+
 
 #### Module 1: RNA-seq processing
 ```
@@ -25,8 +22,8 @@ baseDir=/your/path/to/PipeOne/
 nextflow run ${baseDir}/s1_RNAseq.nf  -resume -profile docker \
         --genome hg38 \
         --reads "../test_dat/s1_RNA-seq/*_{1,2}.fq.gz"
-
 ```
+
 __Results__:
 Tables for different aspects of RNA-seq:
 ```
@@ -46,12 +43,12 @@ snp.geneBase.csv
 ```
 
 #### Module 2: Feature Prioritization
-We use thess test tables as input data. in actual applications, one should use the result table of the previous step as input 
+We use these downloaded test tables as input data. 
+__Note:__ _In real applications, the result tables of the previous step should be used as input_
 
 ```bash
 mkdir s2
 cd s2
-baseDir=/your/path/to/PipeOne/
 nextflow run ${baseDir}/s2_RF.nf -profile docker \
     --rawdir ../test_dat/s2_tables/00_rawdata  \
     --sample_info ../test_dat/s2_tables/s1_sample_info-tumor-normal.csv \
@@ -71,17 +68,16 @@ results/data/discriminative_power_of_topk_feature.csv
 ```bash
 mkdir s3
 cd s3
-baseDir=/your/path/to/PipeOne/
 nextflow run ${baseDir}/s3_Subtype.nf -profile docker \
-	--rawdir ../test_dat/s3_subtype/00_rawdata/ \
+	--rawdir   ../test_dat/s3_subtype/00_rawdata/ \
 	--clinical ../test_dat/s3_subtype/KIRP_cli.OS.csv \
 	--test 
 ```
-Note: parameter `--test` is use for test running only, should not be use in real execution.
+__Note:__  _The parameter `--test` is use for test running only, should not be use in real execution._
 
 __Results__:
 results/record_log_rank_test_pvalue.csv
 
 results/FeatureSelection
 
-__[For detail](../documentation/doc_s1)__
+__[Click for detailed documentation](../documentation/doc_s1)__

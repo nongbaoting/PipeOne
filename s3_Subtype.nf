@@ -17,7 +17,5 @@ log.info Header()
 mkdir_tmp('./tmp')
 
 workflow {
-
     Subtype()
-    
 }

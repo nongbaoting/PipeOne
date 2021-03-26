@@ -1,5 +1,5 @@
 
-__Note: As long as the corresponding input data is provided, these three main modules can be operate independently__
+__Note:__ _As long as the corresponding input data is provided, these three main modules can be operate independently_
 
 ### __Module 1: RNA-seq processing__
 
@@ -33,27 +33,27 @@ Optional:
         6 represent task 'RNAediting',
         7 represent task 'AS',
         8 represent task 'SNP'.
-        user could use the task number or task name, such as '1,2,RetroTrans,Fusion,RNAediting,AS,8'.
---cleaned   true or false. defualt[true]
---singleEnd paired or single. defualt [paired]
+        user could both use the task number or task name, such as '1,2,RetroTrans,Fusion,RNAediting,AS,8'.
+--cleaned   true or false. defualt [true]
+--singleEnd flag indicating singleEnd mode.
 --library   <string>	polyA or total. defualt [polyA]
 --max_cpus  <int>	    number of CPU process for each step. default [24]
 --max_memory    <string>   max max_memory for processing. default [ 128.GB]
 --max_time  <string>   number of hours for program to proceed. default [2400.h]
 --maxForks  <int>	    max forks number of parrallel. default [2]
 --saveIntermediateFiles save intermediate files defualt [off]
---update_GTF    use customized GTF generated in step s1.1_lncRNA.nf instand of GENCODE GTF as input for step: s1.2_circRNA.quant.nf, s1.5_fusion.nf and s1.7_alternative_splicing.nf . defualt [off]
+--update_GTF    use customized GTF generated in step mRNA_lncRNA instand of GENCODE GTF as input for step: circRNA, Fusion and AS. defualt [off]
 -h --help               print usage
 ```
 
 #### Output
 
 * __Files result from different programs applied to RNA-seq__
-    * __s1.*__, results of different submodules
-    * __tables__, all tables from different modal of RNA-seq, which are required in module 2 and module3
+    * __s1.*__, results of different submodules.
+    * __tables__, all tables from different modal of RNA-seq, which are required in module 2 and module 3.
 
 ```bash
--> % tree -L 2 results
+$ tree -L 2 results
 .
 ├── pipeline_info
 │   ├── pipeline_report.html

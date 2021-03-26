@@ -24,6 +24,8 @@ process quant {
 	path "${id}", emit: sample
 	tuple path("${id}/circ/${id}.ciri"), path("${id}/gene/"), path("${id}/${id}.*") 
 	
+	script:
+	if(! params.singleEnd && reads.size() == 2 ){
 	"""
 	set +u; source activate pipeOne_CIRIquant; set -u
 	echo "name: ${params.genome}
@@ -49,6 +51,16 @@ process quant {
           -p ${id} \
 		  --bam ${bam} 
 	"""
+	}else if(params.singleEnd){
+		println("only paired-end reads is work for CIRIquant!" )
+		
+		
+	}else{
+		println("input reads or configure error!" )
+		println("Your reads: " + reads)
+		println("Your Configure --singleEnd " + params.singleEnd )
+		exit(1)
+	}
 }
 
 process merge{

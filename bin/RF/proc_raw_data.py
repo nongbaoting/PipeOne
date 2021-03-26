@@ -192,13 +192,10 @@ class MYRUN_procRaw:
         train_df.to_csv("train_sample_clustering.csv", index=False)
         test_df.to_csv("test_sample_clustering.csv", index=False)
 
-        # myrun = MYRUN_procRaw()
-        # train_dir  = "./data/proc/"
-        # test_dir   = "./data/test_proc/"
-        # myrun.proc(rawdir ,  "train_sample_clustering.csv",  var_topk )
-        # sub_feature_samples(rawdir, train_dir, "test_sample_clustering.csv", test_dir)
-        # os.system(f"cp train_sample_clustering.csv {train_dir}")
+    
 
+            
+           
 
 
 if __name__ == '__main__':

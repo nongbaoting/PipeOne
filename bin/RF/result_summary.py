@@ -5,6 +5,7 @@
 # @email   : 523135753@qq.com'
 import fire, os,re
 import pandas as pd
+from collections import defaultdict
 
 def get_geneName(feature_name, gdict):
     ff = feature_name.split('_')
@@ -43,7 +44,7 @@ class myResult_summary:
         rf_res = pd.read_csv(rf_res_fi)
         ginfo = pd.read_csv(ginfo_fi, sep="\t")
         gg = ginfo[['gene_id', 'gene_name']]
-        from collections import defaultdict
+        
         gdict = defaultdict(str)
         for i in range(len(gg)):
             gene_id = gg.loc[i, 'gene_id']
@@ -59,6 +60,28 @@ class myResult_summary:
 
         imp['gene_name'] = imp['feature'].apply(get_geneName, args=(gdict,))
         imp.sort_values(by = ['weight'], ascending=False).to_csv(out_fi, index=False)
+    
+    def filter_chrM(self, rawdir, geneInfo, outdir):
+        ginfo = pd.read_csv(geneInfo, sep="\t")
+        ginfo_chrM = ginfo[ginfo.chrom == "chrM"]
+        gg = ginfo[['gene_id', 'gene_name']]
+        gdict = defaultdict(str)
+        for i in range(len(gg)):
+            gene_id = gg.loc[i, 'gene_id']
+            gene_id = gene_id.split('.')[0]
+            gene_name = gg.loc[i, 'gene_name']
+            gdict[gene_id] = gene_name
+
+        os.system('mkdir -p %s' % outdir) 
+        for entry in os.scandir(rawdir):
+            print(entry.name)
+            dat = pd.read_csv(entry.path, header=0)
+            dat['gene_name2'] = dat.iloc[:, 0].apply( get_geneName, args=(gdict,) ) 
+            fi_name_out = f'{outdir}/{entry.name}'
+            dat_nochrM = dat[dat.gene_name2.isin( ginfo_chrM.gene_name ) == False ]
+            dat_nochrM = dat_nochrM.drop( columns = ['gene_name2'] )
+            dat_nochrM.to_csv(fi_name_out, index=False )
+
 
 if __name__ == '__main__':
     fire.Fire(myResult_summary)

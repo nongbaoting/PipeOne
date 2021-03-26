@@ -44,10 +44,12 @@ workflow {
 
     // define prepare or run
     if( params.prepare_ref ){
+        
         println("Preparing reference data!")
         Prepare_References()
         
     }else{
+
         println("RNA-seq data processing!")
         gtf     = check_file(params.gtf, '--gtf') 
         ch_reads = input_reads(params.reads, params.singleEnd )
@@ -63,7 +65,7 @@ workflow {
             }
         } 
 
-        if( runList.contains('2') || runList.contains('circRNA' )    ){
+        if( ( runList.contains('2') || runList.contains('circRNA' ) ) && ! params.singleEnd   ){
 
             if( runList.contains('1') || runList.contains('mRNA_lncRNA') ){
                 CircRNA_CIRIquant_bam( reads, mRNA_lncRNA.out.bam, gtf)
