@@ -61,9 +61,14 @@ class myResult_summary:
         imp['gene_name'] = imp['feature'].apply(get_geneName, args=(gdict,))
         imp.sort_values(by = ['weight'], ascending=False).to_csv(out_fi, index=False)
     
-    def filter_chrM(self, rawdir, geneInfo, outdir):
+    def filter_chrM(self, rawdir, geneInfo, outdir, rRNA_Fi = "/dat1/dat/ref/hg38/hg38+gencode.v32/rRNA/rRNA.info"):
         ginfo = pd.read_csv(geneInfo, sep="\t")
+        ginfo_rRNA = pd.read_csv(rRNA_Fi, sep="\t")
         ginfo_chrM = ginfo[ginfo.chrom == "chrM"]
+        ginfo_chrM = ginfo_chrM[['gene_id', 'gene_name']]
+        ginfo_rRNA = ginfo_rRNA[['gene_id', 'gene_name']]
+        ginfo_chrM = ginfo_chrM.append(ginfo_rRNA, ignore_index=True)
+
         gg = ginfo[['gene_id', 'gene_name']]
         gdict = defaultdict(str)
         for i in range(len(gg)):

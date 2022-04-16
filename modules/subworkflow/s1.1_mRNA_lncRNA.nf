@@ -15,7 +15,7 @@ params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : fals
 params.lncpedia_gtf  = params.genome ? params.genomes[ params.genome ].lncpedia_gtf  ?: false : false
 params.genecode_lncRNA_gtf  = params.genome ? params.genomes[ params.genome ].genecode_lncRNA_gtf   ?: false : false
 params.hisat2_idx = params.genome ? params.genomes[ params.genome ].hisat2_index ?:false :false
-
+params.novel_lnc_single_exon_len = 0 // > define a length value (> 200) if want to keep single exon lncRNA
 params.featureCounts = false
 params.saveIntermediateFiles = false
 

@@ -1,4 +1,6 @@
 process salmon_index {
+		label 'local'
+
 		label 'bigCPU'
 		publishDir "${params.outdir_sub}/salmon/salmon_index/", mode: 'link', 
     		saveAs: { filename -> params.saveIntermediateFiles ? "$filename" : null }
@@ -18,8 +20,9 @@ process salmon_index {
 
 process salmon {
 	label 'bigCPU'
+	label 'local'
 
-	publishDir "${params.outdir_sub}/salmon/samples", mode: 'link',
+	publishDir "${params.outdir_sub}/salmon/samples", mode: 'copy',
 		saveAs: { filename -> params.saveIntermediateFiles ? "$filename" : null }
 	
 	tag {id }
@@ -36,14 +39,14 @@ process salmon {
 					
 		"""
 		set +u; source activate pipeOne_lncRNA; set -u
-		salmon quant -i transcripts_index -l A -r $reads -p 8 -o ${id} --gcBias
+		salmon quant -i transcripts_index -l A -r $reads -p $task.cpus -o ${id} --gcBias
 
 		"""
 	}else{
 					
 		"""
 		set +u; source activate pipeOne_lncRNA; set -u
-		salmon quant -i transcripts_index -l A -1 ${reads[0] } -2 ${reads[1] } -p $task.cpus -o ${id} --gcBias
+		salmon quant -i transcripts_index -l A -1 ${reads[0] } -2 ${reads[1] } -p $task.cpus -o ${id} 
 
 		"""
 	}
@@ -51,6 +54,7 @@ process salmon {
 }
 
 process salmon_merge {
+	label 'local'
 	
 	publishDir "${params.outdir_sub}/salmon/", mode: 'link'
 	

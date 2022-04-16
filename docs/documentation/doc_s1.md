@@ -34,7 +34,7 @@ Optional:
         7 represent task 'AS',
         8 represent task 'SNP'.
         user could both use the task number or task name, such as '1,2,RetroTrans,Fusion,RNAediting,AS,8'.
---cleaned   true or false. defualt [true]
+--cleaned   flag indicating input reads is cleaned or not. defualt [false]
 --singleEnd flag indicating singleEnd mode.
 --library   <string>	polyA or total. defualt [polyA]
 --max_cpus  <int>	    number of CPU process for each step. default [24]

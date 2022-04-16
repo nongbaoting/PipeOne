@@ -33,7 +33,7 @@ process hisat2 {
             """
 			set +u; source activate pipeOne_lncRNA; set -u
             hisat2 -p $task.cpus --dta  $rnastrandness  -x hisat2_index/$hisat2_base \
-            -1 ${reads[0]} -2 ${reads[1]}   2> ${id}.hisat2.log | samtools sort -@ 8 - -o ${id}.hisat2.sortbycoordinate.bam 
+            -1 ${reads[0]} -2 ${reads[1]}   2> ${id}.hisat2.log | samtools sort -@ 2 - -o ${id}.hisat2.sortbycoordinate.bam 
             samtools index ${id}.hisat2.sortbycoordinate.bam
 			conda deactivate
             """
@@ -42,7 +42,7 @@ process hisat2 {
             """
 			set +u; source activate pipeOne_lncRNA; set -u
             hisat2 -p $task.cpus --dta  $rnastrandness -x  hisat2_index/$hisat2_base \
-            -U  ${reads}   2> ${id}.hisat2.log  | samtools sort -@ 8 - -o ${id}.hisat2.sortbycoordinate.bam
+            -U  ${reads}   2> ${id}.hisat2.log  | samtools sort -@ 2 - -o ${id}.hisat2.sortbycoordinate.bam
             samtools index ${id}.hisat2.sortbycoordinate.bam
 			conda deactivate
             """

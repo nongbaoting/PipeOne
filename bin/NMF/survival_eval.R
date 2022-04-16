@@ -8,9 +8,9 @@ cli_fi = argv[1]
 outdir = argv[2]
 cluster_range = argv[3]
 
-alpha <- c(0.01, 0.02, 0.1, 1, 5)
-gamma <- c(0, 0.1, 1, 10, 100)
-low_dim <- c(2, 3, 4, 5, 6, 7)
+alpha <- c(0.01, 0.02, 0.1, 1, 5 )
+gamma <- c(0, 0.1, 1, 10, 100 )
+low_dim <- c(2, 3, 4, 5, 6, 7 )
 # cluster_num = c(2, 3, 4, 5, 6, 7, 8)
 cr = as.numeric(str_split(cluster_range, '-', simplify=T) )
 cluster_num = seq(cr[1], cr[2] )

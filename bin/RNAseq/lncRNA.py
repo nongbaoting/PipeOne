@@ -126,7 +126,7 @@ class MYRUN:
         fo_coding.close()
 
 
-    def gffcompare_tmap(self, tmap, out):
+    def gffcompare_tmap(self, tmap, out, single_exon = 0):
         mytx = defaultdict(list)
         mygene_not = defaultdict(int)
         mygene_len  = defaultdict(int)
@@ -148,6 +148,7 @@ class MYRUN:
                 mygene_exon[qry_gene_id] = max(mygene_exon[qry_gene_id], num_exons )
 
                 mytx[qry_id] = [qry_gene_id, class_code, int(num_exons), int(tx_len) ]
+            
             ## get multi-exons lncRNAs or single exon length >= 2000	
             for tx_id in mytx:
                 gene_id, class_code, num_exons, tx_len = mytx[tx_id]
@@ -158,12 +159,16 @@ class MYRUN:
                 max_exon = mygene_exon[gene_id]
                 max_len  = mygene_len[gene_id]
                 ok = 0
-                if max_exon >1:
-                    ok = 1
 
-                else:
-                    if max_len > 2000 and class_code == "u":
-                        ok =1
+                ## max exon for tx_id
+                if num_exons > 1: ok = 1
+
+                ## max exon for gene
+                # if num_exons > 1:
+                #     ok = 1
+                # elif single_exon >200:
+                #     if num_exons > single_exon and class_code == "u":
+                #         ok =1
 
                 if ok :
                     fo.write('\t'.join( [tx_id, gene_id, class_code,

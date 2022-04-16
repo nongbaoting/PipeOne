@@ -26,7 +26,7 @@ process gffcompare{
 	gffcompare -r all.gtf assembly.gtf 
 
 	## get multi-exons lncRNAs or single exon length >= 2000	
-	python3 ${baseDir}/bin/RNAseq/lncRNA.py gffcompare_tmap gffcmp.assembly.gtf.tmap novel_lncRNA_candidate.list
+	python3 ${baseDir}/bin/RNAseq/lncRNA.py gffcompare_tmap gffcmp.assembly.gtf.tmap novel_lncRNA_candidate.list ${params.novel_lnc_single_exon_len}
 	
 	python3 ${baseDir}/bin/RNAseq/gtf.py get_by_trans_id assembly.gtf novel_lncRNA_candidate.list novel_lncRNA_candidate.gtf
 	gffread novel_lncRNA_candidate.gtf -g ${fasta} -w novel_lncRNA_candidate.fa -W
